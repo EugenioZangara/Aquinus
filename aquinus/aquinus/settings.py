@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -144,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-la'
 
 TIME_ZONE = 'UTC'
 
@@ -171,6 +172,14 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-LOGIN_URL = 'login'  # URL para la página de login
+LOGIN_URL = 'usuarios:login'  # URL para la página de login
 LOGIN_REDIRECT_URL = '/'  # URL a la que se redirige después del login exitoso
-LOGOUT_REDIRECT_URL = 'login'  # URL a la que se redirige después del logout
+LOGOUT_REDIRECT_URL = 'usuarios:login'  # URL a la que se redirige después del logout
+
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'alert-secondary',  # Puedes usar 'alert-secondary' para debug
+    message_constants.INFO: 'alert-info',        # Para mensajes de info
+    message_constants.SUCCESS: 'alert-success',  # Para mensajes de éxito
+    message_constants.WARNING: 'alert-warning',  # Para advertencias
+    message_constants.ERROR: 'alert-danger',     # Para errores
+}

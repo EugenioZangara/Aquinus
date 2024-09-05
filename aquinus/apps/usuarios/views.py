@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.contrib import messages
+
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from .models import Perfil
@@ -15,7 +17,7 @@ class UsuarioPerfilCreateView(CreateView):
     model = User
     form_class = UserForm
     template_name = 'usuarios/create_user.html'
-    success_url = reverse_lazy('/')
+    success_url = reverse_lazy('home')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,8 +36,12 @@ class UsuarioPerfilCreateView(CreateView):
             user = form.save()
             # Asignar el usuario al perfil y guardar el perfil
             perfil = perfil_form.save(commit=False)
-            perfil.user = user
+            perfil.usuario = user
             perfil.save()
+            # Mensaje de éxito
+            messages.success(self.request, 'Usuario y perfil creados con éxito.')
             return super().form_valid(form)
         else:
+            # Mensaje de error
+            messages.error(self.request, 'Hubo un error al crear el usuario o el perfil. Verifica los datos e inténtalo de nuevo.')
             return self.form_invalid(form)
