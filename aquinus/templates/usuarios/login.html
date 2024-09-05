@@ -1,0 +1,98 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aquinus</title>
+
+    <!-- Meta -->
+    <meta name="description" content="Marketplace for Bootstrap Admin Dashboards" />
+    <meta name="author" content="Bootstrap Gallery" />
+    <link rel="canonical" href="https://www.bootstrap.gallery/">
+    <meta property="og:url" content="https://www.bootstrap.gallery">
+    <meta property="og:title" content="Aquinus">
+    <meta property="og:description" content="Marketplace for Bootstrap Admin Dashboards">
+    <meta property="og:type" content="Website">
+    <meta property="og:site_name" content="Aquinus">
+    <link rel="shortcut icon" href="{% static 'assets/images/aquinus-logo-2.png' %}" />
+
+    <!-- *************
+			************ CSS Files *************
+		************* -->
+    <!-- Icomoon Font Icons css -->
+    <link rel="stylesheet" href="{% static 'assets/fonts/icomoon/style.css' %}" />
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'assets/css/main.min.css' %}" />
+  </head>
+
+  <body class="login-bg">
+    <!-- Container start -->
+    <div class="container p-0">
+      <!-- Row start -->
+      <div class="row g-0">
+        <div class="col-xl-6 col-lg-12"></div>
+        <div class="col-xl-6 col-lg-12">
+          <!-- Row start -->
+          {% if form.errors %}
+          <p>
+            Your username and password didn't match.
+            Please try again.
+          </p>
+       
+        {% endif %}
+          <div class="row align-items-center justify-content-center">
+            <div class="col-xl-8 col-sm-4 col-12">
+              <form action="{%url 'login'%}" class="my-5" method="post">
+                
+                {% csrf_token %}
+                <div class="bg-white p-5 rounded-4">
+                  <div class="login-form">
+                    <a href="index.html" class="mb-3 d-flex">
+                      <img src="{% static 'assets/images/logo_aquinos_con_texto.svg' %}" class="img-fluid login-logo" alt="Aquinus" />
+                    </a>
+                    <h2 class="mt-4 mb-4">Acceso</h2>
+                    <div class="mb-3">
+                      <label class="form-label">Nombre de Usuario</label>
+                      {{form.username}}
+                    
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Password</label>
+                      <div class="input-group">
+                        {{form.password}}
+                        
+                        <a href="#" class="input-group-text">
+                          <i class="icon-eye"></i>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                      
+                      <a href="forgot-password.html" class="text-primary text-decoration-underline">Olvidó la Contraseña?</a>
+                    </div>
+                    <div class="d-grid py-3 mt-3 gap-3">
+                      <button type="submit" class="btn btn-lg btn-primary">
+                        INGRESAR
+                      </button>
+                      
+                      <a href="signup.html" class="btn btn-lg btn-outline-dark">
+                        REGISTRARSE
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- Row end -->
+        </div>
+      </div>
+      <!-- Row end -->
+    </div>
+    <!-- Container end -->
+  </body>
+
+</html>

@@ -1,0 +1,92 @@
+{% extends "main.html" %}
+{%load static%}
+
+{%block main_content1%}
+
+   <!-- Row start -->
+<div class="row gx-3">
+    <div class="col-xxl-12">
+      <div class="card mb-3">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+            <div class="custom-tabs-container">
+            
+            
+                <!-- Row start -->
+               
+                <div class="row gx-3">
+                  
+                  <div class="col-sm-8 col-12">
+                    <div class="row gx-3">
+                      <div class="col-6">
+                        <!-- Form Field Start -->
+                        <div class="mb-3">
+                          <label for="nombre" class="form-label">Nombre/s</label>
+                         {{form.first_name}}
+                        </div>
+
+                        <!-- Form Field Start -->
+                        <div class="mb-3">
+                          <label for="apellido" class="form-label">Apellido</label>
+                          {{form.last_name}}
+                        </div>
+                        <!-- Form Field Start -->
+                        <div class="mb-3">
+                            <label for="dni" class="form-label">D.N.I.</label>
+                            {{perfil_form.dni}}
+                          </div>
+                           <!-- Form Field Start -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            {{form.email}}
+                          </div>
+                      </div>
+                      <div class="col-6">
+                           <!-- Form Field Start -->
+                           <div class="mb-3">
+                            <label for="username" class="form-label">Nombre de Usuario</label>
+                            {{form.username}}
+                          </div>
+
+                        <!-- Form Field Start -->
+                        <div class="mb-3">
+                          <label for="password1" class="form-label">Contraseña</label>
+                          {{form.password1}}
+                        </div>
+                   
+
+                        <!-- Form Field Start -->
+                        <div class="mb-3">
+                            <label for="password2" class="form-label">Confirmar Contraseña</label>
+                            {{form.password2}}
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit">Crear Usuario</button>
+            
+                <!-- Row end -->
+           
+             
+            <div class="d-flex gap-2 justify-content-end">
+              <button type="button" class="btn btn-outline-secondary">
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">
+               Crear Usuario
+              </button>
+            </div>
+        </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Row end -->
+
+
+{% endblock main_content1%}
