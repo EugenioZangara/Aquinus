@@ -18,33 +18,49 @@ class CustomLoginForm(AuthenticationForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'})
     )
 
+
 class UserEditForm(forms.ModelForm):
     class Meta:
             model = User
-            fields = ['first_name', 'last_name', 'email']
+            fields = ['username','first_name', 'last_name', 'email']
+            widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'}),
+            
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre/s'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido/s'}),
+        }
             
 class PerfilEditForm(forms.ModelForm):
     class Meta:
             model = Perfil
             fields = ['dni', 'es_profesor', 'puede_calificar']
-            
+            widgets = {
+            'dni': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de DNI (sin puntos)'}),
+            'es_profesor': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'puede_calificar': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
             
             
 
 
-class UserForm(UserCreationForm):
+class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'password1', 'password2', 'email', 'first_name', 'last_name',]
+        fields = ['username', 'email', 'first_name', 'last_name']
         
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
-            'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirmar contraseña'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre/s'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido/s'}),
         }
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+        return user
 
 class PerfilForm(forms.ModelForm):
     class Meta:

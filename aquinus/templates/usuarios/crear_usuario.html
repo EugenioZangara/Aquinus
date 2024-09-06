@@ -16,7 +16,7 @@
                   <!-- Form Field Start -->
                   <div class="mb-3">
                     <label for="nombre" class="form-label">Nombre/s</label>
-                    {{form.first_name}}
+                    {{form.first_name}} 
                   </div>
                   <!-- Form Field Start -->
                   <div class="mb-3">
@@ -26,7 +26,8 @@
                   <!-- Form Field Start -->
                   <div class="mb-3">
                     <label for="dni" class="form-label">D.N.I.</label>
-                    {{perfil_form.dni}}{{perfil_form.dni.errors}}
+                    {{perfil_form.dni}}
+                    <div class="text-danger">{{ perfil_form.dni.errors }}</div>
                   </div>
                   <!-- Form Field Start -->
                   <div class="mb-3">
@@ -56,18 +57,7 @@
                     >
                     {{form.username}} {{form.username.errors}}
                   </div>
-                  <!-- Form Field Start -->
-                  <div class="mb-3">
-                    <label for="password1" class="form-label">Contraseña</label>
-                    {{form.password1}}{{form.password1.errors}}
-                  </div>
-                  <!-- Form Field Start -->
-                  <div class="mb-3">
-                    <label for="password2" class="form-label"
-                      >Confirmar Contraseña</label
-                    >
-                    {{form.password2}} {{form.password2.errors}}
-                  </div>
+                 
                 </div>
               </div>
               <div class="d-flex gap-2 justify-content-end">

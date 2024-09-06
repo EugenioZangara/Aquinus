@@ -1,0 +1,12 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block main_content1 %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Cambiar contraseña</button>
+</form>
+
+{% endblock main_content1 %}

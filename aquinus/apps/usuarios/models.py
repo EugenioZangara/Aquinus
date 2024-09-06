@@ -16,9 +16,10 @@ class Perfil(models.Model):
         ])
     es_profesor=models.BooleanField(default=False)
     puede_calificar=models.BooleanField(default=False)
-    
+    debe_cambiar_contraseña = models.BooleanField(default=True)  # Este campo controla si debe cambiar la contraseña
+
 
     
     
     def __str__(self):
-        return f'Perfil de {self.user.username}'
+        return f'Perfil de {self.usuario.username}'

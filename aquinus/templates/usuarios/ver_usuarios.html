@@ -41,9 +41,10 @@
             </td>
             <td>
              
-            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Modificar" aria-describedby="tooltip599725">
+              <a href="{% url 'usuarios:modificar_usuario' usuario.pk %}" class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Modificar" aria-describedby="tooltip599725">
                 <i class="icon-edit"></i>
-              </button>
+            </a>
+            
           
               <form action="{% url 'usuarios:eliminar_usuario' usuario.pk %}" method="post" style="display: inline-block;">
                 {% csrf_token %}

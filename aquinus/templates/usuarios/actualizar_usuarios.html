@@ -1,0 +1,43 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block main_content1 %}
+
+<h2>Actualizar Usuario</h2>
+<form method="post">
+  {% csrf_token %}
+  
+  <!-- Renderizar los campos de user_form manualmente -->
+  {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      
+      <!-- Mostrar errores del campo -->
+      {% if field.errors %}
+        <div class="text-danger">
+          {{ field.errors|striptags }}
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <!-- Renderizar los campos de perfil_form manualmente -->
+  {% for field in perfil_form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+
+      <!-- Mostrar errores del campo -->
+      {% if field.errors %}
+        <div class="text-danger">
+          {{ field.errors|striptags }}
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary">Guardar cambios</button>
+</form>
+
+{% endblock main_content1 %}
