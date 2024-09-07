@@ -3,6 +3,8 @@ from django import forms
 from django.forms import IntegerField
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import PasswordChangeForm
+
 from .models import Perfil
 from django.contrib.auth.forms import UserCreationForm
 
@@ -71,3 +73,24 @@ class PerfilForm(forms.ModelForm):
             'es_profesor': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'puede_calificar': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+        
+class CustomPasswordChangeForm(PasswordChangeForm):
+    class Meta:
+        model = User  # El modelo de usuario si es necesario
+        fields = ['old_password', 'new_password1', 'new_password2']  # Campos que quieres usar
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Personalizar widgets
+        self.fields['old_password'].widget = forms.PasswordInput(attrs={
+            'class': 'form-control', 
+            'placeholder': 'Contraseña actual'
+        })
+        self.fields['new_password1'].widget = forms.PasswordInput(attrs={
+            'class': 'form-control', 
+            'placeholder': 'Nueva contraseña'
+        })
+        self.fields['new_password2'].widget = forms.PasswordInput(attrs={
+            'class': 'form-control', 
+            'placeholder': 'Confirmar nueva contraseña'
+        })

@@ -10,7 +10,7 @@ from django.contrib.auth.views import LoginView
 from django.views.generic import CreateView, ListView, UpdateView, FormView
 from django.views import View
 
-from .forms import CustomLoginForm, UserForm, PerfilForm, UserEditForm, PerfilEditForm
+from .forms import CustomLoginForm, UserForm, PerfilForm, UserEditForm, PerfilEditForm, CustomPasswordChangeForm
 
 # Vista personalizada de inicio de sesión.
 class CustomLoginView(LoginView):
@@ -31,6 +31,7 @@ class UsuarioPerfilCreateView(CreateView):
         Si es un POST, usa los datos enviados, de lo contrario, inicializa el formulario vacío.
         """
         context = super().get_context_data(**kwargs)
+        context['active_tab']="usuarios"
         if self.request.POST:
             context['perfil_form'] = PerfilForm(self.request.POST)  # Formulario de perfil con datos enviados.
         else:
@@ -74,7 +75,12 @@ class UserListView(ListView):
     model = User
     template_name = "usuarios/ver_usuarios.html"
     context_object_name = 'usuarios'
-
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab']="usuarios"
+      
+        return context
     def get_queryset(self):
         # Hacemos un select_related para traer el perfil asociado al usuario
         # Filtramos solo los usuarios que están activos (is_active=True)
@@ -113,6 +119,7 @@ class UserUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Obtener el perfil asociado al usuario
+        context['active_tab']="usuarios"
         perfil = Perfil.objects.get(usuario=self.get_object())
         
         # Si 'user_form' y 'perfil_form' no están en kwargs, crearlos
@@ -146,7 +153,7 @@ class UserUpdateView(UpdateView):
 
 class CambiarContrasenaView(FormView):
     template_name = 'usuarios/cambiar_contrasena.html'  # Tu plantilla HTML para el cambio de contraseña
-    form_class = PasswordChangeForm
+    form_class = CustomPasswordChangeForm
     success_url = reverse_lazy('home')  # Redirigir a esta URL después del cambio
 
     def get_form_kwargs(self):

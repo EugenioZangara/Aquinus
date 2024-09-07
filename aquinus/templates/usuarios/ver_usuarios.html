@@ -1,4 +1,22 @@
-{% extends "main.html" %} {%load static%} {%block main_content1%}
+{% extends "main.html" %} {%load static%} 
+
+
+{% block breadcrumb %}
+                
+                
+<ol class="breadcrumb mb-3">
+  <li class="breadcrumb-item">
+    <i class="icon-house_siding lh-1"></i>
+    <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
+  </li>
+  <li class="breadcrumb-item">Gestión de Usuarios</li>
+  <li class="breadcrumb-item">Ver Usuarios</li>
+</ol>
+
+{% endblock breadcrumb %}
+<!-- Breadcrumb end -->
+
+{%block main_content1%}
 
 <div class="card mb-3">
   <div class="card-header">

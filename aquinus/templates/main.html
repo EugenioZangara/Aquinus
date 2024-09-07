@@ -247,7 +247,7 @@
                 </button>
               </div>
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item dropdown active-link">
+                <li class="nav-item dropdown {% if active_tab == 'cursos' %}active-link{% endif %}">
                   <a
                     class="nav-link dropdown-toggle"
                     href="#"
@@ -270,7 +270,7 @@
                     </li>
                   </ul>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown {% if active_tab == 'profesores' %}active-link{% endif %}">
                   <a
                     class="nav-link dropdown-toggle"
                     href="#"
@@ -298,7 +298,7 @@
                     </li>
                   </ul>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown {% if active_tab == 'planes_estudio' %}active-link{% endif %}">
                   <a
                     class="nav-link dropdown-toggle"
                     href="#"
@@ -332,7 +332,7 @@
                   </ul>
                 </li>
 
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown {% if active_tab == 'materias' %}active-link{% endif %}">
                   <a
                     class="nav-link dropdown-toggle"
                     href="#"
@@ -356,7 +356,7 @@
                   </ul>
                 </li>
 
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown {% if active_tab == 'definir_fechas' %}active-link{% endif %}">
                   <a
                     class="nav-link dropdown-toggle"
                     href="#"
@@ -395,7 +395,7 @@
                   </ul>
                 </li>
 
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown {% if active_tab == 'usuarios' %}active-link{% endif %}">
                   <a
                     class="nav-link dropdown-toggle"
                     href="#"
@@ -422,16 +422,7 @@
                         <span>Ver Usuarios</span>
                       </a>
                     </li>
-                    <li>
-                      <a class="dropdown-item" href="signup.html">
-                        <span>Modificar</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="forgot-password.html">
-                        <span>Eliminar</span>
-                      </a>
-                    </li>
+                    
                   </ul>
                 </li>
               </ul>
@@ -448,6 +439,10 @@
             <div class="row gx-3">
               <div class="col-12 col-xl-6">
                 <!-- Breadcrumb start -->
+
+                {% block breadcrumb %}
+                
+                
                 <ol class="breadcrumb mb-3">
                   <li class="breadcrumb-item">
                     <i class="icon-house_siding lh-1"></i>
@@ -456,7 +451,10 @@
                   <li class="breadcrumb-item">Dashboards</li>
                   <li class="breadcrumb-item">Analytics</li>
                 </ol>
+                
+                {% endblock breadcrumb %}
                 <!-- Breadcrumb end -->
+                
               </div>
             </div>
             <!-- Row end -->
