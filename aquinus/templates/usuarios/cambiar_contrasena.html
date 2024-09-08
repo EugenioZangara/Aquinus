@@ -1,30 +1,26 @@
-{% extends "main.html" %}
-{% load static %}
-
-{% block main_content1 %}
- <!-- Row start -->
- <div class="row align-items-center justify-content-center">
-    <div class="col-xl-6 col-sm-4 col-12">
- <div class="row gx-3">
-    <div class="col-12">
-      <div class="card mb-3">
-        <div class="card-header">
-          <h5 class="card-title">Debe cambiar su contraseña</h5>
-        </div>
-        <div class="card-body">
+{% extends "main.html" %} {% load static %} {% block main_content1 %}
+<!-- Row start -->
+<div class="row align-items-center justify-content-center">
+  <div class="col-xl-6 col-sm-4 col-12">
+    <div class="row gx-3">
+      <div class="col-12">
+        <div class="card mb-3">
+          <div class="card-header">
+            <h5 class="card-title">Debe cambiar su contraseña</h5>
+          </div>
+          <div class="card-body">
             <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-lg btn-primary">Cambiar contraseña</button>
+              {% csrf_token %} {{ form.as_p }}
+              <button type="submit" class="btn btn-lg btn-primary">
+                Cambiar contraseña
+              </button>
             </form>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
 </div>
-</div>
-  <!-- Row end -->
-
+<!-- Row end -->
 
 {% endblock main_content1 %}

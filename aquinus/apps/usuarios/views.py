@@ -59,14 +59,10 @@ class UsuarioPerfilCreateView(CreateView):
             perfil.usuario = user  # Relacionar el perfil con el usuario creado.
             perfil.save()  # Guardar el perfil.
             # Mensaje de éxito
-            print("valido")
             messages.success(self.request, 'Usuario y perfil creados con éxito.')
             return super().form_valid(form)  # Redirige a la URL de éxito.
         else:
             # Mensaje de error en caso de datos inválidos.
-            print("INvalido")
-            print(form.errors)
-            print(perfil_form.errors)
             messages.error(self.request, 'Hubo un error al crear el usuario o el perfil. Verifica los datos e inténtalo de nuevo.')
             return self.form_invalid(form)  # Redirige a la misma página mostrando los errores.
 
