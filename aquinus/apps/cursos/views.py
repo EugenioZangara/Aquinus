@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
+
 
 from .models import Materia
-from django.views.generic import CreateView, ListView, DeleteView
-from .forms import MateriaForm
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView
+from .forms import MateriaForm, MateriaEditForm
 # Create your views here.
 
 class MateriaCreateView(CreateView):
@@ -32,7 +34,29 @@ class MateriaListView(ListView):
         context['active_tab']="materias"   
         return context
     
-class MateriaDeleteView(DeleteView):
+class MateriaDeleteView(SuccessMessageMixin,DeleteView):
     model = Materia
-    success_url = reverse_lazy('cursos:ver_materias')  # Redirigir a la lista de materias después de eliminar
+    success_url = reverse_lazy('cursos:ver_materias')  
+    success_message = "La materia %(nombre)s ha sido eliminada exitosamente."
+
+    # Este método se asegura de pasar el objeto al success_message
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            nombre=self.object.nombre
+        )
+
+class MateriaUpdateView(SuccessMessageMixin, UpdateView):
+    model = Materia
+    template_name = "cursos/modificar_materia.html"
+    form_class = MateriaForm
+    success_url = reverse_lazy('cursos:ver_materias') 
+    success_message = "La materia %(nombre)s ha sido modificada exitosamente."
+
     
+    # Este método se asegura de pasar el objeto al success_message
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            nombre=self.object.nombre
+        )
