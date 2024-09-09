@@ -71,19 +71,28 @@
                 <i class="icon-edit"></i>
               </a>
 
-            <a
-                class="btn btn-outline-danger btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#deleteModal"
-                data-plan-estudio-id="{{ plan.id }}"
-                data-plan-estudio-nombre="{{ plan.especialidad }}"
-                data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip-primary"
-                 aria-describedby="tooltip599725"
-    title="Eliminar"  
-              > 
-                <i class="icon-trash"></i>
-              </button>
+
+<!-- Contenedor para el tooltip -->
+<span
+    data-bs-toggle="tooltip"
+    data-bs-placement="top"
+    data-bs-custom-class="custom-tooltip-primary"
+    title="Eliminar"
+    class="tooltip-wrapper"
+>
+    <a
+        class="btn btn-outline-danger btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#deleteModal"
+        data-plan-estudio-id="{{ plan.id }}"
+        data-plan-estudio-nombre="{{ plan.especialidad }}"
+    >
+        <i class="icon-trash"></i>
+    </a>
+</span>
+
+
+           
             </td>
           </tr>
           {%endfor%}
