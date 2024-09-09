@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from django.db.models import Q
+
 from django.contrib.auth.models import User  # Importa el modelo User
 
 from apps.alumnos.models import persona
@@ -35,10 +37,27 @@ class Materia(models.Model):
     
 class PlanEstudio(models.Model):
     especialidad=models.CharField(max_length=10)
-    materias=models.ManyToManyField(Materia, related_name='materias_plan_de_estudio')
+    materias=models.ManyToManyField(Materia, related_name='materias_plan_de_estudio',help_text="Materias asociadas al plan de estudio")
     anio=models.IntegerField(validators=[validate_four_digits],  # Aplica la validación personalizada
-        help_text='Ingrese el año del plan de estudio.')
+        )
     vigente=models.BooleanField(default=True)
+    
+    class Meta:
+        constraints = [
+            # Garantiza que la combinación de especialidad y año sea única
+            models.UniqueConstraint(fields=['especialidad', 'anio'], name='unique_especialidad_anio'),
+        ]
+
+    def clean(self):
+        # Validar que solo haya un plan vigente por especialidad
+        if self.vigente:
+            # Busca otros planes de estudio de la misma especialidad que estén vigentes
+            planes_vigentes = PlanEstudio.objects.filter(especialidad=self.especialidad, vigente=True)
+            if self.pk:  # Si estamos actualizando un objeto existente, excluimos este objeto de la búsqueda
+                planes_vigentes = planes_vigentes.exclude(pk=self.pk)
+            if planes_vigentes.exists():
+                raise ValidationError(f'Ya existe un plan de estudio vigente para la especialidad {self.especialidad}.')
+
     def __str__(self):
         return self.especialidad
     

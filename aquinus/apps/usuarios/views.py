@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash

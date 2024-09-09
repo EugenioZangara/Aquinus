@@ -1,0 +1,207 @@
+{% extends "main.html" %} {%load static%} {% block breadcrumb %}
+
+<ol class="breadcrumb mb-3">
+  <li class="breadcrumb-item">
+    <i class="icon-house_siding lh-1"></i>
+    <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
+  </li>
+  <li class="breadcrumb-item">Plan de Estudio</li>
+  <li class="breadcrumb-item">Ver Planes de Estudio</li>
+</ol>
+
+{% endblock breadcrumb %}
+<!-- Breadcrumb end -->
+
+{%block main_content1%}
+
+<div class="card mb-3">
+  <div class="card-header">
+    <div class="card-title">Listado de Materias</div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table id="highlightRowColumn" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Especialidad</th>
+            <th>Abreviatura</th>
+            <th>Año del plan de Estudio</th>
+            <th>Materias</th>
+            
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for plan in planes %}
+          <tr>
+            <td>{{plan.especialidad}}</td>
+            <td></td>
+            <td>{{plan.anio}}</td>
+            <td>
+                {%for materia in plan.materias.all%}
+                {{materia}}
+            {%endfor%}</td>
+          
+            <td></td>
+
+            <td>
+                <a
+                href="#"
+                class="btn btn-outline-info btn-sm"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip-primary"
+                data-bs-title="Detalles"
+                aria-describedby="tooltip599725"
+              > 
+                <i class="icon-eye"></i>
+              </a>
+
+
+
+             <a
+                href="{%url 'cursos:modificar_plan_estudio' plan.pk %}"
+                class="btn btn-outline-primary btn-sm"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip-primary"
+                data-bs-title="Modificar"
+                aria-describedby="tooltip599725"
+              > 
+                <i class="icon-edit"></i>
+              </a>
+
+            <a
+                class="btn btn-outline-danger btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteModal"
+                data-plan-estudio-id="{{ plan.id }}"
+                data-plan-estudio-nombre="{{ plan.especialidad }}"
+                data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip-primary"
+                 aria-describedby="tooltip599725"
+    title="Eliminar"  
+              > 
+                <i class="icon-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {%endfor%}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- Card end -->
+
+<!-- MODAL -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalSmLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Eliminar Plan de Estudio</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Está a punto de eliminar el Plan de Estudio de la Especialidad <strong><span id="planEstudioNombre"></span></strong>.
+          El plan de estudio dejará de estar vigente, y deberá crear uno nuevo para la especialidad. Desea continuar?
+        </p>
+      </div>
+      <div class="modal-footer flex-column">
+        <form
+          method="POST"
+          action="{% url 'cursos:eliminar_plan_estudio' 0 %}"
+          id="deleteForm"
+        >
+          {% csrf_token %}
+          <input type="hidden" name="plan_estudio_id" id="plan_estudioId" />
+          <button type="submit" class="btn btn-lg btn-danger w-100 mx-0 mb-2">
+            Eliminar Plan de Estudio
+          </button>
+          <button
+            type="button"
+            class="btn btn-lg btn-secondary w-100 mx-0"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%endblock main_content1%} {% block scripts %}
+<script src="{% static 'assets/vendor/datatables/dataTables.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/dataTables.bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/custom/custom-datatables.js' %}"></script>
+<!-- DataTable Buttons -->
+<script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/jszip.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/pdfmake.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/vfs_fonts.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/buttons.print.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/buttons.colVis.min.js' %}"></script>
+
+<!-- Custom JS files -->
+
+<script src="{% static 'assets/js/custom.js' %}"></script>
+
+
+<!-- pasar al modal el id de la materia seleccionada, para ser eliminada -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Selecciona todos los elementos con tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        
+        // Inicializa los tooltips
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl, {
+                'customClass':  'custom-tooltip-primary',
+             'placement':  'top',
+                'aria-describedby':"tooltip599725",
+            });
+        });
+    });
+    
+    
+
+
+
+
+    const deleteModal = document.getElementById('deleteModal');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+      // Botón que activó el modal
+      const button = event.relatedTarget;
+  
+      // Extraer la información de los atributos data-
+      const planEstudioId = button.getAttribute('data-plan-estudio-id');
+      const planEstudioNombre = button.getAttribute('data-plan-estudio-nombre');
+  
+      // Actualizar el contenido del modal
+      const planEstudioNombreElement = document.getElementById('planEstudioNombre');
+      planEstudioNombreElement.textContent = planEstudioNombre;
+  
+      // Actualizar la acción del formulario con el ID de la materia
+      const deleteForm = document.getElementById('deleteForm');
+      deleteForm.action = `{% url 'cursos:eliminar_plan_estudio' 0 %}`.replace('0', planEstudioId);
+      document.getElementById('plan_estudioId').value = planEstudioId;
+    });
+  </script>
+  
+
+{% endblock scripts %}
