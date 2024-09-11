@@ -1,0 +1,12 @@
+{%load static%}{% load custom_filters %}
+
+{% for alumno in alumnos%}
+<tr class="odd">
+    <td class="sorting_1">{{alumno.grado|convertirGrado}}</td>
+    <td>{{alumno.dni}}</td>
+    <td>{{alumno.apellidos}}</td>
+    <td>{{alumno.nombres}}</td>
+    <td>bton Agregar</td>
+  
+  </tr>
+  {%endfor%}

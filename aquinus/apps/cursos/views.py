@@ -4,11 +4,11 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 
 
-from .models import Materia, PlanEstudio
-from django.views.generic import CreateView, ListView, DeleteView, UpdateView
+from .models import Materia, PlanEstudio ,Curso, Cursante
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from django.views import View
 
-from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm
+from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm
 # Create your views here.
 
 class MateriaCreateView(CreateView):
@@ -81,6 +81,15 @@ class PlanEstudioCreateView(CreateView):
         messages.success(self.request, f"Se ha creado el plan de estudio para la especialidad {especialidad} exitosamente.")
         return response
     
+    def form_invalid(self, form):
+        print(form)
+        # Imprimir los errores del formulario en la consola
+        print("Formulario inválido. Errores:", form.errors)
+        # También puedes registrar los errores usando logging
+        # Mostrar mensaje de error en la página
+        messages.error(self.request, "Ocurrió un error al crear el plan de estudio. Por favor, revisa los datos ingresados.")
+        return super().form_invalid(form)
+    
 class PlanEstudioListView(ListView):
     model = PlanEstudio
     template_name = "cursos/planes_estudio/ver_planes_estudio.html"
@@ -125,3 +134,17 @@ class DeletePlanEstudio(View):
         messages.success(self.request, 'Plan de estudio eliminado con éxito.')
         # Redirigir a la URL definida en success_url
         return redirect(self.success_url)
+    
+class PlanEstudioDetailView(DetailView):
+    model = PlanEstudio
+    template_name = "cursos/planes_estudio/detalles.html"
+    context_object_name='plan_de_estudio'
+
+
+class CursoCreateView(CreateView):
+    model = Curso
+    template_name = "cursos/cursos/crear_curso.html"
+    success_url=reverse_lazy('home')
+    form_class=CursoCreateForm
+    
+    

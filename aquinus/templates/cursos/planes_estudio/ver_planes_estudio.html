@@ -27,7 +27,7 @@
             <th>Abreviatura</th>
             <th>Año del plan de Estudio</th>
             <th>Materias</th>
-            
+
             <th>Acciones</th>
           </tr>
         </thead>
@@ -37,29 +37,24 @@
             <td>{{plan.especialidad}}</td>
             <td></td>
             <td>{{plan.anio}}</td>
-            <td>
-                {%for materia in plan.materias.all%}
-                {{materia}}
-            {%endfor%}</td>
-          
+            <td>{%for materia in plan.materias.all%} {{materia}} {%endfor%}</td>
+
             <td></td>
 
             <td>
-                <a
-                href="#"
+              <a
+                href="{%url 'cursos:detalles_plan_estudio' plan.pk %}"
                 class="btn btn-outline-info btn-sm"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 data-bs-custom-class="custom-tooltip-primary"
                 data-bs-title="Detalles"
                 aria-describedby="tooltip599725"
-              > 
+              >
                 <i class="icon-eye"></i>
               </a>
 
-
-
-             <a
+              <a
                 href="{%url 'cursos:modificar_plan_estudio' plan.pk %}"
                 class="btn btn-outline-primary btn-sm"
                 data-bs-toggle="tooltip"
@@ -67,32 +62,28 @@
                 data-bs-custom-class="custom-tooltip-primary"
                 data-bs-title="Modificar"
                 aria-describedby="tooltip599725"
-              > 
+              >
                 <i class="icon-edit"></i>
               </a>
 
-
-<!-- Contenedor para el tooltip -->
-<span
-    data-bs-toggle="tooltip"
-    data-bs-placement="top"
-    data-bs-custom-class="custom-tooltip-primary"
-    title="Eliminar"
-    class="tooltip-wrapper"
->
-    <a
-        class="btn btn-outline-danger btn-sm"
-        data-bs-toggle="modal"
-        data-bs-target="#deleteModal"
-        data-plan-estudio-id="{{ plan.id }}"
-        data-plan-estudio-nombre="{{ plan.especialidad }}"
-    >
-        <i class="icon-trash"></i>
-    </a>
-</span>
-
-
-           
+              <!-- Contenedor para el tooltip -->
+              <span
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip-primary"
+                title="Eliminar"
+                class="tooltip-wrapper"
+              >
+                <a
+                  class="btn btn-outline-danger btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteModal"
+                  data-plan-estudio-id="{{ plan.id }}"
+                  data-plan-estudio-nombre="{{ plan.especialidad }}"
+                >
+                  <i class="icon-trash"></i>
+                </a>
+              </span>
             </td>
           </tr>
           {%endfor%}
@@ -124,8 +115,10 @@
       </div>
       <div class="modal-body">
         <p>
-          Está a punto de eliminar el Plan de Estudio de la Especialidad <strong><span id="planEstudioNombre"></span></strong>.
-          El plan de estudio dejará de estar vigente, y deberá crear uno nuevo para la especialidad. Desea continuar?
+          Está a punto de eliminar el Plan de Estudio de la Especialidad
+          <strong><span id="planEstudioNombre"></span></strong>. El plan de
+          estudio dejará de estar vigente, y deberá crear uno nuevo para la
+          especialidad. Desea continuar?
         </p>
       </div>
       <div class="modal-footer flex-column">
@@ -170,47 +163,46 @@
 
 <script src="{% static 'assets/js/custom.js' %}"></script>
 
-
 <!-- pasar al modal el id de la materia seleccionada, para ser eliminada -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Selecciona todos los elementos con tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        
-        // Inicializa los tooltips
-        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-            new bootstrap.Tooltip(tooltipTriggerEl, {
-                'customClass':  'custom-tooltip-primary',
-             'placement':  'top',
-                'aria-describedby':"tooltip599725",
-            });
-        });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Selecciona todos los elementos con tooltips
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+
+    // Inicializa los tooltips
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+      new bootstrap.Tooltip(tooltipTriggerEl, {
+        customClass: "custom-tooltip-primary",
+        placement: "top",
+        "aria-describedby": "tooltip599725",
+      });
     });
-    
-    
+  });
 
+  const deleteModal = document.getElementById("deleteModal");
+  deleteModal.addEventListener("show.bs.modal", function (event) {
+    // Botón que activó el modal
+    const button = event.relatedTarget;
 
+    // Extraer la información de los atributos data-
+    const planEstudioId = button.getAttribute("data-plan-estudio-id");
+    const planEstudioNombre = button.getAttribute("data-plan-estudio-nombre");
 
+    // Actualizar el contenido del modal
+    const planEstudioNombreElement =
+      document.getElementById("planEstudioNombre");
+    planEstudioNombreElement.textContent = planEstudioNombre;
 
-    const deleteModal = document.getElementById('deleteModal');
-    deleteModal.addEventListener('show.bs.modal', function (event) {
-      // Botón que activó el modal
-      const button = event.relatedTarget;
-  
-      // Extraer la información de los atributos data-
-      const planEstudioId = button.getAttribute('data-plan-estudio-id');
-      const planEstudioNombre = button.getAttribute('data-plan-estudio-nombre');
-  
-      // Actualizar el contenido del modal
-      const planEstudioNombreElement = document.getElementById('planEstudioNombre');
-      planEstudioNombreElement.textContent = planEstudioNombre;
-  
-      // Actualizar la acción del formulario con el ID de la materia
-      const deleteForm = document.getElementById('deleteForm');
-      deleteForm.action = `{% url 'cursos:eliminar_plan_estudio' 0 %}`.replace('0', planEstudioId);
-      document.getElementById('plan_estudioId').value = planEstudioId;
-    });
-  </script>
-  
+    // Actualizar la acción del formulario con el ID de la materia
+    const deleteForm = document.getElementById("deleteForm");
+    deleteForm.action = `{% url 'cursos:eliminar_plan_estudio' 0 %}`.replace(
+      "0",
+      planEstudioId
+    );
+    document.getElementById("plan_estudioId").value = planEstudioId;
+  });
+</script>
 
 {% endblock scripts %}

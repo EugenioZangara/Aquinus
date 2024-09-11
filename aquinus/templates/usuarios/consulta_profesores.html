@@ -1,0 +1,94 @@
+{% extends "main.html" %} {%load static%} {% block breadcrumb %}
+
+<ol class="breadcrumb mb-3">
+  <li class="breadcrumb-item">
+    <i class="icon-house_siding lh-1"></i>
+    <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
+  </li>
+  <li class="breadcrumb-item">Profesores</li>
+  <li class="breadcrumb-item">Consultar Profesores</li>
+</ol>
+
+{% endblock breadcrumb %}
+<!-- Breadcrumb end -->
+
+{%block main_content1%}
+<div class="card mb-3">
+    <div class="card-header">
+      <div class="card-title">Usuarios <strong>Activos</strong></div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="highlightRowColumn" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Apellido</th>
+             
+              <th>D.N.I.</th>
+              
+              <th>Puede Calificar</th>
+              <td>Materias</td>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for profesor in profesores %}
+            <tr>
+              <td>{{profesor.first_name}}</td>
+              <td>{{profesor.last_name}}</td>
+             
+              <td>{{profesor.perfil.dni}}</td>
+              
+              <td>
+                {%if profesor.perfil.puede_calificar %}
+                <i class="icon-circle1 me-2 text-success fs-5"></i>
+                {%else%}
+                <i class="icon-circle1 me-2 text-dark fs-5"></i>
+                {%endif%}
+              </td>
+              <td></td>
+              <td>
+               
+                <a href="{% url 'usuarios:modificar_usuario' profesor.pk %}" class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Modificar" aria-describedby="tooltip599725">
+                  <i class="icon-edit"></i>
+              </a>
+              
+            
+                <form action="{% url 'usuarios:eliminar_usuario' profesor.pk %}" method="post" style="display: inline-block;">
+                  {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-danger" data-bs-title="Eliminar">
+                  <i class="icon-trash"></i>
+                </button>
+              </form>
+  
+              </td>
+            </tr>
+            {%endfor%}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- Card end -->
+  
+  {%endblock main_content1%} {% block scripts %}
+  <script src="{% static 'assets/vendor/datatables/dataTables.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/dataTables.bootstrap.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/custom/custom-datatables.js' %}"></script>
+  <!-- DataTable Buttons -->
+  <script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/jszip.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/pdfmake.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/vfs_fonts.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.print.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.colVis.min.js' %}"></script>
+  
+  
+      <!-- Custom JS files -->
+  
+  <script src="{% static 'assets/js/custom.js' %}"></script>
+  {% endblock scripts %}
+  

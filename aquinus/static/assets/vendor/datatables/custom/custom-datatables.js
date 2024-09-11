@@ -30,7 +30,7 @@ $(function () {
 			[5, 10, 25, 50, "All"],
 		],
 		language: {
-			lengthMenu: "Display _MENU_ Records Per Page",
+			lengthMenu: "Mostrar _MENU_  Elementos por página",
 		},
 	});
 	var table = $("#highlightRowColumn").DataTable();

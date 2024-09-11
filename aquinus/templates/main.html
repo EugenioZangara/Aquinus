@@ -51,6 +51,7 @@
       href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}"
     />
     {%block head%} {% endblock head %}
+    <script src={% static 'assets/htmx/htmx.min.js' %}></script>
   </head>
 
   <body>
@@ -259,7 +260,7 @@
                   </a>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item current-page" href="index.html">
+                      <a class="dropdown-item current-page" href="{%url 'cursos:crear_curso' %}">
                         <span>Nuevo</span>
                       </a>
                     </li>
@@ -286,14 +287,10 @@
                         <span>Nuevo</span>
                       </a>
                     </li>
+                    
                     <li>
-                      <a class="dropdown-item" href="open-tickets.html"
-                        ><span>Modificar</span></a
-                      >
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="pending-tickets.html"
-                        ><span>Eliminar</span></a
+                      <a class="dropdown-item" href="{% url 'usuarios:consultar_profesores' %}"
+                        ><span>Consultar</span></a
                       >
                     </li>
                   </ul>
@@ -314,16 +311,8 @@
                         <span>Nuevo</span>
                       </a>
                     </li>
-                    <li>
-                      <a class="dropdown-item" href="alerts.html">
-                        <span>Modificar</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="buttons.html">
-                        <span>Eliminar</span>
-                      </a>
-                    </li>
+                    
+                    
                     <li>
                       <a class="dropdown-item" href="{%url 'cursos:ver_planes_estudio' %}">
                         <span>Consultar</span>

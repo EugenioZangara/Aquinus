@@ -1,0 +1,148 @@
+{% extends "main.html" %} {%load static%}
+
+<!-- Breadcrumb start -->
+
+{% block breadcrumb %}
+
+<ol class="breadcrumb mb-3">
+  <li class="breadcrumb-item">
+    <i class="icon-house_siding lh-1"></i>
+    <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
+  </li>
+  <li class="breadcrumb-item">Cursos</li>
+  <li class="breadcrumb-item">Nuevo Curso</li>
+</ol>
+
+{% endblock breadcrumb %}
+<!-- Breadcrumb end -->
+
+{%block main_content1%}
+<div class="row gx-3">
+  <div class="col-12">
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="card-title">Definir Curso</h5>
+      </div>
+      <div class="card-body">
+        <div class="row gx-3">
+          <div class="col-lg-4 col-sm-4 col-12">
+            <div class="mb-3">
+              <label class="form-label">{{form.plan_de_estudio.label}}</label>
+              {{form.plan_de_estudio}}
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-sm-4 col-12">
+            <div class="mb-3">
+              <label class="form-label">{{form.anio.label}}</label>
+              {{form.anio}}
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-sm-4 col-12">
+            <div class="row row-cols-lg-auto g-3 align-items-center">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="form-label"> {{form.division.label}}</label>
+                  {{form.division}}
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="unicaDivisionCheck"
+                  />
+                  <label class="form-check-label" for="gridCheck1">
+                    Única División
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%endblock main_content1%} {%block main_content2%}
+<div class="row gx-3">
+  <div class="col-lg-6 col-12">
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="card-title">Cursantes</h5>
+      </div>
+      <div class="card-body">
+        <div class="card-body">
+          <div class="table-responsive">
+            <div id="basicExample_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+              <div class="row">
+                <div class="col-sm-12 col-md-6">
+                  <div class="dataTables_length" id="basicExample_length">
+                    <label>Display <select name="basicExample_length" aria-controls="basicExample" class="form-select form-select-sm"><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50">50</option></select> Records Per Page</label>
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                  <div id="basicExample_filter" class="dataTables_filter">
+                    <label>Search:<input type="search" class="form-control form-control-sm" placeholder="" aria-controls="basicExample"></label>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <table id="basicExample" class="table table-striped dataTable no-footer" aria-describedby="basicExample_info">
+              <thead>
+                <tr>
+                  <th class="sorting sorting_asc" tabindex="0" aria-controls="basicExample" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: 155.45px;">
+                    Grado
+                  </th>
+                  <th class="sorting" tabindex="0" aria-controls="basicExample" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 89.7875px ;">
+                    DNI
+                  </th>
+                    <th class="sorting" tabindex="0" aria-controls="basicExample" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width:  189.337px;">
+                      Apellido 
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="basicExample" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: 317.55px;">
+                      Nombre
+                    </th>
+                   <th class="sorting" tabindex="0" aria-controls="basicExample" rowspan="1" colspan="1" aria-label="Salary: activate to sort column ascending" style="width: 117.713px;">Agregar</th></tr>
+              </thead>
+              <tbody id="tablaListadoAspirantes">
+
+
+
+              <tr class="odd" >
+                  <td class="sorting_1"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                
+                </tr>
+              
+              
+              
+              </tbody>
+            </table></div></div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="basicExample_info" role="status" aria-live="polite">Showing Page 1 of 3</div></div><div class="col-sm-12 col-md-7"><div class="dataTables_paginate paging_simple_numbers" id="basicExample_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="basicExample_previous"><a href="#" aria-controls="basicExample" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="basicExample" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="basicExample" data-dt-idx="2" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item "><a href="#" aria-controls="basicExample" data-dt-idx="3" tabindex="0" class="page-link">3</a></li><li class="paginate_button page-item next" id="basicExample_next"><a href="#" aria-controls="basicExample" data-dt-idx="4" tabindex="0" class="page-link">Next</a></li></ul></div></div></div></div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+</div>
+    <div class="col-lg-6 col-12">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h5 class="card-title">Materias</h5>
+        </div>
+        <div class="card-body">aca va el listado de materias</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+  {% endblock main_content2%}
+

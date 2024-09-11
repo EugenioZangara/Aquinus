@@ -181,3 +181,21 @@ class CambiarContrasenaView(FormView):
         if not request.user.perfil.debe_cambiar_contraseña:
             return redirect('home')  # Si no necesita cambiar contraseña, redirigir
         return super().dispatch(request, *args, **kwargs)
+    
+    
+class ProfesoresListView(ListView):
+    model = User
+    template_name = "usuarios/consulta_profesores.html"
+    context_object_name='profesores'
+    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab']="profesores"
+      
+        return context
+    def get_queryset(self):
+        # Hacemos un select_related para traer el perfil asociado al usuario
+        # Filtramos solo los usuarios que están activos (is_active=True)
+        return User.objects.filter(is_active=True, is_staff=False, perfil__es_profesor=True).select_related('perfil')
+    
