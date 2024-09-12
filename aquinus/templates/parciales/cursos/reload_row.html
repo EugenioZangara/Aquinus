@@ -1,0 +1,12 @@
+{% load static %}
+{% load custom_filters %}
+
+<tr id="registro-{{ registro.dni }}">
+  <td>{{ registro.grado|convertirGrado }}</td>
+  <td>{{ registro.dni }}</td>
+  <td>{{ registro.apellidos }}</td>
+  <td>{{ registro.nombres }}</td>
+  <td>
+    <button class="btn btn-info" hx-post="{% url 'cursos:seleccionar_registro' registro.pk %}" hx-target="#tablaSeleccionados" hx-swap="beforeend" hx-trigger="click">Seleccionar</button>
+  </td>
+</tr>

@@ -17,5 +17,4 @@ def convertir_grado(value):
     """
     Filtro que reutiliza la función de conversión para plantillas.
     """
-    print(type(value), value)
     return convertirGrado(value)

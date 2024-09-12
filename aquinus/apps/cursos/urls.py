@@ -1,5 +1,5 @@
 from .views import MateriaCreateView, MateriaListView, MateriaDeleteView, MateriaUpdateView,PlanEstudioCreateView,PlanEstudioListView, PlanEstudioUpdateView, DeletePlanEstudio, PlanEstudioDetailView, CursoCreateView
-from .views_htmx import get_orientaciones
+from .views_htmx import get_orientaciones, seleccionar_registro, quitar_registro
 from django.urls import path
 
 app_name='cursos'
@@ -14,6 +14,7 @@ urlpatterns = [
      path('eliminar_plan_estudio/<int:pk>/', DeletePlanEstudio.as_view(), name='eliminar_plan_estudio'),
      path('detalles_plan_estudio/<int:pk>/', PlanEstudioDetailView.as_view(), name='detalles_plan_estudio'),
      path('crear_curso/', CursoCreateView.as_view(), name='crear_curso'),
-     path('get_orientaciones/', get_orientaciones, name='get_orientaciones') #htmx para generar opciones dinámicamente para las orientaciones
-    
+     path('get_orientaciones/', get_orientaciones, name='get_orientaciones') ,#htmx para generar opciones dinámicamente para las orientaciones
+    path('seleccionar_registro/<int:id>/',seleccionar_registro, name='seleccionar_registro'),
+     path('quitar_registro/<int:id>/',quitar_registro, name='quitar_registro')
 ]

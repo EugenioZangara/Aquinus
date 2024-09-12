@@ -50,7 +50,11 @@ class CursoCreateForm(forms.ModelForm):
             ("2", 'Segundo Año'),
             ("3", 'Tercer Año')
         ],
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'form-control anio',
+                                   'hx-get': "/alumnos/alumnosPorEspecialidad",  # Ruta donde envías la solicitud
+                'hx-trigger': "change",
+                'hx-target': "#tablaListadoAspirantes",  # ID del contenedor que HTMX actualizará
+                'hx-include':"[name='plan_de_estudio']", }),
         label='Año del curso:'
     )
 
@@ -63,11 +67,12 @@ class CursoCreateForm(forms.ModelForm):
                 'hx-get': "/alumnos/alumnosPorEspecialidad",  # Ruta donde envías la solicitud
                 'hx-trigger': "change",
                 'hx-target': "#tablaListadoAspirantes",  # ID del contenedor que HTMX actualizará
-                'hx-vals': '{"plan_de_estudio": this.value}'  # Envia plan_de_estudio con HTMX
+                'hx-include':"[name='anio']",
+                "hx-on:after-swap":"scrollAppBodyToBottom()", 
             }),
             'division': forms.NumberInput(attrs={'class': 'form-control'})
         }
         labels = {
-            'plan_de_estudio': 'Especialidad/plan del estudio del curso a abrir:',
+            'plan_de_estudio': 'Especialidad del curso a abrir:',
             'division': 'Número de Divisiones del Curso:'
         }

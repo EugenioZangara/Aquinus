@@ -126,6 +126,7 @@ class Materia(models.Model):
     area=models.CharField(max_length=50)
     regimen=models.CharField(max_length=50, choices=[('PROMOCIONABLE','PROMOCIONABLE'),('NO PROMOCIONABLE','NO PROMOCIONABLE'),('ESPECIAL','ESPECIAL')])
     observaciones=models.TextField(max_length=500, null=True, blank=True)
+    anio=models.IntegerField(choices=[(1,1),(2,2),(3,3)])
     def __str__(self):
         return self.nombre
     

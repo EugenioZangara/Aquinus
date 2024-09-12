@@ -3,6 +3,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{% csrf_token %}">
+
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Aquinus</title>
 
@@ -423,9 +425,9 @@
         <!-- App Navbar ends -->
 
         <!-- App body starts -->
-        <div class="app-body">
+        <div class="app-body" id="app-body">
           <!-- Container starts -->
-          <div class="container">
+          <div class="container" id="main-container">
             <!-- Row start -->
             <div class="row gx-3">
               <div class="col-12 col-xl-6">
@@ -512,8 +514,8 @@
 		************* -->
 
     <!-- Overlay Scroll JS -->
-    {% comment %} <script src="assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js"></script>
-    <script src="assets/vendor/overlay-scroll/custom-scrollbar.js"></script> {% endcomment %}
+   {% comment %} <script src="{% static 'assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/overlay-scroll/custom-scrollbar.js' %}"></script>  {% endcomment %}
 
     <!-- Apex Charts -->
     {% comment %} <script src="assets/vendor/apex/apexcharts.min.js"></script>

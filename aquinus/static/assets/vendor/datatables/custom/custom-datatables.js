@@ -22,6 +22,7 @@ $(function () {
 	});
 });
 
+
 // Highlighting rows and columns
 $(function () {
 	$("#highlightRowColumn").DataTable({

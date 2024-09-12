@@ -1,12 +1,120 @@
-{%load static%}{% load custom_filters %}
+{% load static %}
+{% load custom_filters %}
+<head>
+<link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5.css' %}" />
+<link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5-custom.css' %}" />
+<link rel="stylesheet" href="{% static 'assets/vendor/datatables/buttons/dataTables.bs5-custom.css' %}" />
 
-{% for alumno in alumnos%}
-<tr class="odd">
-    <td class="sorting_1">{{alumno.grado|convertirGrado}}</td>
-    <td>{{alumno.dni}}</td>
-    <td>{{alumno.apellidos}}</td>
-    <td>{{alumno.nombres}}</td>
-    <td>bton Agregar</td>
+</head>
+<div class="table-responsive">
+  <table id="scrollVertical" class="table table-striped">
+    <!-- El contenido que antes estaba dentro de los divs de la tabla ahora sigue la estructura correcta -->
+    <thead>
+      <tr>
+        <th>Grado</th>
+        <th>DNI</th>
+        <th>Apellido</th>
+        <th>Nombre</th>
+        <th>Agregar</th>
+      </tr>
+    </thead>
+    <tbody id='listadoAspirantes'>
+      {% for alumno in alumnos %}
+        <tr id="registro-{{ alumno.dni }}">
+          <td>{{ alumno.grado|convertirGrado }}</td>
+          <td>{{ alumno.dni }}</td>
+          <td>{{ alumno.apellidos }}</td>
+          <td>{{ alumno.nombres }}</td>
+          <td> <button class="btn btn-info"
+            hx-post="{% url 'cursos:seleccionar_registro'  alumno.pk %}" 
+            hx-target="#tablaSeleccionados" 
+            hx-swap="beforeend"
+             hx-trigger="click"
+             >
+      Seleccionar
+    </button></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script src="{% static 'assets/vendor/datatables/dataTables.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/dataTables.bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/custom/custom-datatables.js' %}"></script>
+<!-- DataTable Buttons -->
+<script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+{% comment %} <script src="{% static 'assets/vendor/datatables/buttons/jszip.min.js' %}"></script> {% endcomment %}
+{% comment %} <script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/pdfmake.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/vfs_fonts.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/buttons.print.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables/buttons/buttons.colVis.min.js' %}"></script> {% endcomment %}
+<script>
+  document.addEventListener('htmx:configRequest', function(event) {
+    // Obtén el token CSRF de la metaetiqueta
+    var metaTag = document.querySelector('meta[name="csrf-token"]');
+    if (metaTag) {
+      var csrfToken = metaTag.getAttribute('value');
+      if (csrfToken) {
+        event.detail.headers['X-CSRFToken'] = csrfToken;
+      } else {
+        console.error("CSRF Token not found in meta tag content");
+      }
+    } else {
+      console.error("Meta tag for CSRF token not found");
+    }
+  });
+</script>
+
+<script>
+  document.body.addEventListener('htmx:afterRequest', function(event) {
+      console.log('htmx:afterRequest event fired');
   
-  </tr>
-  {%endfor%}
+      // Verifica que la solicitud haya terminado correctamente
+      if (event.detail.xhr.status === 200) {
+          const response = event.detail.xhr.responseText;
+          console.log('Response received:', response);
+          
+          try {
+              const data = JSON.parse(response);
+              console.log('Parsed JSON:', data);
+  
+              // Elimina la fila con el id especificado
+              const idToRemove = data.id_to_remove;
+              const rowToRemove = document.querySelector(`#selected-table tbody tr#registro-${idToRemove}`);
+
+              if (rowToRemove) {
+                  rowToRemove.remove();
+              }
+  
+              // Añade la nueva fila al final de la tabla
+              const selectedTableBody = document.querySelector('#selected-table tbody');
+              if (selectedTableBody) {
+                  selectedTableBody.insertAdjacentHTML('beforeend', data.new_row_in_selected);
+              }
+          } catch (e) {
+              console.error('Error parsing JSON:', e);
+          }
+      } else {
+          console.error('Request failed with status:', event.detail.xhr.status);
+      }
+  });
+</script>
+
+
+<script>// Vertical Scroll
+  $(function () {
+    console.log("llamo EL SCROLL 2")
+    $("#scrollVertical2").DataTable({
+      scrollY: "207px",
+      scrollCollapse: true,
+      paging: false,
+      bInfo: false,
+    });
+  });
+  </script>
+
+  
+  
