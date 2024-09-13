@@ -53,7 +53,7 @@ class CursoCreateForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control anio',
                                    'hx-get': "/alumnos/alumnosPorEspecialidad",  # Ruta donde envías la solicitud
                 'hx-trigger': "change",
-                'hx-target': "#tablaListadoAspirantes",  # ID del contenedor que HTMX actualizará
+                'hx-target': "#listadoAspirantes",  # ID del contenedor que HTMX actualizará
                 'hx-include':"[name='plan_de_estudio']", }),
         label='Año del curso:'
     )
@@ -66,9 +66,9 @@ class CursoCreateForm(forms.ModelForm):
                 'class': 'form-control',
                 'hx-get': "/alumnos/alumnosPorEspecialidad",  # Ruta donde envías la solicitud
                 'hx-trigger': "change",
-                'hx-target': "#tablaListadoAspirantes",  # ID del contenedor que HTMX actualizará
+                'hx-target': "#listadoAspirantes",  # ID del contenedor que HTMX actualizará
                 'hx-include':"[name='anio']",
-                "hx-on:after-swap":"scrollAppBodyToBottom()", 
+                 
             }),
             'division': forms.NumberInput(attrs={'class': 'form-control'})
         }

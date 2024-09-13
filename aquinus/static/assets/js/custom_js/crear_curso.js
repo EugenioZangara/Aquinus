@@ -19,19 +19,32 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 
-    const crearCursoBtn = document.getElementById("crearCursoBtn");
-    const bloqueCargaAlumnos = document.getElementById("bloqueCargaAlumnos");
-    
-    crearCursoBtn.addEventListener("click", function() {
-        // Cambia el estilo `display` a `flex`
-        bloqueCargaAlumnos.style.display = "flex";
-    
-        // Hace scroll hasta el final de la página de manera suave
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "smooth"
-        });
-    });
+    const btnCargarAlumnos = document.getElementById("btnCargarAlumnos");
+    const areaCargaAlumnos = document.getElementById("bloqueCargaAlumnos");
+
+    if (btnCargarAlumnos) {
+        btnCargarAlumnos.addEventListener("click", cargarAlumnos);
+       
+    } else {
+        console.error("No se encontró el botón con id btnCargarAlumnos");
+    }
+
+    function cargarAlumnos() {
+        numeroDivisionesInput.disabled = true;
+        areaCargaAlumnos.style.display = "flex";
+        const appBody = document.getElementById('app-body');
+        if (appBody) {
+            appBody.scrollTo({
+                top: appBody.scrollHeight,
+                behavior: 'smooth'
+            });
+        } else {
+            console.warn('No se encontró el elemento con id app-body');
+        }
+    }
     
 
+
+    
 });
+

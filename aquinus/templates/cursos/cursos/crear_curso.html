@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5-custom.css' %}" />
   <link rel="stylesheet" href="{% static 'assets/vendor/datatables/buttons/dataTables.bs5-custom.css' %}" />
 
-  <script src="{% static 'assets/js/custom_js/crear_curso.js' %}"></script>
+ 
 {% endblock %}
 <!-- Breadcrumb start -->
 
@@ -67,7 +67,8 @@
             </div>
             <div class="col-lg-2 col-sm-4 col-12">
               <div class="row row-cols-lg-auto g-3 align-items-center">
-                <button type="button" class="btn btn-warning" id="crearCursoBtn"><i class="fs-4 icon-file-plus"></i> Cargar Alumnos</button>
+                <button type="button" class="btn btn-warning" id="btnCargarAlumnos"
+                ><i class="fs-4 icon-file-plus"></i> Cargar Alumnos</button>
               </div>
             </div>
           </div>
@@ -76,21 +77,42 @@
     </div>
   </div>
 {% endblock %} {% block main_content2 %}
-  <div class="row gx-3" id="bloqueCargaAlumnos">
-    <div class="col-lg-7 col-12">
+
+
+  <div class="row gx-2" id="bloqueCargaAlumnos" >
+    
+    <div class="col-lg-6 col-12">
       <div class="card mb-3">
         <div class="card-header">
-          <div class="card-title">Aspirantes</div>
+          <h5 class="card-title">Aspirantes</h5>
         </div>
-
-        <div class="card-body" id="tablaListadoAspirantes"></div>
+    
+        <div class="card-body" id="tablaListadoAspirantes">
+          <div class="table-responsive">
+            <table id="scrollVertical" class="table table-striped">
+              <!-- El contenido que antes estaba dentro de los divs de la tabla ahora sigue la estructura correcta -->
+              <thead>
+                <tr>
+                  <th>Grado</th>
+                  <th>DNI</th>
+                  <th>Apellido</th>
+                  <th>Nombre</th>
+                  <th>Agregar</th>
+                </tr>
+              </thead>
+              <tbody id='listadoAspirantes'>
+               
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="col-lg-5 col-12">
+    
+    <div class="col-lg-6 col-12">
       <div class="card mb-3">
         <div class="card-header">
-          <h5 class="card-title">Materias</h5>
+          <h5 class="card-title">Aspirantes asignados a la División</h5>
         </div>
         <div class="card-body">
           <!-- Segunda tabla: Registros seleccionados -->
@@ -111,8 +133,87 @@
         </div>
       </div>
     </div>
+    
   </div>
 {% endblock %}
-{% block script %}
+{% block scripts %}
  
+
+  <script src="{% static 'assets/js/custom_js/crear_curso.js' %}"></script>
+
+  <script src="{% static 'assets/vendor/datatables/dataTables.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/dataTables.bootstrap.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/custom/custom-datatables.js' %}"></script>
+  <!-- DataTable Buttons -->
+  <script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/jszip.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/vfs_fonts.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.print.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.colVis.min.js' %}"></script> 
+
+
+  <script>
+    document.addEventListener('htmx:configRequest', function(event) {
+      // Obtén el token CSRF de la metaetiqueta
+      var metaTag = document.querySelector('meta[name="csrf-token"]');
+      if (metaTag) {
+        var csrfToken = metaTag.getAttribute('value');
+        if (csrfToken) {
+          event.detail.headers['X-CSRFToken'] = csrfToken;
+        } else {
+          console.error("CSRF Token not found in meta tag content");
+        }
+      } else {
+        console.error("Meta tag for CSRF token not found");
+      }
+    });
+  </script>
+  
+  <script>
+    document.body.addEventListener('htmx:afterRequest', function(event) {  
+        // Verifica que la solicitud haya terminado correctamente
+        if (event.detail.xhr.status === 200) {          
+            try {
+                const data = JSON.parse(response);
+    
+                // Elimina la fila con el id especificado
+                const idToRemove = data.id_to_remove;
+                const rowToRemove = document.querySelector(`#selected-table tbody tr#registro-${idToRemove}`);
+  
+                if (rowToRemove) {
+                    rowToRemove.remove();
+                }
+    
+                // Añade la nueva fila al final de la tabla
+                const selectedTableBody = document.querySelector('#selected-table tbody');
+                if (selectedTableBody) {
+                    selectedTableBody.insertAdjacentHTML('beforeend', data.new_row_in_selected);
+                }
+            } catch (e) {
+                console.error('Error parsing JSON:', e);
+            }
+        } else {
+            console.error('Request failed with status:', event.detail.xhr.status);
+        }      
+    });
+  </script>
+
+
+
+  
+  <script>// Vertical Scroll
+    $(function () {
+      console.log("llamo EL SCROLL 2")
+      $("#scrollVertical2").DataTable({
+        scrollY: "207px",
+        scrollCollapse: true,
+        paging: false,
+        bInfo: false,
+      });
+    });
+    </script>
+  
+
 {% endblock %}
