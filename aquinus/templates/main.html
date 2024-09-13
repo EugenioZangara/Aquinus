@@ -1,66 +1,47 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="csrf-token" content="{% csrf_token %}">
+    <meta name="csrf-token" content="{% csrf_token %}" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Aquinus</title>
 
     <!-- Meta -->
-    <meta
-      name="description"
-      content="Marketplace for Bootstrap Admin Dashboards"
-    />
+    <meta name="description" content="Marketplace for Bootstrap Admin Dashboards" />
     <meta name="author" content="Bootstrap Gallery" />
     <link rel="canonical" href="https://www.bootstrap.gallery/" />
     <meta property="og:url" content="https://www.bootstrap.gallery" />
-    <meta
-      property="og:title"
-      content="Admin Templates - Dashboard Templates | Bootstrap Gallery"
-    />
-    <meta
-      property="og:description"
-      content="Marketplace for Bootstrap Admin Dashboards"
-    />
+    <meta property="og:title" content="Admin Templates - Dashboard Templates | Bootstrap Gallery" />
+    <meta property="og:description" content="Marketplace for Bootstrap Admin Dashboards" />
     <meta property="og:type" content="Website" />
     <meta property="og:site_name" content="Bootstrap Gallery" />
-    <link
-      rel="shortcut icon"
-      href="{% static 'assets/images/aquinus-logo-2.png' %}"
-    />
+    <link rel="shortcut icon" href="{% static 'assets/images/aquinus-logo-2.png' %}" />
 
-    <!-- *************
+    <!--  *************
 			************ CSS Files *************
-		************* -->
+		*************  -->
     <!-- Icomoon Font Icons css -->
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/fonts/icomoon/style.css' %}"
-    />
+    <link rel="stylesheet" href="{% static 'assets/fonts/icomoon/style.css' %}" />
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="{% static 'assets/css/main.min.css' %}" />
 
-    <!-- *************
+    <!--  *************
 			************ Vendor Css Files *************
-		************ -->
+		************  -->
 
     <!-- Scrollbar CSS -->
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}"
-    />
-    {%block head%} {% endblock head %}
-    <script src={% static 'assets/htmx/htmx.min.js' %}></script>
+    <link rel="stylesheet" href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}" />
+    {% block head %}
 
+    {% endblock %}
+    <script src="{% static 'assets/htmx/htmx.min.js' %}"></script>
 
     <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5-custom.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/vendor/datatables/buttons/dataTables.bs5-custom.css' %}" />
-    
-
   </head>
 
   <body>
@@ -77,20 +58,8 @@
               <div class="col-md-3 col-2">
                 <!-- App brand starts -->
                 <div class="app-brand">
-                  <a href="{%url 'home'%}" class="d-lg-block d-none">
-                    <img
-                      src="{%static 'assets/images/logo_aquinus_con_texto_blanco.svg' %}"
-                      class="logo"
-                      alt="Aquinus"
-                    />
-                  </a>
-                  <a href="index.html" class="d-lg-none d-md-block">
-                    <img
-                      src="{%static 'assets/images/logo_aquinus_con_texto_blanco.svg' %}"
-                      class="logo"
-                      alt="Bootstrap Gallery"
-                    />
-                  </a>
+                  <a href="{% url 'home' %}" class="d-lg-block d-none"><img src="{% static 'assets/images/logo_aquinus_con_texto_blanco.svg' %}" class="logo" alt="Aquinus" /></a>
+                  <a href="index.html" class="d-lg-none d-md-block"><img src="{% static 'assets/images/logo_aquinus_con_texto_blanco.svg' %}" class="logo" alt="Bootstrap Gallery" /></a>
                 </div>
                 <!-- App brand ends -->
               </div>
@@ -100,48 +69,28 @@
                 <div class="header-actions col">
                   <div class="d-sm-flex d-none align-items-center gap-2">
                     <div class="dropdown">
-                      <a
-                        class="dropdown-toggle header-action-icon"
-                        href="#!"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
+                      <a class="dropdown-toggle header-action-icon" href="#!" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="icon-warning fs-4 lh-1 text-white"></i>
                         <span class="count">7</span>
                       </a>
-                      <div
-                        class="dropdown-menu dropdown-menu-end dropdown-menu-md"
-                      >
-                        <h5 class="fw-semibold px-3 py-2 text-primary">
-                          Notificaciones
-                        </h5>
+                      <div class="dropdown-menu dropdown-menu-end dropdown-menu-md">
+                        <h5 class="fw-semibold px-3 py-2 text-primary">Notificaciones</h5>
                         <div class="dropdown-item">
                           <div class="d-flex py-2">
-                            <div
-                              class="icons-box md bg-success rounded-circle me-3"
-                            >
+                            <div class="icons-box md bg-success rounded-circle me-3">
                               <i class="icon-shopping-bag text-white fs-4"></i>
                             </div>
                             <div class="m-0">
                               <h6 class="mb-1 fw-semibold">Rosalie Deleon</h6>
-                              <p class="mb-1 text-secondary">
-                                You have new order.
-                              </p>
-                              <p class="small m-0 text-secondary">
-                                30 mins ago
-                              </p>
+                              <p class="mb-1 text-secondary">You have new order.</p>
+                              <p class="small m-0 text-secondary">30 mins ago</p>
                             </div>
                           </div>
                         </div>
                         <div class="dropdown-item">
                           <div class="d-flex py-2">
-                            <div
-                              class="icons-box md bg-danger rounded-circle me-3"
-                            >
-                              <i
-                                class="icon-alert-triangle text-white fs-4"
-                              ></i>
+                            <div class="icons-box md bg-danger rounded-circle me-3">
+                              <i class="icon-alert-triangle text-white fs-4"></i>
                             </div>
                             <div class="m-0">
                               <h6 class="mb-1 fw-semibold">Donovan Stuart</h6>
@@ -152,9 +101,7 @@
                         </div>
                         <div class="dropdown-item">
                           <div class="d-flex py-2">
-                            <div
-                              class="icons-box md bg-warning rounded-circle me-3"
-                            >
+                            <div class="icons-box md bg-warning rounded-circle me-3">
                               <i class="icon-shopping-cart text-white fs-4"></i>
                             </div>
                             <div class="m-0">
@@ -165,72 +112,34 @@
                           </div>
                         </div>
                         <div class="d-grid mx-3 my-1">
-                          <a
-                            href="javascript:void(0)"
-                            class="btn btn-outline-primary"
-                            >View all</a
-                          >
+                          <a href="javascript:void(0)" class="btn btn-outline-primary">View all</a>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class="dropdown ms-3">
-                    <a
-                      id="userSettings"
-                      class="dropdown-toggle d-flex py-2 align-items-center text-decoration-none"
-                      href="#!"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      <img
-                        src="{%static 'assets/images/user2.png' %}"
-                        class="rounded-2 img-3x"
-                        alt="Bootstrap Gallery"
-                      />
-                      <div
-                        class="ms-2 text-truncate d-lg-block d-none text-white"
-                      >
+                    <a id="userSettings" class="dropdown-toggle d-flex py-2 align-items-center text-decoration-none" href="#!" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <img src="{% static 'assets/images/user2.png' %}" class="rounded-2 img-3x" alt="Bootstrap Gallery" />
+                      <div class="ms-2 text-truncate d-lg-block d-none text-white">
                         <span class="d-flex opacity-50 small">Admin</span>
-                        <span>{{user.username}}</span>
+                        <span>{{ user.username }}</span>
                       </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end">
                       <div class="header-action-links">
-                        <a class="dropdown-item" href="profile.html"
-                          ><i
-                            class="icon-user border border-primary text-primary"
-                          ></i
-                          >Perfil</a
-                        >
+                        <a class="dropdown-item" href="profile.html"><i class="icon-user border border-primary text-primary"></i>Perfil</a>
                       </div>
                       <div class="mx-3 mt-2 d-grid">
-                        <form
-                          action="{% url 'usuarios:logout' %}"
-                          method="post"
-                        >
+                        <form action="{% url 'usuarios:logout' %}" method="post">
                           {% csrf_token %}
-                          <button
-                            type="submit"
-                            class="btn btn-outline-danger"
-                            style="width: 100%; text-align: center"
-                          >
-                            Logout
-                          </button>
+                          <button type="submit" class="btn btn-outline-danger" style="width: 100%; text-align: center">Logout</button>
                         </form>
                       </div>
                     </div>
                   </div>
 
                   <!-- Toggle Menu starts -->
-                  <button
-                    class="btn btn-warning btn-sm ms-3 d-lg-none d-md-block"
-                    type="button"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#MobileMenu"
-                  >
-                    <i class="icon-menu"></i>
-                  </button>
+                  <button class="btn btn-warning btn-sm ms-3 d-lg-none d-md-block" type="button" data-bs-toggle="offcanvas" data-bs-target="#MobileMenu"><i class="icon-menu"></i></button>
                   <!-- Toggle Menu ends -->
                 </div>
                 <!-- App header actions end -->
@@ -248,181 +157,87 @@
             <div class="offcanvas offcanvas-end" id="MobileMenu">
               <div class="offcanvas-header">
                 <h5 class="offcanvas-title semibold">Navigation</h5>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  data-bs-dismiss="offcanvas"
-                >
-                  <i class="icon-clear"></i>
-                </button>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="offcanvas"><i class="icon-clear"></i></button>
               </div>
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item dropdown {% if active_tab == 'cursos' %}active-link{% endif %}">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="fs-3 icon-auto_stories"></i> Cursos
-                  </a>
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fs-3 icon-auto_stories"></i> Cursos</a>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item current-page" href="{%url 'cursos:crear_curso' %}">
-                        <span>Nuevo</span>
-                      </a>
+                      <a class="dropdown-item current-page" href="{% url 'cursos:crear_curso' %}"><span>Nuevo</span></a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="reports.html">
-                        <span>Modificar</span>
-                      </a>
+                      <a class="dropdown-item" href="reports.html"><span>Modificar</span></a>
                     </li>
                   </ul>
                 </li>
                 <li class="nav-item dropdown {% if active_tab == 'profesores' %}active-link{% endif %}">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="icon-add_task"></i>Profesores
-                  </a>
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-add_task"></i>Profesores</a>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item" href="all-tickets.html">
-                        <span>Nuevo</span>
-                      </a>
+                      <a class="dropdown-item" href="all-tickets.html"><span>Nuevo</span></a>
                     </li>
-                    
+
                     <li>
-                      <a class="dropdown-item" href="{% url 'usuarios:consultar_profesores' %}"
-                        ><span>Consultar</span></a
-                      >
+                      <a class="dropdown-item" href="{% url 'usuarios:consultar_profesores' %}"><span>Consultar</span></a>
                     </li>
                   </ul>
                 </li>
                 <li class="nav-item dropdown {% if active_tab == 'planes_estudio' %}active-link{% endif %}">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="icon-server"></i>Planes de Estudio
-                  </a>
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-server"></i>Planes de Estudio</a>
                   <ul class="dropdown-menu dropdown-megamenu">
                     <li>
-                      <a class="dropdown-item" href="{% url 'cursos:crear_nuevo_plan_estudio' %}">
-                        <span>Nuevo</span>
-                      </a>
+                      <a class="dropdown-item" href="{% url 'cursos:crear_nuevo_plan_estudio' %}"><span>Nuevo</span></a>
                     </li>
-                    
-                    
+
                     <li>
-                      <a class="dropdown-item" href="{%url 'cursos:ver_planes_estudio' %}">
-                        <span>Consultar</span>
-                      </a>
+                      <a class="dropdown-item" href="{% url 'cursos:ver_planes_estudio' %}"><span>Consultar</span></a>
                     </li>
                   </ul>
                 </li>
 
                 <li class="nav-item dropdown {% if active_tab == 'materias' %}active-link{% endif %}">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="icon-package"></i>Materias
-                  </a>
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-package"></i>Materias</a>
                   <ul class="dropdown-menu dropdown-megamenu">
                     <li>
-                      <a class="dropdown-item" href="{%url 'cursos:ver_materias' %}">
-                        <span>Ver Materias</span></a
-                      >
+                      <a class="dropdown-item" href="{% url 'cursos:ver_materias' %}"><span>Ver Materias</span></a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="{%url 'cursos:crear_materia'%}">
-                        <span>Nueva Materia</span></a
-                      >
+                      <a class="dropdown-item" href="{% url 'cursos:crear_materia' %}"><span>Nueva Materia</span></a>
                     </li>
-                   
-                    
                   </ul>
                 </li>
 
                 <li class="nav-item dropdown {% if active_tab == 'definir_fechas' %}active-link{% endif %}">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="icon-drive_file_rename_outline"></i>Definir Fechas
-                  </a>
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-drive_file_rename_outline"></i>Definir Fechas</a>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item" href="form-inputs.html"
-                        ><span>Trimestrales</span></a
-                      >
+                      <a class="dropdown-item" href="form-inputs.html"><span>Trimestrales</span></a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="form-checkbox-radio.html"
-                        ><span>Semestrales</span></a
-                      >
+                      <a class="dropdown-item" href="form-checkbox-radio.html"><span>Semestrales</span></a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="form-file-input.html"
-                        ><span>Cuatrimestrales</span></a
-                      >
+                      <a class="dropdown-item" href="form-file-input.html"><span>Cuatrimestrales</span></a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="form-validations.html"
-                        ><span>Anuales</span></a
-                      >
+                      <a class="dropdown-item" href="form-validations.html"><span>Anuales</span></a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="form-layouts.html"
-                        >Complementarios</a
-                      >
+                      <a class="dropdown-item" href="form-layouts.html">Complementarios</a>
                     </li>
                   </ul>
                 </li>
 
                 <li class="nav-item dropdown {% if active_tab == 'usuarios' %}active-link{% endif %}">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="icon-login"></i>Gestionar Usuarios
-                  </a>
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-login"></i>Gestionar Usuarios</a>
                   <ul class="dropdown-menu dropdown-menu-end">
                     <li>
-                      <a
-                        class="dropdown-item"
-                        href="{%url 'usuarios:create_user' %}"
-                      >
-                        <span>Nuevo</span>
-                      </a>
+                      <a class="dropdown-item" href="{% url 'usuarios:create_user' %}"><span>Nuevo</span></a>
                     </li>
                     <li>
-                      <a
-                        class="dropdown-item"
-                        href="{%url 'usuarios:ver_usuarios' %}"
-                      >
-                        <span>Ver Usuarios</span>
-                      </a>
+                      <a class="dropdown-item" href="{% url 'usuarios:ver_usuarios' %}"><span>Ver Usuarios</span></a>
                     </li>
-                    
                   </ul>
                 </li>
               </ul>
@@ -441,57 +256,69 @@
                 <!-- Breadcrumb start -->
 
                 {% block breadcrumb %}
-                
-                
-                <ol class="breadcrumb mb-3">
-                  <li class="breadcrumb-item">
-                    <i class="icon-house_siding lh-1"></i>
-                    <a href="index.html" class="text-decoration-none">Home</a>
-                  </li>
-                  <li class="breadcrumb-item">Dashboards</li>
-                  <li class="breadcrumb-item">Analytics</li>
-                </ol>
-                
-                {% endblock breadcrumb %}
+                  <ol class="breadcrumb mb-3">
+                    <li class="breadcrumb-item">
+                      <i class="icon-house_siding lh-1"></i>
+                      <a href="index.html" class="text-decoration-none">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">Dashboards</li>
+                    <li class="breadcrumb-item">Analytics</li>
+                  </ol>
+                {% endblock %}
                 <!-- Breadcrumb end -->
-                
               </div>
             </div>
             <!-- Row end -->
 
             <!-- Bloque de mensajes -->
             {% if messages %}
-            <div class="alert-container">
-              {% for message in messages %}
-
-              <div class="alert {{ message.tags }} alert-dismissible d-flex align-items-center fade show" role="alert">
-                <i class="icon-layers fs-2 me-2 lh-1"></i>
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <div class="alert-container">
+                {% for message in messages %}
+                  <div class="alert {{ message.tags }} alert-dismissible d-flex align-items-center fade show" role="alert">
+                    <i class="icon-layers fs-2 me-2 lh-1"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
               </div>
-
-              </div>
-              {% endfor %}
-            </div>
             {% endif %}
 
             <!-- Row start -->
             <div class="row gx-3">
-              {%block main_content1%} {% endblock main_content1%}
+              {% block main_content1 %}
+
+              {% endblock %}
             </div>
             <!-- Row end -->
 
             <!-- Row start -->
             <div class="row gx-3">
-              {%block main_content2%} {% endblock main_content2%}
+              {% block main_content2 %}
+
+              {% endblock %}
             </div>
             <!-- Row end -->
 
             <!-- Row start -->
             <div class="row gx-3">
-              {%block main_content3%} {% endblock main_content3%}
+              {% block main_content3 %}
+
+              {% endblock %}
             </div>
             <!-- Row end -->
+
+            <!-- TOAST -->
+            <div class="row gx-3">
+              <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                {% block toast %}
+                
+                {% endblock toast %}
+              </div>
+
+             
+            </div>
+
+            <!-- end TOAST -->
           </div>
           <!-- Container ends -->
         </div>
@@ -509,20 +336,20 @@
     </div>
     <!-- Page wrapper end -->
 
-    <!-- *************
+    <!--  *************
 			************ JavaScript Files *************
-		************* -->
+		*************  -->
     <!-- Required jQuery first, then Bootstrap Bundle JS -->
     <script src="{% static 'assets/js/jquery.min.js' %}"></script>
     <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
 
-    <!-- *************
+    <!--  *************
 			************ Vendor Js Files *************
-		************* -->
+		*************  -->
 
     <!-- Overlay Scroll JS -->
-   {% comment %} <script src="{% static 'assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js' %}"></script>
-    <script src="{% static 'assets/vendor/overlay-scroll/custom-scrollbar.js' %}"></script>  {% endcomment %}
+    {% comment %} <script src="{% static 'assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/overlay-scroll/custom-scrollbar.js' %}"></script> {% endcomment %}
 
     <!-- Apex Charts -->
     {% comment %} <script src="assets/vendor/apex/apexcharts.min.js"></script>
@@ -536,7 +363,9 @@
 
     <!-- Custom JS files -->
     <script src="{% static 'assets/js/custom.js' %}"></script>
+    <script src="{% static 'assets/js/custom_js/main.js' %}"></script>
+    {% block scripts %}
 
-    {% block scripts %} {% endblock scripts %}
+    {% endblock %}
   </body>
 </html>

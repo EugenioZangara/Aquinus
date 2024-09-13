@@ -16,8 +16,8 @@ class CursoAdmin(admin.ModelAdmin):
     
 @admin.register(Cursante)
 class CursanteAdmin(admin.ModelAdmin):
-    list_display=['alumno', 'curso']
-    raw_id_fields=['alumno', 'curso']
+    list_display=['dni', 'curso']
+    raw_id_fields=[ 'curso']
     
 @admin.register(Calificaciones)
 class CalificacionesAdmin(admin.ModelAdmin):

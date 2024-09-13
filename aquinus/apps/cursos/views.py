@@ -1,13 +1,14 @@
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import  get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-
-
-from .models import Materia, PlanEstudio ,Curso, Cursante
-from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from django.views import View
-
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
+import json
+from django.db import transaction
+from apps.alumnos.models import persona
+from .models import Materia, PlanEstudio ,Curso, Cursante
 from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm
 # Create your views here.
 
@@ -79,10 +80,11 @@ class PlanEstudioCreateView(CreateView):
         especialidad = self.object.especialidad
         # Mostrar el mensaje de éxito
         messages.success(self.request, f"Se ha creado el plan de estudio para la especialidad {especialidad} exitosamente.")
+        print(form.cleaned_data)
         return response
     
     def form_invalid(self, form):
-        print(form)
+       
         # Imprimir los errores del formulario en la consola
         print("Formulario inválido. Errores:", form.errors)
         # También puedes registrar los errores usando logging
@@ -115,11 +117,12 @@ class PlanEstudioUpdateView(SuccessMessageMixin,UpdateView):
     
     # Este método se asegura de pasar el objeto al success_message
     def get_success_message(self, cleaned_data):
-        print("llamo el succeess")
         return self.success_message % dict(
             cleaned_data,
             nombre=self.object.especialidad
         )
+    
+    
 
 class DeletePlanEstudio(View):
     success_url = reverse_lazy('cursos:ver_planes_estudio')  # Redirigir al listado de planes de estudio
@@ -144,7 +147,46 @@ class PlanEstudioDetailView(DetailView):
 class CursoCreateView(CreateView):
     model = Curso
     template_name = "cursos/cursos/crear_curso.html"
-    success_url=reverse_lazy('home')
-    form_class=CursoCreateForm
-    
-    
+    success_url = reverse_lazy('home')
+    form_class = CursoCreateForm
+
+    def form_valid(self, form):
+        # Crea el curso pero no lo guarda aún
+        self.curso = form.save(commit=False)
+        self.curso.activo = True
+        self.curso.puede_calificar = True
+        # No guardar aún
+        return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        # Procesar el formulario
+        response = super().post(request, *args, **kwargs)
+
+        # Obtener los alumnos seleccionados del request
+        alumnos = request.POST.get('alumnos_seleccionados')
+        try:
+            alumnos_seleccionados = json.loads(alumnos)
+        except json.JSONDecodeError:
+            alumnos_seleccionados = []
+
+        curso = self.curso  # Curso no guardado aún
+        
+        # Empezar una transacción
+        with transaction.atomic():
+            try:
+                for alumno_dni in alumnos_seleccionados:
+                    Cursante.objects.create(dni=alumno_dni, curso=curso)
+                
+                # Guardar el curso después de asociar todos los alumnos
+                curso.save()
+                # Mensaje de éxito
+                messages.success(request, 'El curso se ha creado y se han asociado los alumnos correctamente.')
+                
+            except Exception as e:
+                # Si ocurre un error, la transacción se revertirá
+                messages.error(request, f'Hubo un error al asociar los alumnos: {str(e)}')
+                response = redirect(self.success_url)
+                return response
+
+        # Redirigir a la URL de éxito después de agregar el mensaje
+        return redirect(self.success_url)

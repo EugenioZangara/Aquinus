@@ -33,7 +33,7 @@ class PlanEstudioForm(forms.ModelForm):
                                                'hx-get':'/cursos/get_orientaciones/', 'hx-indicator':'.htmx-indicator', 'hx-target':'#id_orientacion'}),
             'orientacion':forms.Select(attrs={'class': 'form-control', 'placeholder': 'Abreviatura de la Orientacion', 'id':'id_orientacion'}),
             'anio':forms.TextInput(attrs={'class':'form-control', 'placeholder':'Año de puesta en vigencia del Plan'}),
-                        'materias': forms.CheckboxSelectMultiple(attrs={'class': 'form-check'}),  # Cambiar el widget a CheckboxSelectMultiple
+            'materias': forms.CheckboxSelectMultiple(attrs={'class': 'form-check'}),  # Cambiar el widget a CheckboxSelectMultiple
 
         }
         # Personalización de los labels
@@ -74,5 +74,5 @@ class CursoCreateForm(forms.ModelForm):
         }
         labels = {
             'plan_de_estudio': 'Especialidad del curso a abrir:',
-            'division': 'Número de Divisiones del Curso:'
+            'division': 'Ingrese la división del Curso:'
         }

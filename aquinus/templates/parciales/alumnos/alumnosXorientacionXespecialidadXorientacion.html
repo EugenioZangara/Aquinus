@@ -1,32 +1,15 @@
 {% load static %}
 {% load custom_filters %}
 
-
-
-          
-            {% for alumno in alumnos %}
-              <tr id="registro-{{ alumno.dni }}">
-                <td>{{ alumno.grado|convertirGrado }}</td>
-                <td>{{ alumno.dni }}</td>
-                <td>{{ alumno.apellidos }}</td>
-                <td>{{ alumno.nombres }}</td>
-                <td> <button class="btn btn-info"
-                  hx-post="{% url 'cursos:seleccionar_registro'  alumno.pk %}" 
-                  hx-target="#tablaSeleccionados" 
-                  hx-swap="beforeend"
-                   hx-trigger="click"
-                   >
-            Seleccionar
-          </button></td>
-              </tr>
-            {% endfor %}
-      
-        
-
-
-
-
-
-
-
-  
+{% for alumno in alumnos %}
+  <tr id="registro-{{ alumno.dni }}">
+    <td>{{ alumno.grado|convertirGrado }}</td>
+    <td>{{ alumno.dni }}</td>
+    <td>{{ alumno.apellidos }}</td>
+    <td>{{ alumno.nombres }}</td>
+    <td>
+     
+      <button class="btn btn-info" hx-post="{% url 'cursos:seleccionar_registro' alumno.pk %}" hx-target="#tablaSeleccionados" hx-swap="beforeend" hx-trigger="click">Seleccionar</button>
+    </td>
+  </tr>
+{% endfor %}

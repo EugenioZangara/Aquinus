@@ -127,8 +127,9 @@ class Materia(models.Model):
     regimen=models.CharField(max_length=50, choices=[('PROMOCIONABLE','PROMOCIONABLE'),('NO PROMOCIONABLE','NO PROMOCIONABLE'),('ESPECIAL','ESPECIAL')])
     observaciones=models.TextField(max_length=500, null=True, blank=True)
     anio=models.IntegerField(choices=[(1,1),(2,2),(3,3)])
+   
     def __str__(self):
-        return self.nombre
+        return f'{self.nombre} - ({self.abreviatura}) - ({self.tipo}) - ({self.regimen})'
     
     '''
     Se asegura que el nombre y abreviatura de la materia esté todo en mayúsculas
@@ -152,7 +153,7 @@ class PlanEstudio(models.Model):
     class Meta:
         constraints = [
             # Garantiza que la combinación de especialidad y año sea única
-            models.UniqueConstraint(fields=['especialidad', 'anio'], name='unique_especialidad_anio'),
+            models.UniqueConstraint(fields=['especialidad','orientacion', 'anio'], name='unique_especialidad_orientacion_anio'),
         ]
 
     def clean(self):
@@ -190,10 +191,11 @@ class Curso(models.Model):
     activo=models.BooleanField(default=False)
     puede_calificar=models.BooleanField(default=False)
     division=models.IntegerField(default=1)
+    
     def save(self, *args, **kwargs):
         if not self.nombre:  # Solo lo genera si el nombre no ha sido definido aún
             año_actual = datetime.now().year
-            self.nombre = f'{self.especialidad}-{año_actual}-{self.division}'
+            self.nombre = f'{self.plan_de_estudio.especialidad}{self.plan_de_estudio.orientacion}-{año_actual}-{self.division}'
         super().save(*args, **kwargs)
         
     def __str__(self):
@@ -201,12 +203,19 @@ class Curso(models.Model):
     
     
 class Cursante(models.Model):
-    alumno=models.OneToOneField(persona, on_delete=models.CASCADE,related_name='persona_alumno')
-    curso=models.ForeignKey(Curso, on_delete=models.DO_NOTHING, related_name='alumno_curso')
+    dni = models.IntegerField()
+    curso = models.ForeignKey(Curso, on_delete=models.DO_NOTHING, related_name='alumno_curso')
+
+    class Meta:
+        # Asegura que la combinación de curso y dni sea única
+        unique_together = ('dni', 'curso')
+        # Opcional: Puedes añadir un índice para optimizar consultas
+        indexes = [
+            models.Index(fields=['dni', 'curso']),
+        ]
     
     def __str__(self):
-        return self.alumno.dni
-    
+        return str(self.dni)
 
 
 class Calificaciones(models.Model):

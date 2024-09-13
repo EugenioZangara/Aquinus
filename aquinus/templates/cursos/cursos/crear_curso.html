@@ -27,6 +27,8 @@
 <!-- Breadcrumb end -->
 
 {% block main_content1 %}
+<form method="post" action="{% url 'cursos:crear_curso' %}" id="crearCursoForm">
+  {% csrf_token %}
   <div class="row gx-3">
     <div class="col-12">
       <div class="card mb-3">
@@ -67,8 +69,9 @@
             </div>
             <div class="col-lg-2 col-sm-4 col-12">
               <div class="row row-cols-lg-auto g-3 align-items-center">
-                <button type="button" class="btn btn-warning" id="btnCargarAlumnos"
-                ><i class="fs-4 icon-file-plus"></i> Cargar Alumnos</button>
+                <button type="submit" class="btn btn-warning btn-lg" id="btnCrearCurso">
+                  <i class="fs-4 icon-file-plus"></i> Crear Curso
+                </button>
               </div>
             </div>
           </div>
@@ -135,6 +138,8 @@
     </div>
     
   </div>
+
+</form>
 {% endblock %}
 {% block scripts %}
  
@@ -215,5 +220,38 @@
     });
     </script>
   
+<script>
 
+  document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById("crearCursoForm");
+  
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevenimos el envío del formulario temporalmente
+ console.log("llama la funcion")
+        // Recopila los datos de los alumnos seleccionados
+        var alumnosSeleccionados = Array.from(document.querySelectorAll('#tablaSeleccionados input[name="alumnos_pk"]'))
+          .map(input => input.value);
+  
+        // Crea o actualiza el campo oculto para los alumnos seleccionados
+        var hiddenInput = document.getElementById('alumnos_seleccionados');
+        if (!hiddenInput) {
+          hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.id = 'alumnos_seleccionados';
+          hiddenInput.name = 'alumnos_seleccionados';
+          form.appendChild(hiddenInput);
+        }
+  
+        // Actualiza el valor del campo oculto
+        hiddenInput.value = JSON.stringify(alumnosSeleccionados);
+  
+        // Ahora podemos enviar el formulario
+        form.submit();
+      });
+    } else {
+      console.error('No se encontró el formulario');
+    }
+  });
+  </script>
 {% endblock %}
