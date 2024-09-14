@@ -5,8 +5,8 @@
     <i class="icon-house_siding lh-1"></i>
     <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
   </li>
-  <li class="breadcrumb-item">Plan de Estudio</li>
-  <li class="breadcrumb-item">Ver Planes de Estudio</li>
+  <li class="breadcrumb-item">Cursos</li>
+  <li class="breadcrumb-item">Ver Cursos Activos</li>
 </ol>
 
 {% endblock breadcrumb %}
@@ -16,36 +16,45 @@
 
 <div class="card mb-3">
   <div class="card-header">
-    <div class="card-title">Listado de Materias</div>
+    <div class="card-title">Listado de Cursos Activos</div>
   </div>
   <div class="card-body">
     <div class="table-responsive">
       <table id="highlightRowColumn" class="table table-striped">
         <thead>
           <tr>
-            <th>Especialidad</th>
-            <th>Orientación</th>
-     
-            <th>Año del plan de Estudio</th>
-            <th>Materias</th>
+            <th>Nombre</th>
+            <th>Plan de Estudio</th>
+            <th>División</th>
+            
 
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {% for plan in planes %}
+          {% for curso in cursos %}
           <tr>
-            <td>{{plan.especialidad}}</td>
-            <td>{{plan.orientacion}}</td>
-        
-            <td>{{plan.anio}}</td>
-            <td>{%for materia in plan.materias.all%} {{materia}} {%endfor%}</td>
-
-            <td></td>
+            <td>{{curso.nombre}}</td>
+            <td>{{curso.plan_de_estudio}}
+              <a
+                href="{%url 'cursos:detalles_plan_estudio' curso.plan_de_estudio.pk %}"
+                class="btn btn-outline-dark btn-sm"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip-primary"
+                data-bs-title="Detalles"
+                aria-describedby="tooltip599725"
+              >
+                <i class="icon-eye"></i>
+              </a>
+            </td>
+            <td>{{curso.division}}
+            
+            
 
             <td>
               <a
-                href="{%url 'cursos:detalles_plan_estudio' plan.pk %}"
+                href="{%url 'cursos:detalles_curso' curso.pk %}"
                 class="btn btn-outline-info btn-sm"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
@@ -57,7 +66,7 @@
               </a>
 
               <a
-                href="{%url 'cursos:modificar_plan_estudio' plan.pk %}"
+                href="{%url 'cursos:modificar_plan_estudio' curso.pk %}"
                 class="btn btn-outline-primary btn-sm"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
@@ -80,8 +89,8 @@
                   class="btn btn-outline-danger btn-sm"
                   data-bs-toggle="modal"
                   data-bs-target="#deleteModal"
-                  data-plan-estudio-id="{{ plan.id }}"
-                  data-plan-estudio-nombre="{{ plan.especialidad }}"
+                  data-curso-id="{{ curso.id }}"
+                  data-curso-nombre="{{ curso.nombre }}"
                 >
                   <i class="icon-trash"></i>
                 </a>
@@ -107,7 +116,7 @@
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Eliminar Plan de Estudio</h5>
+        <h5 class="modal-title">Eliminar Curso</h5>
         <button
           type="button"
           class="btn-close"
@@ -117,22 +126,21 @@
       </div>
       <div class="modal-body">
         <p>
-          Está a punto de eliminar el Plan de Estudio de la Especialidad
-          <strong><span id="planEstudioNombre"></span></strong>. El plan de
-          estudio dejará de estar vigente, y deberá crear uno nuevo para la
+          Está a punto de eliminar el Curso
+          <strong><span id="cursoNombre"></span></strong>. El Curso dejará de estar vigente, y deberá crear uno nuevo para la
           especialidad. Desea continuar?
         </p>
       </div>
       <div class="modal-footer flex-column">
         <form
           method="POST"
-          action="{% url 'cursos:eliminar_plan_estudio' 0 %}"
+          action="{% url 'cursos:eliminar_curso' 0 %}"
           id="deleteForm"
         >
           {% csrf_token %}
-          <input type="hidden" name="plan_estudio_id" id="plan_estudioId" />
+          <input type="hidden" name="curso_id" id="cursoId" />
           <button type="submit" class="btn btn-lg btn-danger w-100 mx-0 mb-2">
-            Eliminar Plan de Estudio
+            Eliminar Curso
           </button>
           <button
             type="button"
@@ -189,21 +197,20 @@
     const button = event.relatedTarget;
 
     // Extraer la información de los atributos data-
-    const planEstudioId = button.getAttribute("data-plan-estudio-id");
-    const planEstudioNombre = button.getAttribute("data-plan-estudio-nombre");
+    const cursoId = button.getAttribute("data-curso-id");
+    const cursoNombre = button.getAttribute("data-curso-nombre");
 
     // Actualizar el contenido del modal
-    const planEstudioNombreElement =
-      document.getElementById("planEstudioNombre");
-    planEstudioNombreElement.textContent = planEstudioNombre;
+    const cursoNombreElement = document.getElementById("cursoNombre");
+    cursoNombreElement.textContent = cursoNombre;
 
     // Actualizar la acción del formulario con el ID de la materia
     const deleteForm = document.getElementById("deleteForm");
-    deleteForm.action = `{% url 'cursos:eliminar_plan_estudio' 0 %}`.replace(
+    deleteForm.action = `{% url 'cursos:eliminar_curso' 0 %}`.replace(
       "0",
-      planEstudioId
+      cursoId
     );
-    document.getElementById("plan_estudioId").value = planEstudioId;
+    document.getElementById("cursoId").value = cursoId;
   });
 </script>
 

@@ -5,9 +5,9 @@
     <i class="icon-house_siding lh-1"></i>
     <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
   </li>
-  <li class="breadcrumb-item">Plan de Estudio</li>
+  <li class="breadcrumb-item">Cursos</li>
   <li class="breadcrumb-item">Detalles</li>
-  <li class="breadcrumb-item">{{plan_de_estudio}}</li>
+  <li class="breadcrumb-item">{{cursos}}</li>
 </ol>
 
 {% endblock breadcrumb %}
@@ -27,15 +27,19 @@
                   <img src="{% static 'assets/images/plan_estudio.png' %}" class="img-5x rounded-3" />
                 </div>
                 <div class="col">
-                  <h6 class="fw-light">Especialidad</h6>
-                  <h5 class="m-0 fw-semibold">{{plan_de_estudio}}</h5>
+                  <h6 class="fw-light">Curso:</h6>
+                  <h5 class="m-0 fw-semibold">{{cursos}}</h5>
                 </div>
                 <div class="col">
-                    <h6 class="fw-light">Año puesta en vigencia</h6>
-                    <h5 class="m-0 fw-semibold">{{plan_de_estudio.anio}}</h5>
+                    <h6 class="fw-light">Plan de estudio</h6>
+                    <h5 class="m-0 fw-semibold">{{cursos.plan_de_estudio}}</h5>
+                  </div>
+                  <div class="col">
+                    <h6 class="fw-light">División:</h6>
+                    <h5 class="m-0 fw-semibold">{{cursos.division}}</h5>
                   </div>
                 <div class="col-12 col-md-auto">
-                  <a href="{%url 'cursos:modificar_plan_estudio' plan_de_estudio.pk %}" class="btn btn-warning"> Modificar</a>
+                  <a href="{%url 'cursos:modificar_plan_estudio' cursos.pk %}" class="btn btn-warning"> Modificar</a>
                 </div>
               </div>
             </div>
@@ -69,7 +73,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for materia in plan_de_estudio.materias.all %}
+            {% for materia in materias %}
             <tr>
               <td>{{materia.nombre}}</td>
               <td>{{materia.abreviatura}}</td>

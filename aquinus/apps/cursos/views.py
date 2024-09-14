@@ -99,7 +99,9 @@ class PlanEstudioListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active_tab']="planes_estudio"   
+        planes=PlanEstudio.objects.filter(vigente=True)
+        context['active_tab']="planes_estudio" 
+        context['planes']=planes  
         return context
     
     def get_queryset(self):
@@ -190,3 +192,48 @@ class CursoCreateView(CreateView):
 
         # Redirigir a la URL de éxito después de agregar el mensaje
         return redirect(self.success_url)
+    
+class CursoListView(ListView):
+    model = Curso
+    template_name = "cursos/cursos/ver_cursos.html"
+    context_object_name="cursos"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab']="cursos"   
+        return context
+    
+class CursoDeleteView(SuccessMessageMixin, DeleteView):
+    model = Curso
+    success_url = reverse_lazy('cursos:ver_cursos')  # Redirigir al listado de planes de estudio
+    success_message = "El curso %(nombre) ha sido eliminado exitosamente."
+
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            nombre=self.object.nombre
+        )
+        
+class CursoDetailView(DetailView):
+    model = Curso
+    template_name = "cursos/cursos/detalles.html"
+    context_object_name='cursos'
+
+    def get_context_data(self, **kwargs):
+        # Obtén el contexto original de la vista
+        context = super().get_context_data(**kwargs)
+        
+        # Accede al curso actual
+        curso = self.object
+        
+        # Accede al plan de estudio asociado al curso
+        plan_de_estudio = curso.plan_de_estudio
+        
+        # Obtén las materias asociadas al plan de estudio
+        materias = plan_de_estudio.materias.all()
+        
+        # Agrega las materias al contexto
+        context['materias'] = materias
+        
+        return context

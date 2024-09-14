@@ -76,3 +76,8 @@ class CursoCreateForm(forms.ModelForm):
             'plan_de_estudio': 'Especialidad del curso a abrir:',
             'division': 'Ingrese la división del Curso:'
         }
+    def __init__(self, *args, **kwargs):
+        super(CursoCreateForm, self).__init__(*args, **kwargs)
+        # Filtrar solo los planes de estudio cuyo campo 'vigente' sea True
+    
+        self.fields['plan_de_estudio'].queryset = PlanEstudio.objects.filter(vigente=True)

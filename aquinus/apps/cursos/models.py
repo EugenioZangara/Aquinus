@@ -204,7 +204,7 @@ class Curso(models.Model):
     
 class Cursante(models.Model):
     dni = models.IntegerField()
-    curso = models.ForeignKey(Curso, on_delete=models.DO_NOTHING, related_name='alumno_curso')
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='alumno_curso')
 
     class Meta:
         # Asegura que la combinación de curso y dni sea única
