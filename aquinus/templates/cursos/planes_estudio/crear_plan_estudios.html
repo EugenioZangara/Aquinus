@@ -28,9 +28,13 @@
     <div class="col-xl-10 col-sm-12 col-12">
       <div class="row gx-3">
         <div class="col-12">
+
+
+
+
           <div class="card mb-3">
             <div class="card-header">
-              <h5 class="card-title">Ingrese nuevo Plan de Estudios</h5>
+              <h5 class="card-title">Definir nuevo Plan de Estudios</h5>
             </div>
             <div class="card-body">
               <form method="post">
@@ -45,13 +49,14 @@
                     {{ form.anio }}
                     <div class="d-grid py-3 mt-3 gap-3">
                       <button type="submit" class="btn btn-lg btn-primary">Crear Plan de Estudios</button>
+                      <button type="button" class="btn btn-lg btn-secondary" id="limpiarCheckboxes">Limpiar Formulario</button>
                     </div>
                   </div>
 
                   <div class="col-lg-8 col-sm-4 col-12">
                     <div class="mb-3">
                       {{ form.materias.label }}
-                      <div class="table-responsive">
+                      <div class="table-responsive" >
                         <table id="scrollVertical" class="table table-striped">
                           <thead>
                             <tr>
@@ -96,7 +101,7 @@
 
   <script src="{% static 'assets/vendor/datatables/dataTables.min.js' %}"></script>
   <script src="{% static 'assets/vendor/datatables/dataTables.bootstrap.min.js' %}"></script>
-  <script src="{% static 'assets/vendor/datatables/custom/custom-datatables.js' %}"></script>
+  {% comment %} <script src="{% static 'assets/vendor/datatables/custom/custom-datatables.js' %}"></script> {% endcomment %}
   <!-- DataTable Buttons -->
   <script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
   <script src="{% static 'assets/vendor/datatables/buttons/jszip.min.js' %}"></script>
@@ -137,30 +142,77 @@
     document.addEventListener('DOMContentLoaded', function() {
       const checkboxes = document.querySelectorAll('.form-check');
       const toastContainer = document.querySelector('.toast-container');
+      const limpiarButton = document.getElementById('limpiarCheckboxes');
+
+      function mostrarToast(mensaje) {
+        const toastHtml = `
+          <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+              <strong class="me-auto">Notificación</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+              ${mensaje}
+            </div>
+          </div>
+        `;
+    
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+        const toast = toastContainer.lastElementChild;
+        const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+        bsToast.show();
+      }
     
       checkboxes.forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
           const materiaLabel = this.closest('tr').querySelector('label').textContent;
           const isChecked = this.checked;
-    
-          const toastHtml = `
-            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-              <div class="toast-header">
-                <strong class="me-auto">Materia ${isChecked ? 'seleccionada' : 'deseleccionada'}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-              </div>
-              <div class="toast-body">
-                ${materiaLabel} ha sido ${isChecked ? 'añadida' : 'removida'} del plan de estudios.
-              </div>
-            </div>
-          `;
-    
-          toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-          const toast = toastContainer.lastElementChild;
-          const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
-          bsToast.show();
+          mostrarToast(`${materiaLabel} ha sido ${isChecked ? 'añadida' : 'removida'} del plan de estudios.`);
         });
       });
+
+      limpiarButton.addEventListener('click', function() {
+        checkboxes.forEach(function(checkbox) {
+          checkbox.checked = false;
+        });
+        mostrarToast('Todas las materias han sido deseleccionadas.');
+      });
+
+
     });
   </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var loader = document.getElementById('loader');
+      var mainContent = document.getElementById('main-content');
+    
+      // Verifica si la tabla ya ha sido inicializada
+      if (!$.fn.DataTable.isDataTable('#scrollVertical')) {
+        // Inicializa DataTables si aún no está inicializada
+        var table = $('#scrollVertical').DataTable({
+          // Tus opciones de DataTables aquí
+          scrollY: "207px",
+        scrollCollapse: true,
+        paging: false,
+        bInfo: false,
+          "initComplete": function(settings, json) {
+            // Oculta el loader y muestra el contenido cuando DataTables ha terminado de inicializarse
+            loader.style.display = 'none';
+            mainContent.style.display = 'block';
+            console.log("DataTable terminó de cargar");
+          }
+        });
+      } else {
+        // Si ya está inicializada, simplemente oculta el loader y muestra el contenido
+        loader.style.display = 'none';
+        mainContent.style.display = 'block';
+      }
+    });
+    
+
+
+   
+    
+    </script>
 {% endblock %}
