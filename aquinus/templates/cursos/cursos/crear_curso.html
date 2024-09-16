@@ -1,6 +1,6 @@
 {% extends 'main.html' %} {% load static %}
 {% block head %}
-  <!-- Scrollbar CSS -->
+<!-- Scrollbar CSS -->
   <link rel="stylesheet" href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}" />
 
   <!-- Data Tables -->
@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5-custom.css' %}" />
   <link rel="stylesheet" href="{% static 'assets/vendor/datatables/buttons/dataTables.bs5-custom.css' %}" />
 
- 
+  
 {% endblock %}
 <!-- Breadcrumb start -->
 
@@ -105,6 +105,14 @@
               </thead>
               <tbody id='listadoAspirantes'>
                
+<tr>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+</tr>
+
               </tbody>
             </table>
           </div>
@@ -130,7 +138,17 @@
                   <th>Acciones</th>
                 </tr>
               </thead>
-              <tbody id="tablaSeleccionados"></tbody>
+              <tbody id="tablaSeleccionados">
+
+<tr>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+                <!--Aspirants seleccionados para el curso-->
+              </tbody>
             </table>
           </div>
         </div>
@@ -253,5 +271,47 @@
       console.error('No se encontró el formulario');
     }
   });
-  </script>
+</script>
+
+<script>
+
+  document.body.addEventListener('htmx:beforeSwap', function(evt) {
+    // Destruir DataTables en la primera tabla si existe
+    if ($.fn.DataTable.isDataTable('#scrollVertical2')) {
+        $('#scrollVertical2').DataTable().destroy();
+    }
+    // Destruir DataTables en la segunda tabla si existe
+    if ($.fn.DataTable.isDataTable('#scrollVertical')) {
+        $('#scrollVertical').DataTable().destroy();
+    }
+});
+
+
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+  // Verifica si la primera tabla fue actualizada por HTMX
+  if (document.getElementById('scrollVertical2') !== null) {
+      // Reinicializar DataTables para la primera tabla
+      $('#scrollVertical2').DataTable({
+          // Opciones específicas de DataTables para la primera tabla
+          paging: true,
+          searching: true,
+          scrollY: '200px',
+          scrollCollapse: true
+      });
+  }
+
+  // Verifica si la segunda tabla fue actualizada por HTMX
+  if (document.getElementById('scrollVertical') !== null) {
+      // Reinicializar DataTables para la segunda tabla
+      $('#scrollVertical').DataTable({
+          // Opciones específicas de DataTables para la segunda tabla
+          paging: true,
+          searching: true,
+          scrollY: '200px',
+          scrollCollapse: true
+      });
+  }
+});
+
+</script>
 {% endblock %}

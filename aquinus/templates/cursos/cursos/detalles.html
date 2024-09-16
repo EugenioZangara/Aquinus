@@ -1,4 +1,4 @@
-{% extends "main.html" %} {%load static%} {% block breadcrumb %}
+{% extends "main.html" %} {%load static%} {% load custom_filters%}{% block breadcrumb %}
 
 <ol class="breadcrumb mb-3">
   <li class="breadcrumb-item">
@@ -56,39 +56,124 @@
   
   {%block main_content2%}
   
-  <div class="card mb-3">
-    <div class="card-header">
-      <div class="card-title">Listado de Materias</div>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table id="highlightRowColumn" class="table table-striped">
-          <thead>
-            <tr>
-              <th>Materia</th>
-              <th>Abreviatura</th>
-              <th>Tipo</th> 
-              <th>Año</th> 
-              <th>Observaciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for materia in materias %}
-            <tr>
-              <td>{{materia.nombre}}</td>
-              <td>{{materia.abreviatura}}</td>
-              <td>{{materia.tipo}}</td>
-             <td>{{materia.anio}}</td>
-  
-              <td>
-               {{materia.observaciones|default:""}}
-              </td>
-            </tr>
-            {%endfor%}
-          </tbody>
-        </table>
+
+  <div class="col-xxl-12">
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="custom-tabs-container">
+          <ul class="nav nav-tabs" id="customTab3" role="tablist">
+            <li class="nav-item" role="presentation">
+              <a class="nav-link active" id="tab-oneAA" data-bs-toggle="tab" href="#oneAA" role="tab"
+                aria-controls="oneAA" aria-selected="true"><i class="icon-group"></i>Alumnos</a>
+            </li>
+            <li class="nav-item" role="presentation">
+              <a class="nav-link" id="tab-twoAA" data-bs-toggle="tab" href="#twoAA" role="tab"
+                aria-controls="twoAA" aria-selected="false"><i class="icon-layers"></i>Materias</a>
+            </li>
+            <li class="nav-item" role="presentation">
+              <a class="nav-link" id="tab-threeAA" data-bs-toggle="tab" href="#threeAA" role="tab"
+                aria-controls="threeAA" aria-selected="false"><i class="icon-grading"></i>Calificaciones</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="customTabContent3">
+            <div class="tab-pane fade show active" id="oneAA" role="tabpanel">
+              <div class="row gx-3">
+                <div class="col-12">
+                  <div class="card mb-3">
+                    <div class="card-body">
+                      <div class="table-outer">
+                        <div class="table-responsive">
+                          <table class="table table-striped align-middle m-0">
+                            <thead>
+                              <tr>
+                                <th>DNI</th>
+                                <th>M.R.</th>
+                                <th>Grado</th>
+                                <th>Espe./Or.</th>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for aspirante in cursantes %}
+                              <tr>
+                                <td>{{aspirante.dni}}</td>
+                                <td>
+                                  {{aspirante.mr}}
+                                </td>
+                                <td>{{aspirante.grado|convertirGrado}}</td>
+                              
+                                <td>{{aspirante.especialidad|convertirEspecialidad}} {{aspirante.orientacion}}</td>
+                                <td>{{aspirante.apellidos}}</td>
+                                <td>{{aspirante.nombres}}</td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+            </div>
+            <div class="tab-pane fade" id="twoAA" role="tabpanel">
+              <div class="row gx-3">
+                <div class="card mb-3">
+                  <div class="card-header">
+                    <div class="card-title">Listado de Materias</div>
+                  </div>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table id="highlightRowColumn" class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>Materia</th>
+                            <th>Abreviatura</th>
+                            <th>Tipo</th> 
+                            <th>Año</th> 
+                            <th>Observaciones</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for materia in materias %}
+                          <tr>
+                            <td>{{materia.nombre}}</td>
+                            <td>{{materia.abreviatura}}</td>
+                            <td>{{materia.tipo}}</td>
+                           <td>{{materia.anio}}</td>
+                
+                            <td>
+                             {{materia.observaciones|default:""}}
+                            </td>
+                          </tr>
+                          {%endfor%}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>            </div>
+            <div class="tab-pane fade" id="threeAA" role="tabpanel">
+              <h3 class="text-primary">Some Description</h3>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+
+
+
+
+
+
+
+ 
 
 {%endblock main_content2%}

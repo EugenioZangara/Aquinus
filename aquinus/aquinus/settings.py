@@ -55,6 +55,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'apps.usuarios.middleware.VerificarCambioContrasenaMiddleware',
+            'aquinus.custom_middleware.CurrentUserMiddleware',
+
 
 ]
 

@@ -6,7 +6,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 import json
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from apps.alumnos.models import persona
 from .models import Materia, PlanEstudio ,Curso, Cursante
 from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm
@@ -153,13 +153,25 @@ class CursoCreateView(CreateView):
     form_class = CursoCreateForm
 
     def form_valid(self, form):
-        # Crea el curso pero no lo guarda aún
-        self.curso = form.save(commit=False)
-        self.curso.activo = True
-        self.curso.puede_calificar = True
-        # No guardar aún
-        return super().form_valid(form)
+        try:
+            # Crea el curso pero no lo guarda aún
+            self.curso = form.save(commit=False)
+            self.curso.activo = True
+            self.curso.puede_calificar = True
+            # No guardar aún
+            return super().form_valid(form)
+        except IntegrityError as e:
+                print("ENTRO EN EL INVALIDA ESTE")
+                # Manejar errores de integridad (como el nombre del curso duplicado)
+                messages.error(self.request, 'El nombre del curso ya existe. Por favor, elige otro.')
+                return self.form_invalid(self.get_form()) 
+            
+        
 
+    def form_invalid(self, form):
+            # Aquí puedes manejar cómo se muestran los errores en el formulario
+            return self.render_to_response(self.get_context_data(form=form))
+        
     def post(self, request, *args, **kwargs):
         # Procesar el formulario
         response = super().post(request, *args, **kwargs)
@@ -180,15 +192,17 @@ class CursoCreateView(CreateView):
                     Cursante.objects.create(dni=alumno_dni, curso=curso)
                 
                 # Guardar el curso después de asociar todos los alumnos
-                curso.save()
+                curso.save(request=request)  #PASAMOS EL REQUEST PARA ALMACENAR EL USUARIO QUE REALIZÓ EL CAMBIO
                 # Mensaje de éxito
                 messages.success(request, 'El curso se ha creado y se han asociado los alumnos correctamente.')
-                
+            except IntegrityError as e:
+                # Manejar errores de integridad (como el nombre del curso duplicado)
+                messages.error(request, 'El nombre del curso ya existe. Por favor, elige otro.')
+                return self.form_invalid(self.get_form())    
             except Exception as e:
                 # Si ocurre un error, la transacción se revertirá
                 messages.error(request, f'Hubo un error al asociar los alumnos: {str(e)}')
-                response = redirect(self.success_url)
-                return response
+                return self.form_invalid(self.get_form())
 
         # Redirigir a la URL de éxito después de agregar el mensaje
         return redirect(self.success_url)
@@ -232,8 +246,10 @@ class CursoDetailView(DetailView):
         
         # Obtén las materias asociadas al plan de estudio
         materias = plan_de_estudio.materias.all()
-        
+        dni_cursantes=Cursante.objects.filter(curso=curso).values_list('dni', flat=True)
+        cursantes=persona.objects.using('id8').filter(dni__in=list(dni_cursantes))
         # Agrega las materias al contexto
         context['materias'] = materias
+        context['cursantes']=cursantes
         
         return context

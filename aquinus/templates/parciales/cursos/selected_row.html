@@ -1,10 +1,6 @@
 {% load static %}
 {% load custom_filters %}
-<head>
-  <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5.css' %}" />
-  <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5-custom.css' %}" />
-  <link rel="stylesheet" href="{% static 'assets/vendor/datatables/buttons/dataTables.bs5-custom.css' %}" />
-</head>
+
 
 <tr id="seleccionadoId-{{ registro.dni }}">
   <td>{{ registro.grado|convertirGrado }}</td>
@@ -16,3 +12,5 @@
     <button class="btn btn-danger" hx-post="{% url 'cursos:quitar_registro' registro.pk %}" hx-target="#listadoAspirantes" hx-swap="beforeend" hx-trigger="click">Quitar</button>
   </td>
 </tr>
+
+

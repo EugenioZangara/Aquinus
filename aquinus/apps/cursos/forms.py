@@ -81,3 +81,9 @@ class CursoCreateForm(forms.ModelForm):
         # Filtrar solo los planes de estudio cuyo campo 'vigente' sea True
     
         self.fields['plan_de_estudio'].queryset = PlanEstudio.objects.filter(vigente=True)
+        
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if Curso.objects.filter(nombre=nombre).exists():
+            raise forms.ValidationError('El curso para esa especialidad y división ya existe. Por favor, verifique especialidad y división.')
+        return nombre

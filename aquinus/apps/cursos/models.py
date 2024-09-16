@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from django.conf import settings
+
 from django.db.models import Q
 from django.contrib.auth.models import User  # Importa el modelo User
 
@@ -191,13 +193,29 @@ class Curso(models.Model):
     activo=models.BooleanField(default=False)
     puede_calificar=models.BooleanField(default=False)
     division=models.IntegerField(default=1)
-    
+    # Nuevos campos para registro
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def save(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        if request:
+            self.updated_by = request.current_user
+        super().save(*args, **kwargs)
+        
     def save(self, *args, **kwargs):
         if not self.nombre:  # Solo lo genera si el nombre no ha sido definido aún
             año_actual = datetime.now().year
             self.nombre = f'{self.plan_de_estudio.especialidad}{self.plan_de_estudio.orientacion}-{año_actual}-{self.division}'
+            
+        request = kwargs.pop('request', None)
+        if request:
+            self.updated_by = request.current_user
         super().save(*args, **kwargs)
-        
+     
+    
+    
     def __str__(self):
         return self.nombre
     
@@ -205,6 +223,7 @@ class Curso(models.Model):
 class Cursante(models.Model):
     dni = models.IntegerField()
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='alumno_curso')
+    activo=models.BooleanField(default=True)
 
     class Meta:
         # Asegura que la combinación de curso y dni sea única

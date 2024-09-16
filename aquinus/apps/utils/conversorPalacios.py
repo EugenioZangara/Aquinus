@@ -13,8 +13,10 @@ especialidades = {
     'OP': 12,
     'CO': 13,
     'SH': 14,
-    'MU': 15,
+    'MU': 15
 }
+
+
 
 orientaciones={
 2:"AM",
@@ -67,8 +69,14 @@ orientaciones={
 # 49:'su'
 # 50:Turbinas
 }
-def convertirEspecialidad(especialidad):
-    return especialidades[especialidad]
+# Diccionario invertido
+especialidades_invertidas = {v: k for k, v in especialidades.items()}
+
+# Función para convertir entre string y número
+def convertirEspecialidad(valor):
+   
+        return especialidades.get(valor)
+   
 
 def convertirOrientaciones(orientacion):
     return orientaciones[orientacion]   

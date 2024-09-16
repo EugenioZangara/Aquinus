@@ -3,6 +3,7 @@ from django.http import HttpResponseBadRequest
 from apps.cursos.models import PlanEstudio
 from .models import persona
 from apps.utils.conversorPalacios import convertirEspecialidad
+from apps.cursos.models import Cursante
 
 def get_alumnos_por_especialidad(request):
     plan_de_estudio = request.GET.get('plan_de_estudio')
@@ -15,7 +16,8 @@ def get_alumnos_por_especialidad(request):
         plan_estudio = PlanEstudio.objects.get(id=plan_de_estudio)
         especialidad = convertirEspecialidad(plan_estudio.especialidad)
         orientacion = plan_estudio.orientacion
-        alumnos = persona.objects.using('id8').filter(especialidad=especialidad, grado=anio).order_by('apellidos')
+        alumnos_con_curso_asignado=Cursante.objects.filter(activo=True).values_list('dni', flat=True)
+        alumnos = persona.objects.using('id8').filter(especialidad=especialidad, grado=anio).order_by('apellidos').exclude(dni__in=list(alumnos_con_curso_asignado))
    
         context = {
             'alumnos': alumnos
