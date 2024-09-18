@@ -1,15 +1,16 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import  get_object_or_404, redirect
+from django.shortcuts import  get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
-from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView, TemplateView
 import json
 from django.db import IntegrityError, transaction
 from apps.alumnos.models import persona
-from .models import Materia, PlanEstudio ,Curso, Cursante
-from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm
+from apps.usuarios.models import Perfil
+from .models import Materia, PlanEstudio ,Curso, Cursante, Profesor
+from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm,  AsignarProfesoresForm
 # Create your views here.
 
 class MateriaCreateView(CreateView):
@@ -80,7 +81,6 @@ class PlanEstudioCreateView(CreateView):
         especialidad = self.object.especialidad
         # Mostrar el mensaje de éxito
         messages.success(self.request, f"Se ha creado el plan de estudio para la especialidad {especialidad} exitosamente.")
-        print(form.cleaned_data)
         return response
     
     def form_invalid(self, form):
@@ -161,7 +161,7 @@ class CursoCreateView(CreateView):
             # No guardar aún
             return super().form_valid(form)
         except IntegrityError as e:
-                print("ENTRO EN EL INVALIDA ESTE")
+             
                 # Manejar errores de integridad (como el nombre del curso duplicado)
                 messages.error(self.request, 'El nombre del curso ya existe. Por favor, elige otro.')
                 return self.form_invalid(self.get_form()) 
@@ -253,3 +253,119 @@ class CursoDetailView(DetailView):
         context['cursantes']=cursantes
         
         return context
+    
+class AsignarProfesores(ListView):
+    model=Materia
+    template_name='cursos/materias/asignar_profesores.html'
+    context_object_name='materias'
+    
+
+    def get_queryset(self):
+        curso_id=self.kwargs.get('pk')
+        curso = Curso.objects.get(id=curso_id)
+        materias=Materia.objects.filter(materias_plan_de_estudio=curso.plan_de_estudio).prefetch_related('profesor_materia')
+        return materias
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        curso = Curso.objects.get(pk=self.kwargs['pk'])
+        materias = curso.plan_de_estudio.materias.all()
+
+        # Crear una lista de tuplas (materia, formulario)
+        
+        context['curso']=curso
+        context['materias'] = materias
+        return context
+    
+class ProfesorTemplateView(TemplateView):
+    model = Profesor
+    template_name = "cursos/materias/actualizar_profesores.html"
+    
+    def get_context_data(self, **kwargs):
+       
+        context = super().get_context_data(**kwargs)
+        materia_id = kwargs.get('materia_id')
+        curso_id = kwargs.get('curso_id')
+        materia = get_object_or_404(Materia, id=materia_id)
+        curso = get_object_or_404(Curso, id=curso_id)
+    
+        
+        # Obtener los profesores existentes para este curso y materia
+        profesores_existentes = Profesor.objects.filter(curso=curso, materias=materia)
+        
+        # Obtener los IDs de los usuarios de los profesores existentes
+        usuarios_existentes = [prof.usuario.usuario.id for prof in profesores_existentes]
+        
+        form = AsignarProfesoresForm(initial={'usuario': usuarios_existentes})
+        context["form"]=form
+        context["materia"] =materia
+        context["curso"]=curso 
+        return context
+    
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        curso = context['curso']
+        materia = context['materia']
+        form = AsignarProfesoresForm(request.POST)
+        
+        if form.is_valid():
+            usuarios_seleccionados = set(form.cleaned_data['usuario'])
+            
+            # Obtener todos los profesores actualmente asignados a este curso y materia
+            profesores_actuales = Profesor.objects.filter(curso=curso, materias=materia)
+            usuarios_actuales = set(profesor.usuario.usuario for profesor in profesores_actuales)
+            
+            # Identificar usuarios deseleccionados
+            usuarios_deseleccionados = usuarios_actuales - usuarios_seleccionados
+            
+            # Eliminar las asignaciones existentes para usuarios deseleccionados
+            for usuario in usuarios_deseleccionados:
+                profesor = profesores_actuales.get(usuario__usuario=usuario)
+                profesor.curso.remove(curso)
+                profesor.materias.remove(materia)
+                messages.warning(request, f'Se ha eliminado la asignación del profesor {profesor.usuario} para este curso y materia.')
+            
+            # Crear o actualizar las nuevas asignaciones
+            for usuario in usuarios_seleccionados:
+                perfil = usuario.perfil
+                profesor, created = Profesor.objects.get_or_create(usuario=perfil)
+                profesor.curso.add(curso)
+                profesor.materias.add(materia)
+                
+                if created:
+                    messages.success(request, f'El profesor {perfil} ha sido creado y asignado correctamente.')
+                elif usuario not in usuarios_actuales:
+                    messages.success(request, f'El profesor {perfil} ha sido asignado correctamente.')
+        else:
+            messages.error(request, 'Por favor, corrija los errores en el formulario.')
+            context['form'] = form
+            return self.render_to_response(context)
+
+
+        # Redirigir pasando los ids de curso y materia
+        return redirect(reverse_lazy('cursos:asignar_profesores', kwargs={'pk': curso.id}))
+
+
+
+
+
+def obtener_formulario_asignar_profesores(request):
+    materia_id = request.GET.get('materia_id')
+    materia = get_object_or_404(Materia, id=materia_id)
+
+    form = AsignarProfesoresForm(materia=materia)
+    return render(request, 'cursos/materias/partials/formulario_asignar_profesores.html', {'form': form, 'materia': materia})
+
+def actualizar_profesores_materia(request, materia_id):
+    materia = get_object_or_404(Materia, id=materia_id)
+    
+    if request.method == 'POST':
+        form = AsignarProfesoresForm(request.POST)
+        if form.is_valid():
+            profesores = form.cleaned_data['profesores']
+            materia.profesor_materia.set(profesores)  # Actualizar los profesores asociados a la materia
+            materia.save()
+            return JsonResponse({'success': True})
+    
+    return JsonResponse({'success': False})

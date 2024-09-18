@@ -26,7 +26,7 @@
             <th>Nombre</th>
             <th>Plan de Estudio</th>
             <th>División</th>
-            
+            <th>Profesores</th>
 
             <th>Acciones</th>
           </tr>
@@ -50,7 +50,7 @@
             </td>
             <td>{{curso.division}}
             
-            
+            <td> <a href="{% url 'cursos:asignar_profesores' curso.pk%}">asignar</a></td>
 
             <td>
               <a

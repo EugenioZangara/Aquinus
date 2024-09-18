@@ -8,7 +8,7 @@ from apps.cursos.models import Cursante
 def get_alumnos_por_especialidad(request):
     plan_de_estudio = request.GET.get('plan_de_estudio')
     anio=request.GET.get('anio')
-   
+    print(anio, plan_de_estudio)
     if not plan_de_estudio:
         return HttpResponseBadRequest("Falta el parámetro 'plan_de_estudio'.")
 
@@ -22,7 +22,7 @@ def get_alumnos_por_especialidad(request):
         context = {
             'alumnos': alumnos
         }
-
+        print(context)
         # Verifica si es una petición HTMX
         if 'HX-Request' in request.headers:
             template = 'parciales/alumnos/alumnosXorientacionXespecialidadXorientacion.html'  # Fragmento HTMX

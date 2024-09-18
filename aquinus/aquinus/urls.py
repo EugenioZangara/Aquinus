@@ -20,6 +20,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+        path("select2/", include("django_select2.urls")),
+
     path('usuarios/', include('apps.usuarios.urls',namespace='usuarios')),  # Incluye las URLs de la aplicación 'usuarios'
     path('', include('apps.main.urls')),  # Incluye las URLs de la aplicación 'main'
     path('cursos/', include('apps.cursos.urls',namespace='cursos')),  # Incluye las URLs de la aplicación 'cursos'

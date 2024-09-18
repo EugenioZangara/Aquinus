@@ -18,8 +18,11 @@ class Perfil(models.Model):
     puede_calificar=models.BooleanField(default=False)
     debe_cambiar_contraseña = models.BooleanField(default=True)  # Este campo controla si debe cambiar la contraseña
     area=models.CharField(max_length=100, choices=AREAS_USUARIOS)
+    tratamiento=models.CharField(max_length=50, null=True, blank=True)
 
     
     
     def __str__(self):
-        return f'Perfil de {self.usuario.username}'
+        tratamiento = f"{self.tratamiento} " if self.tratamiento else ""
+
+        return f'{tratamiento} {self.usuario.first_name} {self.usuario.last_name} (DNI.:{self.dni})'

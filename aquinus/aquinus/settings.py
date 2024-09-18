@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_select2',
     'apps.alumnos',
     'apps.usuarios',
     'apps.main',
@@ -189,3 +190,11 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'alert-warning',  # Para advertencias
     message_constants.ERROR: 'alert-danger',     # Para errores
 }
+
+
+SELECT2_JS = ['assets/select2/js/select2.min.js']
+SELECT2_CSS = [
+    'assets/select2/css/select2.css',
+    'assets/select2/bootstrap5-theme/select2-bootstrap-5-theme.min.css'
+    
+]

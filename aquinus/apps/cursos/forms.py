@@ -1,6 +1,17 @@
 # forms.py
 from django import forms
-from .models import Materia, PlanEstudio, Curso, Cursante
+from django.forms.renderers import BaseRenderer
+from django.forms.utils import ErrorList
+from apps.usuarios.models import Perfil
+from .models import Materia, PlanEstudio, Curso, Cursante, Profesor
+import logging
+from django.contrib.auth import get_user_model
+from django_select2 import forms as s2forms
+
+User = get_user_model()
+
+logger = logging.getLogger(__name__)
+
 
 class MateriaForm(forms.ModelForm):
     class Meta:
@@ -87,3 +98,30 @@ class CursoCreateForm(forms.ModelForm):
         if Curso.objects.filter(nombre=nombre).exists():
             raise forms.ValidationError('El curso para esa especialidad y división ya existe. Por favor, verifique especialidad y división.')
         return nombre
+
+
+
+
+User = get_user_model()
+
+class AsignarProfesoresForm(forms.Form):
+    usuario = forms.ModelMultipleChoiceField(
+        queryset=User.objects.none(),
+        widget=forms.SelectMultiple(attrs={
+            'class': 'js-example-basic-multiple',
+        }),
+        required=False
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['usuario'].queryset = User.objects.select_related('perfil').filter(perfil__es_profesor=True)
+        self.fields['usuario'].label = None
+        self.fields['usuario'].label_from_instance = self.label_usuario
+
+    def label_usuario(self, obj):
+        if hasattr(obj, 'perfil'):
+            tratamiento = f"{obj.perfil.tratamiento} " if obj.perfil.tratamiento else ""
+            return f"{tratamiento} {obj.first_name} {obj.last_name} - DNI: {obj.perfil.dni}"
+        else:
+            return f"{obj.first_name} {obj.last_name} - Sin DNI"
