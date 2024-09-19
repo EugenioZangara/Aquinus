@@ -89,34 +89,13 @@ WSGI_APPLICATION = 'aquinus.wsgi.application'
 Configuración para trabajar en ESSA con servidor en linea
 
 """
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "aquinus",
-#         "USER": "ezangara",
-#         "PASSWORD": "Armada2024@",
-#         "HOST": "192.16.0.252",  # O la dirección IP de tu servidor MySQL
-#         "PORT": "3306",  # El puerto de tu servidor MySQL},
-#     },
-#     "id8": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "aspi",
-#         "USER": "ezangara",
-#         "PASSWORD": "Armada2024@",
-#         "HOST": "192.16.0.252",  # O la dirección IP de tu servidor MySQL
-#         "PORT": "3306",  # El puerto de tu servidor MySQL},
-#     },
-# }
-"""
-Configuración para trabajar OFFLINE
-"""
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "aquinus",
         "USER": "ezangara",
         "PASSWORD": "Armada2024@",
-        "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
+        "HOST": "192.16.0.252",  # O la dirección IP de tu servidor MySQL
         "PORT": "3306",  # El puerto de tu servidor MySQL},
     },
     "id8": {
@@ -124,15 +103,39 @@ DATABASES = {
         "NAME": "aspi",
         "USER": "ezangara",
         "PASSWORD": "Armada2024@",
-        "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
+        "HOST": "192.16.0.252",  # O la dirección IP de tu servidor MySQL
         "PORT": "3306",  # El puerto de tu servidor MySQL},
     },
 }
+"""
+Configuración para trabajar OFFLINE
+"""
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "aquinus",
+#         "USER": "ezangara",
+#         "PASSWORD": "Armada2024@",
+#         "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
+#         "PORT": "3306",  # El puerto de tu servidor MySQL},
+#     },
+#     "id8": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "aspi",
+#         "USER": "ezangara",
+#         "PASSWORD": "Armada2024@",
+#         "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
+#         "PORT": "3306",  # El puerto de tu servidor MySQL},
+#     },
+# }
 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
+AUTHENTICATION_BACKENDS = [
+    'apps.usuarios.custom_auth_backend.DNIAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Mantén el backend predeterminado como respaldo
+]
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',

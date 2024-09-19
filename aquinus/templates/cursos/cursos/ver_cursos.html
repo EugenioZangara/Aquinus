@@ -1,217 +1,150 @@
-{% extends "main.html" %} {%load static%} {% block breadcrumb %}
-
-<ol class="breadcrumb mb-3">
-  <li class="breadcrumb-item">
-    <i class="icon-house_siding lh-1"></i>
-    <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
-  </li>
-  <li class="breadcrumb-item">Cursos</li>
-  <li class="breadcrumb-item">Ver Cursos Activos</li>
-</ol>
-
-{% endblock breadcrumb %}
+{% extends 'main.html' %} {% load static %} {% block breadcrumb %}
+  <ol class="breadcrumb mb-3">
+    <li class="breadcrumb-item">
+      <i class="icon-house_siding lh-1"></i>
+      <a href="{% url 'home' %}" class="text-decoration-none">Inicio</a>
+    </li>
+    <li class="breadcrumb-item">Cursos</li>
+    <li class="breadcrumb-item">Ver Cursos Activos</li>
+  </ol>
+{% endblock %}
 <!-- Breadcrumb end -->
 
-{%block main_content1%}
-
-<div class="card mb-3">
-  <div class="card-header">
-    <div class="card-title">Listado de Cursos Activos</div>
-  </div>
-  <div class="card-body">
-    <div class="table-responsive">
-      <table id="highlightRowColumn" class="table table-striped">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Plan de Estudio</th>
-            <th>División</th>
-            <th>Profesores</th>
-
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for curso in cursos %}
-          <tr>
-            <td>{{curso.nombre}}</td>
-            <td>{{curso.plan_de_estudio}}
-              <a
-                href="{%url 'cursos:detalles_plan_estudio' curso.plan_de_estudio.pk %}"
-                class="btn btn-outline-dark btn-sm"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip-primary"
-                data-bs-title="Detalles"
-                aria-describedby="tooltip599725"
-              >
-                <i class="icon-eye"></i>
-              </a>
-            </td>
-            <td>{{curso.division}}
-            
-            <td> <a href="{% url 'cursos:asignar_profesores' curso.pk%}">asignar</a></td>
-
-            <td>
-              <a
-                href="{%url 'cursos:detalles_curso' curso.pk %}"
-                class="btn btn-outline-info btn-sm"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip-primary"
-                data-bs-title="Detalles"
-                aria-describedby="tooltip599725"
-              >
-                <i class="icon-eye"></i>
-              </a>
-
-              <a
-                href="{%url 'cursos:modificar_plan_estudio' curso.pk %}"
-                class="btn btn-outline-primary btn-sm"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip-primary"
-                data-bs-title="Modificar"
-                aria-describedby="tooltip599725"
-              >
-                <i class="icon-edit"></i>
-              </a>
-
-              <!-- Contenedor para el tooltip -->
-              <span
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip-primary"
-                title="Eliminar"
-                class="tooltip-wrapper"
-              >
-                <a
-                  class="btn btn-outline-danger btn-sm"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteModal"
-                  data-curso-id="{{ curso.id }}"
-                  data-curso-nombre="{{ curso.nombre }}"
-                >
-                  <i class="icon-trash"></i>
-                </a>
-              </span>
-            </td>
-          </tr>
-          {%endfor%}
-        </tbody>
-      </table>
+{% block main_content1 %}
+  <div class="card mb-3">
+    <div class="card-header">
+      <div class="card-title">Listado de Cursos Activos</div>
     </div>
-  </div>
-</div>
-<!-- Card end -->
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="highlightRowColumn" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Plan de Estudio</th>
+              <th>División</th>
+              <th>Total Alumnos</th>
+              <th>Profesores</th>
 
-<!-- MODAL -->
-<div
-  class="modal fade"
-  id="deleteModal"
-  tabindex="-1"
-  aria-labelledby="exampleModalSmLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Eliminar Curso</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <p>
-          Está a punto de eliminar el Curso
-          <strong><span id="cursoNombre"></span></strong>. El Curso dejará de estar vigente, y deberá crear uno nuevo para la
-          especialidad. Desea continuar?
-        </p>
-      </div>
-      <div class="modal-footer flex-column">
-        <form
-          method="POST"
-          action="{% url 'cursos:eliminar_curso' 0 %}"
-          id="deleteForm"
-        >
-          {% csrf_token %}
-          <input type="hidden" name="curso_id" id="cursoId" />
-          <button type="submit" class="btn btn-lg btn-danger w-100 mx-0 mb-2">
-            Eliminar Curso
-          </button>
-          <button
-            type="button"
-            class="btn btn-lg btn-secondary w-100 mx-0"
-            data-bs-dismiss="modal"
-          >
-            Cancelar
-          </button>
-        </form>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for curso, materias_con_profesores in cursos_con_materias_y_profesores.items %}
+              <tr>
+                <td>{{ curso.nombre }}</td>
+                <td>
+                  {{ curso.plan_de_estudio }}
+                  <a href="{% url 'cursos:detalles_plan_estudio' curso.plan_de_estudio.pk %}" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Detalles" aria-describedby="tooltip599725"><i class="icon-eye"></i></a>
+                </td>
+                <td>{{ curso.division }}</td>
+                <td>{{materias_con_profesores.0}} </td>
+                <td>
+                  {% if materias_con_profesores.1 %}
+                    <span class="badge bg-success">Todas las materias con profesores</span>
+                    
+                  {% else %}
+                    <span class="badge bg-danger">Hay materias sin profesores</span>
+                    
+                  {% endif %}
+                </td>
+
+                <td>
+                  <a href="{% url 'cursos:detalles_curso' curso.pk %}" class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Detalles" aria-describedby="tooltip599725"><i class="icon-eye"></i></a>
+
+                  <a href="{% url 'cursos:modificar_alumnos_curso' curso.pk %}" class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Modificar Alumnos" aria-describedby="tooltip599725"><i class="icon-users"></i></a>
+
+
+                  <a href="{% url 'cursos:asignar_profesores' curso.pk %}" class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Modificar Profesores" aria-describedby="tooltip599725"><i class="icon-school"></i></a>
+
+                  <!-- Contenedor para el tooltip -->
+                  <span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" title="Eliminar" class="tooltip-wrapper"><a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-curso-id="{{ curso.id }}" data-curso-nombre="{{ curso.nombre }}"><i class="icon-trash"></i></a></span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
-</div>
+  <!-- Card end -->
 
-{%endblock main_content1%} {% block scripts %}
-<script src="{% static 'assets/vendor/datatables/dataTables.min.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/dataTables.bootstrap.min.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/custom/custom-datatables.js' %}"></script>
-<!-- DataTable Buttons -->
-<script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/buttons/jszip.min.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/buttons/pdfmake.min.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/buttons/vfs_fonts.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/buttons/buttons.html5.min.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/buttons/buttons.print.min.js' %}"></script>
-<script src="{% static 'assets/vendor/datatables/buttons/buttons.colVis.min.js' %}"></script>
+  <!-- MODAL -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalSmLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar Curso</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Está a punto de eliminar el Curso
+            <strong><span id="cursoNombre"></span></strong>. El Curso dejará de estar vigente, y deberá crear uno nuevo para la especialidad. Desea continuar?
+          </p>
+        </div>
+        <div class="modal-footer flex-column">
+          <form method="POST" action="{% url 'cursos:eliminar_curso' 0 %}" id="deleteForm">
+            {% csrf_token %}
+            <input type="hidden" name="curso_id" id="cursoId" />
+            <button type="submit" class="btn btn-lg btn-danger w-100 mx-0 mb-2">Eliminar Curso</button>
+            <button type="button" class="btn btn-lg btn-secondary w-100 mx-0" data-bs-dismiss="modal">Cancelar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %} {% block scripts %}
+  <script src="{% static 'assets/vendor/datatables/dataTables.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/dataTables.bootstrap.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/custom/custom-datatables.js' %}"></script>
+  <!-- DataTable Buttons -->
+  <script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/jszip.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/pdfmake.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/vfs_fonts.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.print.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/buttons/buttons.colVis.min.js' %}"></script>
 
-<!-- Custom JS files -->
+  <!-- Custom JS files -->
 
-<script src="{% static 'assets/js/custom.js' %}"></script>
+  <script src="{% static 'assets/js/custom.js' %}"></script>
 
-<!-- pasar al modal el id de la materia seleccionada, para ser eliminada -->
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Selecciona todos los elementos con tooltips
-    var tooltipTriggerList = [].slice.call(
-      document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    );
-
-    // Inicializa los tooltips
-    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-      new bootstrap.Tooltip(tooltipTriggerEl, {
-        customClass: "custom-tooltip-primary",
-        placement: "top",
-        "aria-describedby": "tooltip599725",
-      });
-    });
-  });
-
-  const deleteModal = document.getElementById("deleteModal");
-  deleteModal.addEventListener("show.bs.modal", function (event) {
-    // Botón que activó el modal
-    const button = event.relatedTarget;
-
-    // Extraer la información de los atributos data-
-    const cursoId = button.getAttribute("data-curso-id");
-    const cursoNombre = button.getAttribute("data-curso-nombre");
-
-    // Actualizar el contenido del modal
-    const cursoNombreElement = document.getElementById("cursoNombre");
-    cursoNombreElement.textContent = cursoNombre;
-
-    // Actualizar la acción del formulario con el ID de la materia
-    const deleteForm = document.getElementById("deleteForm");
-    deleteForm.action = `{% url 'cursos:eliminar_curso' 0 %}`.replace(
-      "0",
-      cursoId
-    );
-    document.getElementById("cursoId").value = cursoId;
-  });
-</script>
-
-{% endblock scripts %}
+  <!-- pasar al modal el id de la materia seleccionada, para ser eliminada -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Selecciona todos los elementos con tooltips
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    
+      // Inicializa los tooltips
+      tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl, {
+          customClass: 'custom-tooltip-primary',
+          placement: 'top',
+          'aria-describedby': 'tooltip599725'
+        })
+      })
+    })
+    
+    const deleteModal = document.getElementById('deleteModal')
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+      // Botón que activó el modal
+      const button = event.relatedTarget
+    
+      // Extraer la información de los atributos data-
+      const cursoId = button.getAttribute('data-curso-id')
+      const cursoNombre = button.getAttribute('data-curso-nombre')
+    
+      // Actualizar el contenido del modal
+      const cursoNombreElement = document.getElementById('cursoNombre')
+      cursoNombreElement.textContent = cursoNombre
+    
+      // Actualizar la acción del formulario con el ID de la materia
+      const deleteForm = document.getElementById('deleteForm')
+      deleteForm.action = `{% url 'cursos:eliminar_curso' 0 %}`.replace('0', cursoId)
+      document.getElementById('cursoId').value = cursoId
+    })
+  </script>
+{% endblock %}

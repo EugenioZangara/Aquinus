@@ -4,7 +4,8 @@ from django.forms import IntegerField
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import PasswordChangeForm
-
+from django import forms
+from django.contrib.auth import authenticate
 from .models import Perfil
 from django.contrib.auth.forms import UserCreationForm
 
@@ -13,12 +14,34 @@ from django.contrib.auth.forms import UserCreationForm
 Formulario para el login al sistema
 '''
 class CustomLoginForm(AuthenticationForm):
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'})
-    )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'})
-    )
+    dni = forms.IntegerField(widget=forms.NumberInput(attrs={'autofocus': True, "class":"form-control", "placeholder":"DNI",
+                                                             'pattern': '[0-9]{7,8}', 
+          
+            'maxlength': '8',
+            'minlength': '7',})) 
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        "class": "form-control", 
+        "placeholder": "Contraseña"
+    }))   
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        del self.fields['username']  # Eliminamos el campo username
+    
+    def clean(self):
+        dni = self.cleaned_data.get('dni')
+        password = self.cleaned_data.get('password')
+
+        if dni and password:
+            self.user_cache = authenticate(self.request, dni=dni, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    'DNI o contraseña incorrectos.',
+                    code='invalid_login'
+                )
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 
 class UserEditForm(forms.ModelForm):
@@ -36,11 +59,13 @@ class UserEditForm(forms.ModelForm):
 class PerfilEditForm(forms.ModelForm):
     class Meta:
             model = Perfil
-            fields = ['dni', 'es_profesor', 'puede_calificar']
+            fields = ['dni', 'es_profesor', 'puede_calificar', 'tratamiento']
             widgets = {
             'dni': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de DNI (sin puntos)'}),
             'es_profesor': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'puede_calificar': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+                        'tratamiento':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lic., Ing, TN, CC, Prof....'}),
+
         }
             
             
@@ -67,11 +92,12 @@ class UserForm(forms.ModelForm):
 class PerfilForm(forms.ModelForm):
     class Meta:
         model = Perfil
-        fields = ['dni', 'es_profesor', 'puede_calificar']
+        fields = ['dni', 'es_profesor', 'puede_calificar', 'tratamiento']
         widgets = {
             'dni': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de DNI (sin puntos)'}),
             'es_profesor': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'puede_calificar': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'tratamiento':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lic., Ing, TN, CC, Prof....'}),
         }
         
 class CustomPasswordChangeForm(PasswordChangeForm):

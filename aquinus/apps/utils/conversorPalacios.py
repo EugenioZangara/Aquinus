@@ -19,55 +19,54 @@ especialidades = {
 
 
 orientaciones={
-2:"AM",
-3:"AC",
-# 4:"AE",
-# 5:"AG",
-6:"AA",
-# 7:"AR"
-# 8:"AS",
-# 9:"AU",
-10:"AV",
-11:"BA",
-# 12:"BT",
-# 13:"BU",
-# 14:"CA",
-# 15:"CC",
-# 16:"CD",
-# 17:"CM",
-18:"CO",
-# 19:"ComputaciÃ³n
-# 20:"CT"
-21:"EE",
-# 22:"EL"
-# 23:"EE",
-# 24:"EN"
-# 25:"FU"
-# 26:"GE"
-27:"HI",
-# 28:"IN"
-# 29:"IM"
-# 30:"IN"
-# 31:'MA'
-32:"MC",
- 33:"ME",
-# 34:"MN"
-# 35:'MO'
-# 36:'MA'
-# 37:"MW"
-# 38:'MO'
-# 39:MÃºsicos
-40:"OC",
-# 41:Operaciones
-# 42:Peluqueros
-# 43:Radiocomunicaciones
-# 44:Radar
-# 45:"Sistemas de Control"
-46:"SH",
-# 47:Salvamento
-# 48:Sonaristas
-# 49:'su'
-# 50:Turbinas
+    "AA": 2,
+    "AC": 3,
+    "AE": 4,
+    "AG": 5,
+    "Armas": 6,
+    "AN": 7,
+    "AS": 8,
+    "AU": 9,
+    "AV": 10,
+    "BA": 11,
+    "Buceo Táctico": 12,
+    "Buceo": 13,
+    "CA": 14,
+    "CC": 15,
+    "CD": 16,
+    "CM": 17,
+    "CO": 18,
+    "CP": 19,
+    "Control Tiro": 20,
+    "EE": 21,
+    "EL": 22,
+    "EM": 23,
+    "FU": 25,
+    "GN": 26,
+    "HI": 27,
+    "IF": 28,
+    "IM": 29,
+    "IN": 30,
+    "MA": 31,
+    "MC": 32,
+    "ME": 33,
+    "MN": 34,
+    "Motores": 35,
+    "MQ": 36,
+    "MW": 37,
+    "MO": 38,
+    "MU": 39,
+    "OC": 40,
+    "OP": 41,
+    "PE": 42,
+    "RC": 43,
+    "Radar": 44,
+    "SC": 45,
+    "SH": 46,
+    "Salvamento": 47,
+    "SO": 48,
+    "SU": 49,
+    "TB": 50
 }
 # Diccionario invertido
 especialidades_invertidas = {v: k for k, v in especialidades.items()}
@@ -79,8 +78,10 @@ def convertirEspecialidad(valor):
    
 
 def convertirOrientaciones(orientacion):
-    return orientaciones[orientacion]   
+    print("ORIENTACION", orientacion)
+    return orientaciones.get(orientacion)  
 
 grados={1:"ANPA",2:"ANSA", 3:"ANTA", 4:"POSTULANTE", 5:"CSCOM"}
 def convertirGrado(grado):
-    return grados[grado]
+    
+    return grados[int(grado)]

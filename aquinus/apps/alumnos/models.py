@@ -47,4 +47,4 @@ class persona(models.Model):
         """ESTO ES PARA CONSULTAR SOBRE LA VISTA QUE TENGA LA RELACIÓN"""
 
         managed = False
-        db_table = "vista_orione"
+        # db_table = "vista_orione"

@@ -1,4 +1,4 @@
-{% extends 'main.html' %} {% load static %}
+{% extends 'main.html' %} {% load static %} {% load custom_filters %}
 {% block head %}
 <!-- Scrollbar CSS -->
   <link rel="stylesheet" href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}" />
@@ -21,33 +21,32 @@
       <a href="{% url 'home' %}" class="text-decoration-none">Inicio</a>
     </li>
     <li class="breadcrumb-item">Cursos</li>
-    <li class="breadcrumb-item">Nuevo Curso</li>
+    <li class="breadcrumb-item">NOMBRE DEL CURSO</li>
+    <li class="breadcrumb-item">Modificar Alumnos</li>
   </ol>
 {% endblock %}
 <!-- Breadcrumb end -->
 
 {% block main_content1 %}
-<form method="post" action="{% url 'cursos:crear_curso' %}" id="crearCursoForm">
-  {% csrf_token %}
+
   <div class="row gx-3">
     <div class="col-12">
       <div class="card mb-3">
         <div class="card-header">
-          <h5 class="card-title">Definir Curso</h5>
+          <h5 class="card-title">Modificar alumnos del curso: NOMBRE DEL CURSO</h5>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-lg-3 col-sm-4 col-12">
               <div class="mb-3">
-                <label class="form-label">{{ form.plan_de_estudio.label }}</label>
-                {{ form.plan_de_estudio }}
+                <h3>Especialidad</h3>
+          
               </div>
             </div>
 
             <div class="col-lg-3 col-sm-4 col-12">
               <div class="mb-3">
-                <label class="form-label">{{ form.anio.label }}</label>
-                {{ form.anio }}
+                <h4>Año del Curso: AÑO DEL CURSO</h4>
               </div>
             </div>
 
@@ -55,35 +54,15 @@
               <div class="row row-cols-lg-auto g-3 align-items-center">
                 <div class="col-lg-8">
                   <div class="mb-3">
-                    <label class="form-label">{{ form.division.label }}</label>
-                    {{ form.division }}
+                   <h4>División: DIVISION</h4>
                   </div>
                 </div>
-                <div class="col-lg-4">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="unicaDivisionCheck" />
-                    <label class="form-check-label" for="gridCheck1">Única División</label>
-                  </div>
-                </div>
+                
               </div>
             </div>
-            <div class="col-lg-2 col-sm-4 col-12">
-              <div class="row row-cols-lg-auto g-3 align-items-center">
-                <button type="submit" class="btn btn-warning btn-lg" id="btnCrearCurso">
-                  <i class="fs-4 icon-file-plus"></i> Crear Curso
-                </button>
-              </div>
-            </div>
+            
           </div>
         </div>
-
-        <div class="alert border border-info alert-dismissible fade show text-info" role="alert">
-          <b>Info!</b> Aspirantes que no fueron promovidos al grado superior, cargar haciendo click en el siguiente
-          <a href="">enlace</a>. (El curso ya debe estar creado previamente)
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-
-
       </div>
     </div>
   </div>
@@ -113,13 +92,18 @@
               </thead>
               <tbody id='listadoAspirantes'>
                
-<tr>
-  <td>-</td>
-  <td>-</td>
-  <td>-</td>
-  <td>-</td>
-  <td>-</td>
-</tr>
+                {% for alumno in alumnos %}
+                <tr id="registro-{{ alumno.dni }}">
+                  <td>{{ alumno.grado }}</td>
+                  <td>{{ alumno.dni }}</td>
+                  <td>{{ alumno.apellidos }}</td>
+                  <td>{{ alumno.nombres }}</td>
+                  <td>
+                   
+                    <button class="btn btn-info" hx-post="{% url 'cursos:seleccionar_registro' alumno.pk %}" hx-target="#tablaSeleccionados" hx-swap="beforeend" hx-trigger="click">Seleccionar</button>
+                  </td>
+                </tr>
+              {% endfor %}
 
               </tbody>
             </table>
@@ -165,7 +149,6 @@
     
   </div>
 
-</form>
 
 {% endblock %}
 {% block scripts %}

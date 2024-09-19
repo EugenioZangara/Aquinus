@@ -1,43 +1,70 @@
-{% extends "main.html" %}
+{% extends 'main.html' %}
 {% load static %}
 
 {% block main_content1 %}
+  <h2>Actualizar Usuario</h2>
+  <form method="post">
+    {% csrf_token %}
 
-<h2>Actualizar Usuario</h2>
-<form method="post">
-  {% csrf_token %}
-  
-  <!-- Renderizar los campos de user_form manualmente -->
-  {% for field in form %}
-    <div class="form-group">
-      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {{ field }}
-      
-      <!-- Mostrar errores del campo -->
-      {% if field.errors %}
-        <div class="text-danger">
-          {{ field.errors|striptags }}
+    <!-- Renderizar los campos de user_form manualmente -->
+
+    <div class="row gx-3">
+      <div class="col-6">
+        {{ perfil_form.tratamiento.label }}
+        {{ perfil_form.tratamiento }}
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+
+            <!-- Mostrar errores del campo -->
+            {% if field.errors %}
+              <div class="text-danger">{{ field.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="col-6">
+        <!-- Renderizar los campos de perfil_form manualmente -->
+
+        <div class="form-group">
+          <label for="{{ perfil_form.dni.id_for_label }}">{{ perfil_form.dni.label }}</label>
+          {{ perfil_form.dni }}
+
+          <!-- Mostrar errores del campo -->
+          {% if perfil_form.dni.errors %}
+            <div class="text-danger">{{ perfil_form.dni.errors|striptags }}</div>
+          {% endif %}
         </div>
-      {% endif %}
-    </div>
-  {% endfor %}
 
-  <!-- Renderizar los campos de perfil_form manualmente -->
-  {% for field in perfil_form %}
-    <div class="form-group">
-      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {{ field }}
+        <div class="form-group">
+          <label for="{{ perfil_form.es_profesor.id_for_label }}">{{ perfil_form.es_profesor.label }}</label>
+          {{ perfil_form.es_profesor }}
 
-      <!-- Mostrar errores del campo -->
-      {% if field.errors %}
-        <div class="text-danger">
-          {{ field.errors|striptags }}
+          <!-- Mostrar errores del campo -->
+          {% if perfil_form.es_profesor.errors %}
+            <div class="text-danger">{{ perfil_form.es_profesor.errors|striptags }}</div>
+          {% endif %}
         </div>
-      {% endif %}
+
+        <div class="form-group">
+          <label for="{{ perfil_form.puede_calificar.id_for_label }}">{{ perfil_form.puede_calificar.label }}</label>
+          {{ perfil_form.puede_calificar }}
+
+          <!-- Mostrar errores del campo -->
+          {% if perfil_form.puede_calificar.errors %}
+            <div class="text-danger">{{ perfil_form.puede_calificar.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
     </div>
-  {% endfor %}
-
-  <button type="submit" class="btn btn-primary">Guardar cambios</button>
-</form>
-
-{% endblock main_content1 %}
+   
+      <div class="d-flex gap-2 justify-content-end">
+        
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a href="{% url 'home' %}"><button type="button" class="btn btn-outline-secondary">Cancelar</button></a>
+      </div>
+   
+  </form>
+{% endblock %}

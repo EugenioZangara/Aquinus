@@ -1,7 +1,7 @@
 {% extends 'main.html' %} {% load static %}
 {% block head %}
   <!-- Scrollbar CSS -->
-  <link rel="stylesheet" href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}" />
+  {% comment %} <link rel="stylesheet" href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}" /> {% endcomment %}
 
   <!-- Data Tables -->
   <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5.css' %}" />
@@ -96,8 +96,8 @@
 {% endblock toast %}
 
 {% block scripts %}
-  <script src="{% static 'assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js' %}"></script>
-  <script src="{% static 'assets/vendor/overlay-scroll/custom-scrollbar.js' %}"></script>
+  {% comment %} <script src="{% static 'assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/overlay-scroll/custom-scrollbar.js' %}"></script> {% endcomment %}
 
   <script src="{% static 'assets/vendor/datatables/dataTables.min.js' %}"></script>
   <script src="{% static 'assets/vendor/datatables/dataTables.bootstrap.min.js' %}"></script>

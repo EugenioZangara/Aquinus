@@ -2,6 +2,8 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import  get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.db.models import Count
+
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView, TemplateView
@@ -49,6 +51,7 @@ class MateriaDeleteView(SuccessMessageMixin,DeleteView):
             cleaned_data,
             nombre=self.object.nombre
         )
+        
 
 class MateriaUpdateView(SuccessMessageMixin, UpdateView):
     model = Materia
@@ -64,7 +67,11 @@ class MateriaUpdateView(SuccessMessageMixin, UpdateView):
             cleaned_data,
             nombre=self.object.nombre
         )
-        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab']="materias"   
+        return context
+       
 class PlanEstudioCreateView(CreateView):
     model = PlanEstudio
     template_name = "cursos/planes_estudio/crear_plan_estudios.html"
@@ -91,6 +98,11 @@ class PlanEstudioCreateView(CreateView):
         # Mostrar mensaje de error en la página
         messages.error(self.request, "Ocurrió un error al crear el plan de estudio. Por favor, revisa los datos ingresados.")
         return super().form_invalid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab']="planes_estudio"   
+        return context
     
 class PlanEstudioListView(ListView):
     model = PlanEstudio
@@ -123,7 +135,10 @@ class PlanEstudioUpdateView(SuccessMessageMixin,UpdateView):
             cleaned_data,
             nombre=self.object.especialidad
         )
-    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab']="planes_estudio"   
+        return context
     
 
 class DeletePlanEstudio(View):
@@ -145,7 +160,11 @@ class PlanEstudioDetailView(DetailView):
     template_name = "cursos/planes_estudio/detalles.html"
     context_object_name='plan_de_estudio'
 
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab']="planes_estudio"   
+        return context
+    
 class CursoCreateView(CreateView):
     model = Curso
     template_name = "cursos/cursos/crear_curso.html"
@@ -207,6 +226,10 @@ class CursoCreateView(CreateView):
         # Redirigir a la URL de éxito después de agregar el mensaje
         return redirect(self.success_url)
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab']="cursos"   
+        return context
 class CursoListView(ListView):
     model = Curso
     template_name = "cursos/cursos/ver_cursos.html"
@@ -214,7 +237,31 @@ class CursoListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active_tab']="cursos"   
+        
+        cursos_activos = Curso.objects.filter(activo=True)
+        cursos_con_materias_y_profesores = {}
+        for curso in cursos_activos:
+            plan_estudio = curso.plan_de_estudio  # Suponiendo que existe un campo plan_de_estudio en Curso
+            materias = plan_estudio.materias.all()
+            todas_materias_con_profesores = True  # Se asume que todas tienen profesor inicialmente
+            cantidad_alumnos_por_curso = Cursante.objects.filter(curso=curso).aggregate(total=Count('id'))['total']
+            # Para cada materia, verificamos si tiene profesores asociados
+            materias_con_profesores = []
+            for materia in materias:
+                tiene_profesor = Profesor.objects.filter(materias=materia).exists()
+                materias_con_profesores.append({
+                    'materia': materia,
+                    'tiene_profesor': tiene_profesor
+                })
+                 # Si alguna materia no tiene profesor, cambia el flag a False
+                if not tiene_profesor:
+                    todas_materias_con_profesores = False
+            cursos_con_materias_y_profesores[curso]=[cantidad_alumnos_por_curso, todas_materias_con_profesores]
+            
+            
+        print(cursos_con_materias_y_profesores)
+        context['cursos_con_materias_y_profesores'] = cursos_con_materias_y_profesores
+        context['active_tab'] = "cursos"
         return context
     
 class CursoDeleteView(SuccessMessageMixin, DeleteView):
@@ -223,6 +270,14 @@ class CursoDeleteView(SuccessMessageMixin, DeleteView):
     success_message = "El curso %(nombre) ha sido eliminado exitosamente."
 
 
+      # Sobrescribir el método delete para hacer la eliminación lógica
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.enabled = False  # Cambiar el estado a deshabilitado (eliminación lógica)
+        self.object.save()  # Guardar los cambios en la base de datos
+        return redirect(self.success_url)
+
+    # Modificar el mensaje de éxito
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(
             cleaned_data,
@@ -253,6 +308,25 @@ class CursoDetailView(DetailView):
         context['cursantes']=cursantes
         
         return context
+ 
+ 
+class AlumnosCursoUpdateView(TemplateView):
+    template_name='cursos/cursos/modificar_alumnos_curso.html' 
+    
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)
+        curso = Curso.objects.get(pk=self.kwargs['pk'])
+        dni_cursantes=list(Cursante.objects.filter(curso=curso).values_list('dni', flat=True))
+       
+        alumnos=persona.objects.filter(dni__in=dni_cursantes).using('id8')
+        context['alumnos']=alumnos
+        return  context
+ 
+ 
+ 
+ 
+ 
+ 
     
 class AsignarProfesores(ListView):
     model=Materia
@@ -349,23 +423,3 @@ class ProfesorTemplateView(TemplateView):
 
 
 
-
-def obtener_formulario_asignar_profesores(request):
-    materia_id = request.GET.get('materia_id')
-    materia = get_object_or_404(Materia, id=materia_id)
-
-    form = AsignarProfesoresForm(materia=materia)
-    return render(request, 'cursos/materias/partials/formulario_asignar_profesores.html', {'form': form, 'materia': materia})
-
-def actualizar_profesores_materia(request, materia_id):
-    materia = get_object_or_404(Materia, id=materia_id)
-    
-    if request.method == 'POST':
-        form = AsignarProfesoresForm(request.POST)
-        if form.is_valid():
-            profesores = form.cleaned_data['profesores']
-            materia.profesor_materia.set(profesores)  # Actualizar los profesores asociados a la materia
-            materia.save()
-            return JsonResponse({'success': True})
-    
-    return JsonResponse({'success': False})

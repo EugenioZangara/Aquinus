@@ -1,4 +1,4 @@
-from .views import MateriaCreateView, MateriaListView, MateriaDeleteView, MateriaUpdateView,PlanEstudioCreateView,PlanEstudioListView, PlanEstudioUpdateView, DeletePlanEstudio, PlanEstudioDetailView, CursoCreateView, CursoListView, CursoDeleteView, CursoDetailView, AsignarProfesores, obtener_formulario_asignar_profesores, actualizar_profesores_materia, ProfesorTemplateView
+from .views import MateriaCreateView, MateriaListView, MateriaDeleteView, MateriaUpdateView,PlanEstudioCreateView,PlanEstudioListView, PlanEstudioUpdateView, DeletePlanEstudio, PlanEstudioDetailView, CursoCreateView, CursoListView, CursoDeleteView, CursoDetailView, AsignarProfesores,  ProfesorTemplateView, AlumnosCursoUpdateView
 from .views_htmx import get_orientaciones, seleccionar_registro, quitar_registro
 from django.urls import path
 
@@ -23,5 +23,6 @@ urlpatterns = [
      path('asignar_profesores/<int:pk>/', AsignarProfesores.as_view(), name='asignar_profesores'),
   
      path('actualizar_profesores_materias/<int:materia_id>/<int:curso_id>/', ProfesorTemplateView.as_view(), name='actualizar_profesores_materias'),
+     path('modificar_alumnos_curso/<int:pk>/', AlumnosCursoUpdateView.as_view(), name='modificar_alumnos_curso')
 
 ]

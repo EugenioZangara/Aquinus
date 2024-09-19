@@ -14,9 +14,19 @@ from .forms import CustomLoginForm, UserForm, PerfilForm, UserEditForm, PerfilEd
 
 # Vista personalizada de inicio de sesión.
 class CustomLoginView(LoginView):
-    template_name = 'usuarios/login.html'  # Plantilla para el login.
-    redirect_authenticated_user = True  # Redirige a usuarios autenticados si intentan acceder al login.
-    form_class = CustomLoginForm  # Formulario personalizado para el login.
+    template_name = 'usuarios/login.html'
+    redirect_authenticated_user = True
+    form_class = CustomLoginForm
+    
+    def get_success_url(self):
+        return reverse_lazy('home')  # Asegúrate de que 'home' es el nombre correcto de tu URL
+
+    def form_valid(self, form):
+        remember_me = form.cleaned_data.get('rememberPassword')
+        if not remember_me:
+            # Establece la cookie de sesión para que expire cuando el usuario cierre el navegador
+            self.request.session.set_expiry(0)
+        return super().form_valid(form)
 
 # Vista para crear un usuario y perfil.
 class UsuarioPerfilCreateView(CreateView):

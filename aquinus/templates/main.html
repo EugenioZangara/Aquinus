@@ -19,9 +19,9 @@
     <meta property="og:site_name" content="Bootstrap Gallery" />
     <link rel="shortcut icon" href="{% static 'assets/images/aquinus-logo-2.png' %}" />
 
-    <!--   *************
+    <!--    *************
 			************ CSS Files *************
-		*************   -->
+		*************    -->
     <!-- Icomoon Font Icons css -->
     <link rel="stylesheet" href="{% static 'assets/fonts/icomoon/style.css' %}" />
 
@@ -30,9 +30,9 @@
 
     <!-- Loader CSS -->
     <link rel="stylesheet" href="{% static 'assets/css/loader.css' %}" />
-    <!--   *************
+    <!--    *************
 			************ Vendor Css Files *************
-		************   -->
+		************    -->
 
     <!-- Scrollbar CSS -->
     <link rel="stylesheet" href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}" />
@@ -49,10 +49,11 @@
   <body>
     <div id="loader" style="display: block;">
       <!-- Aquí va tu código HTML del loader -->
-     
-<div class="loader">Aquinus
-  <span></span>
-</div>
+
+      <div class="loader" aria-hidden="true">
+        Aquinus
+        <span></span>
+      </div>
     </div>
 
     <!-- Page wrapper start -->
@@ -251,6 +252,9 @@
                     <li>
                       <a class="dropdown-item" href="{% url 'usuarios:ver_usuarios' %}"><span>Ver Usuarios</span></a>
                     </li>
+                    <li>
+                      <a class="dropdown-item" href="#"><span>Usuarios Inactivos</span></a>
+                    </li>
                   </ul>
                 </li>
               </ul>
@@ -299,10 +303,10 @@
             <!-- Row start -->
             <div class="row gx-3">
               {% block main_content1 %}
-              
+
               {% endblock %}
             </div>
-         
+
             <!-- Row end -->
 
             <!-- Row start -->
@@ -316,7 +320,7 @@
             <!-- Row start -->
             <div class="row gx-3">
               {% block main_content3 %}
-              
+
               {% endblock %}
             </div>
             <!-- Row end -->
@@ -339,7 +343,7 @@
         <!-- App footer start -->
         <div class="app-footer">
           <div class="container">
-           <span>Aquinus: Intellectus humanus in hoc statu viae non potest exhaurire essentiam unius muscae.</span> 
+            <span>Aquinus: Intellectus humanus in hoc statu viae non potest exhaurire essentiam unius muscae.</span>
 
             <span>© P.P. 2024</span>
           </div>
@@ -350,16 +354,16 @@
     </div>
     <!-- Page wrapper end -->
 
-    <!--   *************
+    <!--    *************
 			************ JavaScript Files *************
-		*************   -->
+		*************    -->
     <!-- Required jQuery first, then Bootstrap Bundle JS -->
     <script src="{% static 'assets/jquery/jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
 
-    <!--   *************
+    <!--    *************
 			************ Vendor Js Files *************
-		*************   -->
+		*************    -->
 
     <!-- Overlay Scroll JS -->
     <script src="{% static 'assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js' %}"></script>
@@ -387,6 +391,6 @@
     </script>
     {% block scripts %}
 
-    {% endblock scripts %}
+    {% endblock %}
   </body>
 </html>

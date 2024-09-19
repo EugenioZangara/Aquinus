@@ -166,11 +166,11 @@ class PlanEstudio(models.Model):
             validate_orientacion(self.especialidad, self.orientacion)
         if self.vigente:
             # Busca otros planes de estudio de la misma especialidad que estén vigentes
-            planes_vigentes = PlanEstudio.objects.filter(especialidad=self.especialidad, vigente=True)
+            planes_vigentes = PlanEstudio.objects.filter(especialidad=self.especialidad,orientacion=self.orientacion,  vigente=True)
             if self.pk:  # Si estamos actualizando un objeto existente, excluimos este objeto de la búsqueda
                 planes_vigentes = planes_vigentes.exclude(pk=self.pk)
             if planes_vigentes.exists():
-                raise ValidationError(f'Ya existe un plan de estudio vigente para la especialidad {self.especialidad}.')
+                raise ValidationError(f'Ya existe un plan de estudio vigente para la especialidad y orientación  {self.especialidad}{self.orientacion}.')
 
 
         def save(self, *args, **kwargs):
@@ -194,7 +194,7 @@ class Curso(models.Model):
     activo=models.BooleanField(default=False)
     puede_calificar=models.BooleanField(default=False)
     division=models.IntegerField(default=1)
-    # Nuevos campos para registro
+    enabled=models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)

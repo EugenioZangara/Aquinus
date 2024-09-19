@@ -27,6 +27,7 @@
       <table id="highlightRowColumn" class="table table-striped">
         <thead>
           <tr>
+            <th>Tratamiento</th>
             <th>Nombre</th>
             <th>Apellido</th>
             <th>usuario</th>
@@ -39,6 +40,7 @@
         <tbody>
           {% for usuario in usuarios %}
           <tr>
+            <td>{{usuario.perfil.tratamiento}}</td>
             <td>{{usuario.first_name}}</td>
             <td>{{usuario.last_name}}</td>
             <td>{{usuario.username}}</td>
