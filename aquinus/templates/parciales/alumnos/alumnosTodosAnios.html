@@ -1,0 +1,17 @@
+{% load static %}
+{% load custom_filters %}
+{%if alumnos%}
+{% for alumno in alumnos %}
+  <tr id="registro-{{ alumno.dni }}">
+    <td>{{ alumno.grado|convertirGrado }}</td>
+    <td>{{ alumno.dni }}</td>
+    <td>{{ alumno.apellidos }}</td>
+    <td>{{ alumno.nombres }}</td>
+    <td>
+     
+      <button class="btn btn-info" hx-post="{% url 'cursos:agregar_registro' alumno.pk %}" hx-target="#tablaSeleccionados" hx-swap="afterbegin" hx-trigger="click">Seleccionar</button>
+    </td>
+  </tr>
+{% endfor %}{% else %}
+<tr>No hay aspirantes con esos datos</tr>
+{% endif %}

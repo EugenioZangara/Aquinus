@@ -1,5 +1,5 @@
 from .views import MateriaCreateView, MateriaListView, MateriaDeleteView, MateriaUpdateView,PlanEstudioCreateView,PlanEstudioListView, PlanEstudioUpdateView, DeletePlanEstudio, PlanEstudioDetailView, CursoCreateView, CursoListView, CursoDeleteView, CursoDetailView, AsignarProfesores,  ProfesorTemplateView, AlumnosCursoUpdateView
-from .views_htmx import get_orientaciones, seleccionar_registro, quitar_registro
+from .views_htmx import get_orientaciones, seleccionar_registro, quitar_registro, agregar_registro
 from django.urls import path
 
 app_name='cursos'
@@ -19,6 +19,8 @@ urlpatterns = [
      path('detalles_curso/<int:pk>/', CursoDetailView.as_view(), name='detalles_curso'),
      path('get_orientaciones/', get_orientaciones, name='get_orientaciones') ,#htmx para generar opciones dinámicamente para las orientaciones
     path('seleccionar_registro/<int:id>/',seleccionar_registro, name='seleccionar_registro'),
+        path('agregar_registro/<int:id>/',agregar_registro, name='agregar_registro'),
+
      path('quitar_registro/<int:id>/',quitar_registro, name='quitar_registro'),
      path('asignar_profesores/<int:pk>/', AsignarProfesores.as_view(), name='asignar_profesores'),
   

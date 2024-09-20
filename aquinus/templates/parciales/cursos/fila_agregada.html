@@ -1,0 +1,15 @@
+{% load static %}
+{% load custom_filters %}
+
+
+<tr id="seleccionadoId-{{ registro.dni }}">
+  <td>{{ registro.grado|convertirGrado }}</td>
+  <td>{{ registro.dni }}</td>
+  <td>{{ registro.apellidos }}</td>
+  <td>{{ registro.nombres }}</td>
+  <td>
+    <input type="hidden" name="alumnos_pk" value="{{ registro.pk }}" />
+    <button class="btn btn-danger"  onclick="this.closest('tr').remove()">Quitar</button>  </td>
+</tr>
+
+

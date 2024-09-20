@@ -1,6 +1,10 @@
 from django.db import models
 
-# Create your models here.
+class PersonaManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(estado=1)
+    
+    
 class persona(models.Model):
     grado = models.CharField(max_length=45, null=True, default=None)
     apellidos = models.CharField(max_length=45)
@@ -40,6 +44,7 @@ class persona(models.Model):
     # causa_inepto = models.CharField(max_length=150, null=True, default=None)
     # observaciones = models.CharField(max_length=1000, null=True, default=None)
     # separado = models.IntegerField(null=True, default=None)
+    objects = PersonaManager()
 
     class Meta:
         db_table = "persona"

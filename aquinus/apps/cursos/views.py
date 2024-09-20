@@ -312,6 +312,8 @@ class CursoDetailView(DetailView):
  
 class AlumnosCursoUpdateView(TemplateView):
     template_name='cursos/cursos/modificar_alumnos_curso.html' 
+    success_url = reverse_lazy('home')
+
     
     def get_context_data(self, **kwargs):
         context=super().get_context_data(**kwargs)
@@ -320,10 +322,59 @@ class AlumnosCursoUpdateView(TemplateView):
        
         alumnos=persona.objects.filter(dni__in=dni_cursantes).using('id8')
         context['alumnos']=alumnos
+        context['curso']=curso
         return  context
+    
+    def post(self, request, *args, **kwargs):
+
+        # Obtener los alumnos seleccionados del request
+        alumnos = request.POST.get('alumnos_seleccionados')
+        try:
+            alumnos_seleccionados = json.loads(alumnos)
+        except json.JSONDecodeError:
+            alumnos_seleccionados = []
+
+        curso = self.get_context_data().get('curso')  # Curso no guardado aún
+        
+        # Empezar una transacción
+        with transaction.atomic():
+            try:
+                # Primero, obtener todos los Cursante existentes para el curso
+                cursantes_existentes = Cursante.objects.filter(curso=curso, activo=True)
+
+                # Ahora eliminar los cursantes que no están en la lista seleccionada
+                for cursante in cursantes_existentes:
+                    if str(cursante.dni) not in alumnos_seleccionados:
+                        print(cursante.dni, "NO ESTÁ EN ", alumnos_seleccionados)
+                        cursante.delete()
+                        messages.warning(request, f'Cursante con DNI {cursante.dni} eliminado.')
+                # Crear o actualizar Cursantes
+                for alumno_dni in alumnos_seleccionados:
+                    # Intentar obtener o crear el cursante
+                    cursante, created = Cursante.objects.get_or_create(dni=int(alumno_dni), curso=curso)
+                    if created:
+                        print("CREO EL USUARIO POR QUE NO EXISTIA COMO CURSANTE ", alumno_dni)
+                        # Mensaje opcional si se crea un nuevo cursante
+                        messages.info(request, f'Cursante con DNI {alumno_dni} creado.')
+
+                
+
+                # Guardar el curso después de asociar todos los alumnos
+                curso.save(request=request)  # Pasamos el request para almacenar el usuario que realizó el cambio
+                # Mensaje de éxito
+                messages.success(request, 'El curso se ha actualizado y se han asociado los alumnos correctamente.')
+                
+            except IntegrityError as e:
+                # Manejar errores de integridad (como el nombre del curso duplicado)
+                messages.error(request, 'El nombre del curso ya existe. Por favor, elige otro.')
+                return self.form_invalid(self.get_form())
+            except Exception as e:
+                # Si ocurre un error, la transacción se revertirá
+                messages.error(request, f'Hubo un error al asociar los alumnos: {str(e)}')
+                return self.form_invalid(self.get_form())
  
- 
- 
+            # Redirigir a la URL de éxito después de agregar el mensaje
+            return redirect(reverse_lazy('cursos:ver_cursos'))
  
  
  
