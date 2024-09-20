@@ -10,8 +10,8 @@
     <i class="icon-house_siding lh-1"></i>
     <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
   </li>
-  <li class="breadcrumb-item">Cursos</li>
-  <li class="breadcrumb-item">Materias</li>
+  <li class="breadcrumb-item"><a href="{%url 'cursos:ver_cursos'%}">Cursos</a></li>
+    <li class="breadcrumb-item">Materias</li>
   <li class="breadcrumb-item">Asignar Profesores</li>
 </ol>
 {% endblock breadcrumb %}
@@ -81,9 +81,9 @@
             <button type="submit" class="btn btn-success">
               Actualizar
             </button>
-            <button type="button" class="btn btn-info">
+            <a href="{%url 'cursos:ver_cursos'%}"type="button" class="btn btn-info">
               Cancelar
-              </button>
+            </a>
           </div>
         </div>
         </form>

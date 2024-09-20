@@ -3,6 +3,7 @@ from django.shortcuts import  get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Count
+from django.db.models import Prefetch
 
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
@@ -230,6 +231,7 @@ class CursoCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['active_tab']="cursos"   
         return context
+    
 class CursoListView(ListView):
     model = Curso
     template_name = "cursos/cursos/ver_cursos.html"
@@ -242,7 +244,8 @@ class CursoListView(ListView):
         cursos_con_materias_y_profesores = {}
         for curso in cursos_activos:
             plan_estudio = curso.plan_de_estudio  # Suponiendo que existe un campo plan_de_estudio en Curso
-            materias = plan_estudio.materias.all()
+            #materias = plan_estudio.materias.all()
+            materias = plan_estudio.materias.filter(anio=curso.anio)
             todas_materias_con_profesores = True  # Se asume que todas tienen profesor inicialmente
             cantidad_alumnos_por_curso = Cursante.objects.filter(curso=curso).aggregate(total=Count('id'))['total']
             # Para cada materia, verificamos si tiene profesores asociados
@@ -388,14 +391,21 @@ class AsignarProfesores(ListView):
     def get_queryset(self):
         curso_id=self.kwargs.get('pk')
         curso = Curso.objects.get(id=curso_id)
-        materias=Materia.objects.filter(materias_plan_de_estudio=curso.plan_de_estudio).prefetch_related('profesor_materia')
+        materias = Materia.objects.filter(materias_plan_de_estudio=curso.plan_de_estudio).prefetch_related(
+                Prefetch('profesor_materia', queryset=Profesor.objects.filter(curso=curso))
+                    )
+        
         return materias
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         curso = Curso.objects.get(pk=self.kwargs['pk'])
-        materias = curso.plan_de_estudio.materias.all()
+        #materias = curso.plan_de_estudio.materias.all()
 
+
+        materias = Materia.objects.filter(materias_plan_de_estudio=curso.plan_de_estudio).prefetch_related(
+                Prefetch('profesor_materia', queryset=Profesor.objects.filter(curso=curso))
+                    )
         # Crear una lista de tuplas (materia, formulario)
         
         context['curso']=curso
@@ -443,34 +453,41 @@ class ProfesorTemplateView(TemplateView):
             
             # Identificar usuarios deseleccionados
             usuarios_deseleccionados = usuarios_actuales - usuarios_seleccionados
-            
+            print(curso, "CUROOOOOSSS")
             # Eliminar las asignaciones existentes para usuarios deseleccionados
-            for usuario in usuarios_deseleccionados:
-                profesor = profesores_actuales.get(usuario__usuario=usuario)
-                profesor.curso.remove(curso)
-                profesor.materias.remove(materia)
-                messages.warning(request, f'Se ha eliminado la asignación del profesor {profesor.usuario} para este curso y materia.')
+            # Eliminar las asignaciones existentes para usuarios deseleccionados de forma más eficiente
             
+           # Obtener los profesores que coinciden con los usuarios deseleccionados
+            profesores = Profesor.objects.filter(usuario__usuario__in=usuarios_deseleccionados, curso=curso)
+
+            # Iterar sobre los profesores y remover la materia de cada uno
+            for profesor in profesores:
+                profesor.materias.remove(materia)  # Esto desasigna la materia del profesor
+
+
+                messages.warning(request, f'Se ha eliminado la asignación del profesor {profesor.usuario} para este curso y materia.')
+           
+             
             # Crear o actualizar las nuevas asignaciones
+             # Crear o actualizar las nuevas asignaciones
             for usuario in usuarios_seleccionados:
                 perfil = usuario.perfil
+                # Crear o recuperar el profesor sin el campo ManyToMany
                 profesor, created = Profesor.objects.get_or_create(usuario=perfil)
-                profesor.curso.add(curso)
-                profesor.materias.add(materia)
                 
+                # Añadir el curso y la materia al profesor
+                profesor.curso.add(curso)  # Relacionar con el curso
+                profesor.materias.add(materia)  # Relacionar con la materia
+
                 if created:
                     messages.success(request, f'El profesor {perfil} ha sido creado y asignado correctamente.')
-                elif usuario not in usuarios_actuales:
+                else:
                     messages.success(request, f'El profesor {perfil} ha sido asignado correctamente.')
+
         else:
             messages.error(request, 'Por favor, corrija los errores en el formulario.')
             context['form'] = form
             return self.render_to_response(context)
 
-
         # Redirigir pasando los ids de curso y materia
         return redirect(reverse_lazy('cursos:asignar_profesores', kwargs={'pk': curso.id}))
-
-
-
-

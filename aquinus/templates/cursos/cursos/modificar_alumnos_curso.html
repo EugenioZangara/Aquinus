@@ -16,8 +16,8 @@
       <i class="icon-house_siding lh-1"></i>
       <a href="{% url 'home' %}" class="text-decoration-none">Inicio</a>
     </li>
-    <li class="breadcrumb-item">Cursos</li>
-    <li class="breadcrumb-item">{{ curso.nombre }}</li>
+    <li class="breadcrumb-item"><a href="{%url 'cursos:ver_cursos'%}">Cursos</a></li>
+        <li class="breadcrumb-item">{{ curso.nombre }}</li>
     <li class="breadcrumb-item">Modificar Alumnos</li>
   </ol>
 {% endblock %}
@@ -120,7 +120,11 @@
             <div class="card-body">
               <div class="m-0">
                 <label class="form-label">Buscar Aspirante:</label>
-                <span class="htmx-indicator"><img src="/img/bars.svg" /> Searching...</span>
+                <span class="htmx-indicator">
+                  <video autoplay loop muted>
+                    <source src="{% static 'assets/images/htmx-indicator.webm' %}" type="video/webm">
+                    Buscando....
+                  </video></span>
 
                 <input type="text" class="form-control" placeholder="Buscar..." name="search" hx-get="{% url 'alumnos:alumnos_por_especialidad' %}" hx-trigger="input changed delay:500ms, search" hx-target="#listadoAspirantes" hx-indicator=".htmx-indicator" hx-include="#plan_de_estudio, #anio" />
                 <input type="hidden" id="plan_de_estudio" name="plan_de_estudio" value="{{ curso.plan_de_estudio.pk }}" />

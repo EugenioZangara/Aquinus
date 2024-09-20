@@ -55,23 +55,23 @@ class PlanEstudioForm(forms.ModelForm):
         }
         
 class CursoCreateForm(forms.ModelForm):
-    anio = forms.ChoiceField(
-        choices=[
-            ("1", 'Primer Año'),
-            ("2", 'Segundo Año'),
-            ("3", 'Tercer Año')
-        ],
-        widget=forms.Select(attrs={'class': 'form-control anio',
-                                   'hx-get': "/alumnos/alumnosPorEspecialidad",  # Ruta donde envías la solicitud
-                'hx-trigger': "change",
-                'hx-target': "#listadoAspirantes",  # ID del contenedor que HTMX actualizará
-                'hx-include':"[name='plan_de_estudio']", }),
-        label='Año del curso:'
-    )
+    # anio = forms.ChoiceField(
+    #     choices=[
+    #         ("1", 'Primer Año'),
+    #         ("2", 'Segundo Año'),
+    #         ("3", 'Tercer Año')
+    #     ],
+    #     widget=forms.Select(attrs={'class': 'form-control anio',
+    #                                'hx-get': "/alumnos/alumnosPorEspecialidad",  # Ruta donde envías la solicitud
+    #             'hx-trigger': "change",
+    #             'hx-target': "#listadoAspirantes",  # ID del contenedor que HTMX actualizará
+    #             'hx-include':"[name='plan_de_estudio']", }),
+    #     label='Año del curso:'
+    # )
 
     class Meta:
         model = Curso
-        fields = ['plan_de_estudio', 'division']
+        fields = ['plan_de_estudio', 'division', 'anio']
         widgets = {
             'plan_de_estudio': forms.Select(attrs={
                 'class': 'form-control',
@@ -81,11 +81,18 @@ class CursoCreateForm(forms.ModelForm):
                 'hx-include':"[name='anio']",
                  
             }),
-            'division': forms.NumberInput(attrs={'class': 'form-control'})
-        }
+            'division': forms.NumberInput(attrs={'class': 'form-control'}),
+            'anio':forms.Select(attrs={'class': 'form-control anio',
+                                   'hx-get': "/alumnos/alumnosPorEspecialidad",  # Ruta donde envías la solicitud
+                                    'hx-trigger': "change",
+                                    'hx-target': "#listadoAspirantes",  # ID del contenedor que HTMX actualizará
+                                    'hx-include':"[name='plan_de_estudio']", })
+                    }
+        
         labels = {
             'plan_de_estudio': 'Especialidad del curso a abrir:',
-            'division': 'Ingrese la división del Curso:'
+            'division': 'Ingrese la división del Curso:',
+            'anio':'Año del curso:'
         }
     def __init__(self, *args, **kwargs):
         super(CursoCreateForm, self).__init__(*args, **kwargs)

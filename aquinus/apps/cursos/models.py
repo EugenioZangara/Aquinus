@@ -9,7 +9,12 @@ from django.contrib.auth.models import User  # Importa el modelo User
 from apps.alumnos.models import persona
 from apps.usuarios.models import Perfil
 # Create your models here.
-
+ANIO_CHOICES = [
+        (1, '1er año'),
+        (2, '2do año'),
+        (3, '3er año'),
+        
+    ]
 TIPO_DE_MATERIA = [('ANUAL', 'ANUAL'),
                    ('SEMESTRAL', 'SEMESTRAL'),
                    ('CUATRIMESTRAL', 'CUATRIMESTRAL'),
@@ -193,6 +198,7 @@ class Curso(models.Model):
     plan_de_estudio=models.ForeignKey(PlanEstudio, on_delete=models.DO_NOTHING, related_name='plan_estudio_curso')
     activo=models.BooleanField(default=False)
     puede_calificar=models.BooleanField(default=False)
+    anio = models.IntegerField(choices=ANIO_CHOICES)    
     division=models.IntegerField(default=1)
     enabled=models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -208,7 +214,7 @@ class Curso(models.Model):
     def save(self, *args, **kwargs):
         if not self.nombre:  # Solo lo genera si el nombre no ha sido definido aún
             año_actual = datetime.now().year
-            self.nombre = f'{self.plan_de_estudio.especialidad}{self.plan_de_estudio.orientacion}-{año_actual}-{self.division}'
+            self.nombre = f'{self.plan_de_estudio.especialidad}{self.plan_de_estudio.orientacion}-{año_actual}-{self.anio}A-{self.division}D'
             
         request = kwargs.pop('request', None)
         if request:
@@ -238,7 +244,7 @@ class Cursante(models.Model):
         return str(self.dni)
 
 class Profesor (models.Model):
-    usuario=models.OneToOneField(Perfil, on_delete=models.CASCADE)
+    usuario=models.ForeignKey(Perfil, on_delete=models.CASCADE)
     curso=models.ManyToManyField(Curso, related_name='profesor_curso')
     materias=models.ManyToManyField(Materia, related_name='profesor_materia')
     
