@@ -1,0 +1,437 @@
+{% extends 'main.html' %}
+{% load static %} {% load custom_filters %}
+{% block head %}
+  <link href="{% static 'assets/select2/css/select2.min.css' %}" rel="stylesheet" />
+{% endblock %}
+{% block breadcrumb %}
+  <ol class="breadcrumb mb-3">
+    <li class="breadcrumb-item">
+      <i class="icon-house_siding lh-1"></i>
+      <a href="{% url 'home' %}" class="text-decoration-none">Inicio</a>
+    </li>
+    <li class="breadcrumb-item">Fechas</li>
+    <li class="breadcrumb-item">Ver Fechas</li>
+  </ol>
+{% endblock %}
+{% block main_content1 %}
+  <!-- Row start -->
+
+  <div class="row gx-3">
+    {% if form_anual.errors %}
+      <div class="alert alert-danger">{{ form_anual.non_field_errors }}
+        {{ form_anual.anio_lectivo.errors|safe }}</div>
+    {% endif %}
+
+    {% if form_semestral.errors %}
+      <div class="alert alert-danger">{{ form_semestral.non_field_errors }}
+        {{ form_semestral.anio_lectivo.errors|safe }}</div>
+    {% endif %}
+    {% if form_trimestral.errors %}
+      <div class="alert alert-danger">{{ form_trimestral.non_field_errors }}
+        {{ form_trimestral.anio_lectivo.errors|safe }}</div>
+    {% endif %}
+    {% if form_cuatrimestral.errors %}
+      <div class="alert alert-danger">{{ form_cuatrimestral.non_field_errors }}
+        {{ form_cuatrimestral.anio_lectivo.errors|safe }}</div>
+    {% endif %}
+
+    <div class="col-sm-12">
+      <div class="card mb-3">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-lg-6">
+              <h5 class="card-title">Definir fechas de exámenes/calificaciones</h5>
+            </div>
+            <div class="col-lg-6">
+              <div class="col-12">
+                <label class="form-label" for="fecha_inicio_ciclo_lectivo">Defina la fecha de inicio del Ciclo Lectivo</label>
+                <input type="date" name="fecha_inicio_ciclo_lectivo" id="fecha_inicio_ciclo_lectivo" class="form-control" value="{% if fecha_default %}{{ fecha_default|date:'Y-m-d' }}{% endif %}" />
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-success" name="submit_button" value="inicio_ciclo_lectivo">Enviar</button>
+              </div>
+
+              {% if mensaje_advertencia %}
+                <div class="alert alert-warning">{{ mensaje_advertencia }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="accordion" id="accordionSpecialTitle">
+            <!-- Materias ANUALES -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingSpecialTitleOne"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpecialTitleOne" aria-expanded="false" aria-controls="collapseSpecialTitleOne"><h5 class="m-0">Anuales</h5></button></h2>
+              <div id="collapseSpecialTitleOne" class="accordion-collapse collapse" aria-labelledby="headingSpecialTitleOne" data-bs-parent="#accordionSpecialTitle" style="">
+                <div class="accordion-body">
+                  <form method="post">
+                    {% csrf_token %}
+                    <h1 class="display-4 text-primary">Materias Anuales:</h1> <div class="form-label">{{ form_anual.anio_lectivo.label }}</div>{{ form_anual.anio_lectivo }}
+                    <div class="row gx-3">
+                      <div class="col-lg-3 col-sm-4 col-12">
+                        <div class="mb-3">
+                          <div class="form-label">{{ form_anual.anual_primer_trimestre.label }}</div>
+                          {{ form_anual.anual_primer_trimestre }}
+                        </div>
+                      </div>
+                      <div class="col-lg-3 col-sm-4 col-12">
+                        <div class="mb-3">
+                          <div class="form-label">{{ form_anual.anual_segundo_trimestre.label }}</div>
+                          {{ form_anual.anual_segundo_trimestre }}
+                        </div>
+                      </div>
+                      <div class="col-lg-3 col-sm-4 col-12">
+                        <div class="mb-3">
+                          <div class="form-label">{{ form_anual.anual_tercer_trimestre.label }}</div>
+                          {{ form_anual.anual_tercer_trimestre }}
+                        </div>
+                      </div>
+                      <div class="col-lg-3 col-sm-4 col-12">
+                        <div class="mb-3">
+                          <div class="form-label">{{ form_anual.anual_cierre.label }}</div>
+                          {{ form_anual.anual_cierre }}
+                        </div>
+                      </div>
+                      <div class="col-lg-3 col-sm-4 col-12">
+                        <div class="mb-3">
+                          <div class="form-label">{{ form_anual.anual_examen_final.label }}</div>
+                          {{ form_anual.anual_examen_final }}
+                        </div>
+                      </div>
+                    </div>
+                   
+{{form_anual.fecha_inicio_ciclo_lectivo}}
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-success" name="submit_button" value="formulario_anuales">Cargar Fechas Anuales</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingSpecialTitleTwo"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpecialTitleTwo" aria-expanded="false" aria-controls="collapseSpecialTitleTwo"><h5 class="m-0">Semestrales</h5></button></h2>
+              <div id="collapseSpecialTitleTwo" class="accordion-collapse collapse" aria-labelledby="headingSpecialTitleTwo" data-bs-parent="#accordionSpecialTitle">
+                <div class="accordion-body">
+                  <form method="post">
+                    {% csrf_token %}
+                    <!-- Row start -->
+                    <h1 class="display-4 text-primary">Materias Semestrales:</h1> <div class="form-label">{{ form_semestral.anio_lectivo.label }}</div>{{ form_semestral.anio_lectivo }}
+                    <div class="row gx-3">
+                      <div class="col-md-6">
+                        <div class="card mb-3">
+                          <div class="col-lg-6 col-sm-4 col-12 mx-3">
+                            <div class="card-header">
+                              <h5 class="card-title">Primer Semestre</h5>
+                            </div>
+                          </div>
+
+                          <div class="card-body">
+                            <div class="input-group">
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_semestral.semestral_primer_trimestre_a.label }}</div>
+                                  {{ form_semestral.semestral_primer_trimestre_a }}
+                                </div>
+                              </div>
+
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_semestral.semestral_cierre_a.label }}</div>
+                                  {{ form_semestral.semestral_cierre_a }}
+                                </div>
+                              </div>
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_semestral.semestral_examen_final_a.label }}</div>
+                                  {{ form_semestral.semestral_examen_final_a }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="card mb-3">
+                          <div class="col-lg-6 col-sm-4 col-12 mx-3">
+                            <div class="card-header">
+                              <h5 class="card-title">Segundo Semestre</h5>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="input-group">
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_semestral.semestral_primer_trimestre_b.label }}</div>
+                                  {{ form_semestral.semestral_primer_trimestre_b }}
+                                </div>
+                              </div>
+
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_semestral.semestral_cierre_b.label }}</div>
+                                  {{ form_semestral.semestral_cierre_b }}
+                                </div>
+                              </div>
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_semestral.semestral_examen_final_b.label }}</div>
+                                  {{ form_semestral.semestral_examen_final_b }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {{form_semestral.fecha_inicio_ciclo_lectivo}}
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-success" name="submit_button" value="formulario_semestrales">Cargar Fechas Semestrales</button>
+                    </div>
+                    <!-- Row end -->
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingSpecialTitleThree"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpecialTitleThree" aria-expanded="false" aria-controls="collapseSpecialTitleThree"><h5 class="m-0">Cuatrimestrales</h5></button></h2>
+              <div id="collapseSpecialTitleThree" class="accordion-collapse collapse" aria-labelledby="headingSpecialTitleThree" data-bs-parent="#accordionSpecialTitle">
+                <div class="accordion-body">
+                  <form method="post">
+                    {% csrf_token %}
+                    <!-- Row start -->
+                    <h1 class="display-4 text-primary">Materias Cuatrimestrales:</h1> <div class="form-label">{{ form_cuatrimestral.anio_lectivo.label }}</div>{{ form_cuatrimestral.anio_lectivo }}
+                    <div class="row gx-3">
+                      <div class="col-md-6">
+                        <div class="card mb-3">
+                          <div class="col-lg-6 col-sm-4 col-12 mx-3">
+                            <div class="card-header">
+                              <h5 class="card-title">Primer Cuatrimestre</h5>
+                            </div>
+                          </div>
+
+                          <div class="card-body">
+                            <div class="input-group">
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_cuatrimestral.cuatrimestral_primer_bimestre_a.label }}</div>
+                                  {{ form_cuatrimestral.cuatrimestral_primer_bimestre_a }}
+                                </div>
+                              </div>
+
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_cuatrimestral.cuatrimestral_cierre_a.label }}</div>
+                                  {{ form_cuatrimestral.cuatrimestral_cierre_a }}
+                                </div>
+                              </div>
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_cuatrimestral.cuatrimestral_examen_final_a.label }}</div>
+                                  {{ form_cuatrimestral.cuatrimestral_examen_final_a }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="card mb-3">
+                          <div class="col-lg-6 col-sm-4 col-12 mx-3">
+                            <div class="card-header">
+                              <h5 class="card-title">Segundo Semestre</h5>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="input-group">
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_cuatrimestral.cuatrimestral_primer_bimestre_b.label }}</div>
+                                  {{ form_cuatrimestral.cuatrimestral_primer_bimestre_b }}
+                                </div>
+                              </div>
+
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_cuatrimestral.cuatrimestral_cierre_b.label }}</div>
+                                  {{ form_cuatrimestral.cuatrimestral_cierre_b }}
+                                </div>
+                              </div>
+                              <div class="col-lg-6 col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_cuatrimestral.cuatrimestral_examen_final_b.label }}</div>
+                                  {{ form_cuatrimestral.cuatrimestral_examen_final_b }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {{form_cuatrimestral.fecha_inicio_ciclo_lectivo}}
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-success" name="submit_button" value="formulario_cuatrimestrales">Cargar Fechas Cuatritrales</button>
+                    </div>
+                    <!-- Row end -->
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingSpecialTitle3"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpecialTitle3" aria-expanded="false" aria-controls="collapseSpecialTitle3"><h5 class="m-0">Trimestrales</h5></button></h2>
+              <div id="collapseSpecialTitle3" class="accordion-collapse collapse" aria-labelledby="headingSpecialTitle3" data-bs-parent="#accordionSpecialTitle" style="">
+                <div class="accordion-body">
+                  <form method="post">
+                    {% csrf_token %}
+                    <!-- Row start -->
+                    <h1 class="display-4 text-primary">Materias Trimestrales:</h1> <div class="form-label">{{ form_trimestral.anio_lectivo.label }}</div>{{ form_trimestral.anio_lectivo }}
+                    <div class="row gx-3">
+                      <div class="col-md-3">
+                        <div class="card mb-3">
+                          <div class="col-lg-12 col-sm-4 col-12">
+                            <div class="card-header">
+                              <h5 class="card-title">Primer Trimestre</h5>
+                            </div>
+                          </div>
+
+                          <div class="card-body">
+                            <div class="input-group">
+                              <div class="col-lg col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_trimestral.primer_trimestre_cierre.label }}</div>
+                                  {{ form_trimestral.primer_trimestre_cierre }}
+                                </div>
+
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_trimestral.primer_trimestre_examen_final.label }}</div>
+                                  {{ form_trimestral.primer_trimestre_examen_final }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="card mb-3">
+                          <div class="col-lg-12 col-sm-4 col-12">
+                            <div class="card-header">
+                              <h5 class="card-title">Segundo Trimestre</h5>
+                            </div>
+                          </div>
+
+                          <div class="card-body">
+                            <div class="input-group">
+                              <div class="col-lg col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_trimestral.segundo_trimestre_cierre.label }}</div>
+                                  {{ form_trimestral.segundo_trimestre_cierre }}
+                                </div>
+
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_trimestral.segundo_trimestre_examen_final.label }}</div>
+                                  {{ form_trimestral.segundo_trimestre_examen_final }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-3">
+                        <div class="card mb-3">
+                          <div class="col-lg-12 col-sm-4 col-12">
+                            <div class="card-header">
+                              <h5 class="card-title">Tercer Trimestre</h5>
+                            </div>
+                          </div>
+
+                          <div class="card-body">
+                            <div class="input-group">
+                              <div class="col-lg col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_trimestral.tercer_trimestre_cierre.label }}</div>
+                                  {{ form_trimestral.tercer_trimestre_cierre }}
+                                </div>
+
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_trimestral.tercer_trimestre_examen_final.label }}</div>
+                                  {{ form_trimestral.tercer_trimestre_examen_final }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-3">
+                        <div class="card mb-3">
+                          <div class="col-lg-12 col-sm-4 col-12">
+                            <div class="card-header">
+                              <h5 class="card-title">Cuarto Trimestre</h5>
+                            </div>
+                          </div>
+
+                          <div class="card-body">
+                            <div class="input-group">
+                              <div class="col-lg col-sm-4 col-12">
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_trimestral.cuarto_trimestre_cierre.label }}</div>
+                                  {{ form_trimestral.cuarto_trimestre_cierre }}
+                                </div>
+
+                                <div class="mb-3">
+                                  <div class="form-label">{{ form_trimestral.cuarto_trimestre_examen_final.label }}</div>
+                                  {{ form_trimestral.cuarto_trimestre_examen_final }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {{form_trimestral.fecha_inicio_ciclo_lectivo}}
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-success" name="submit_button" value="formulario_trimestrales">Cargar Fechas Trimestrales</button>
+                    </div>
+                    <!-- Row end -->
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row end -->
+{% endblock %}
+{% block main_content2 %}
+  <button type="button" class="btn btn-warning btn-lg">Abrir mesa de complementarios</button>
+{% endblock %}
+{% block scripts %}
+<script>
+  // Inicializa el campo oculto al cargar la página
+  document.addEventListener('DOMContentLoaded', function() {
+      const fechaInput = document.getElementById('fecha_inicio_ciclo_lectivo');
+      const fechasOcultas = document.querySelectorAll('.fecha_inicio_ciclo_lectivo_oculta');
+      console.log(fechasOcultas)
+      // Captura el valor por defecto y lo inyecta en todos los campos ocultos
+      fechasOcultas.forEach(fechaOculta => {
+          fechaOculta.value = fechaInput.value;
+          console.log(fechaOculta.value )
+      });
+
+      // Añade un listener para el cambio de fecha
+      fechaInput.addEventListener('change', function() {
+          // Captura el nuevo valor y lo inyecta en todos los campos ocultos
+          fechasOcultas.forEach(fechaOculta => {
+              fechaOculta.value = this.value;
+          });
+      });
+  });
+</script>
+
+
+
+{% endblock scripts %}

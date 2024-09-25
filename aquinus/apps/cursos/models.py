@@ -2,7 +2,7 @@ from django.db import models
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.conf import settings
-
+from django.urls import reverse
 from django.db.models import Q
 from django.contrib.auth.models import User  # Importa el modelo User
 
@@ -127,6 +127,11 @@ def validate_orientacion(especialidad, orientacion):
         raise ValidationError(f"Orientación '{orientacion}' no es válida para la especialidad '{especialidad}'.")
 
 
+def validate_fechas_comex_finex(comex, finex):
+    if comex>finex:
+        raise ValidationError(f"La fecha de inicio de Calificacion '{comex}', no puede ser posterior a la fecha de finalización de \n Calificación '{finex}'")
+
+
 class Materia(models.Model):
     nombre=models.CharField(max_length=100)
     abreviatura=models.CharField(max_length=20)
@@ -205,11 +210,11 @@ class Curso(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
-    def save(self, *args, **kwargs):
-        request = kwargs.pop('request', None)
-        if request:
-            self.updated_by = request.current_user
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     request = kwargs.pop('request', None)
+    #     if request:
+    #         self.updated_by = request.current_user
+    #     super().save(*args, **kwargs)
         
     def save(self, *args, **kwargs):
         if not self.nombre:  # Solo lo genera si el nombre no ha sido definido aún
@@ -247,10 +252,18 @@ class Profesor (models.Model):
     usuario=models.ForeignKey(Perfil, on_delete=models.CASCADE)
     curso=models.ManyToManyField(Curso, related_name='profesor_curso')
     materias=models.ManyToManyField(Materia, related_name='profesor_materia')
-    
-class Calificaciones(models.Model):
-    
-    CALIFICACIONES_CHOICES=[
+
+
+
+REGIMEN_MATERIAS_CHOICES=[
+    ('BIMESTRAL','Bimestral'), #Calificación promedio de las calificaciones ordinarias del bimestre
+    ('TRIMESTRAL','Trimestral'), # Calificación promedio de las calificaciones ordinarias del trimestre 
+    ('CUATRIMESTRAL','Cuatrimestral'),
+    ('SEMESTRAL','Semestral'),
+     ('ANUAL', 'Anual'), # Calificación correspondiente a un examen complementario, debe acompañar el campo numero_complementario
+]    
+
+CALIFICACIONES_CHOICES=[
     ('BIMESTRAL','Bimestral'), #Calificación promedio de las calificaciones ordinarias del bimestre
     ('TRIMESTRAL','Trimestral'), # Calificación promedio de las calificaciones ordinarias del trimestre
     ('PROMEDIO CURSADA','Promedio Cursada'), #n Calificación promedio de las notas de los periodos intermedios (trimestre/bimestre)
@@ -258,7 +271,10 @@ class Calificaciones(models.Model):
     ('FINAL','Final'), # Nota final de la materia (promedio de examen fina y promedio de cursada o promedio de cursada en caso de promocionables)
     ('COMPLEMENTARIO', 'Complementario'), # Calificación correspondiente a un examen complementario, debe acompañar el campo numero_complementario
     ('ORDINARIA','Ordinaria') #Calificación volcada por el profesor durante la cursada en función de las evaluaciones que haga
-]
+]    
+class Calificaciones(models.Model):
+    
+
     
     materia=models.ForeignKey(Materia,on_delete=models.DO_NOTHING,  related_name='calificacion_materia')
     cursante=models.ForeignKey(Cursante, on_delete=models.DO_NOTHING, related_name='nota_cursante')
@@ -270,5 +286,41 @@ class Calificaciones(models.Model):
     calificador = models.ForeignKey(Profesor, on_delete=models.SET_NULL, null=True, blank=True)
 
 
-
+class FechasExamenes(models.Model):
     
+    anio_lectivo=models.IntegerField(validators=[validate_four_digits],  # Aplica la validación personalizada
+        )
+    regimen_materia=models.CharField(max_length=50, choices=REGIMEN_MATERIAS_CHOICES) #Define el régimen de la materia (cuatrimestral, anual, trimestral, etc)
+    subPeriodo=models.CharField(max_length=100) #(define si es el primer trimestre, segundo, etc...)
+    fechaInicioCalificacion=models.DateField()
+    fechaTopeCalificacion=models.DateField( )
+    aplica_para=models.CharField(max_length=50, default="TODOS", choices=[("TODOS",'TODOS LOS AÑOS'),( "1","PRIMER AÑO"),("2", "SEGUNDO AÑO"),( "3","TERCER AÑO")])
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    
+    class Meta:
+        constraints=[models.UniqueConstraint(fields=['anio_lectivo', 'regimen_materia', 'subPeriodo'], name='combinacion_unica')]
+
+    def validate_unique(self, exclude=None):
+        super().validate_unique(exclude=exclude)
+        if FechasExamenes.objects.filter(anio_lectivo=self.anio_lectivo, regimen_materia=self.regimen_materia, subPeriodo=self.subPeriodo).exists():
+            existing_instance=FechasExamenes.objects.get(anio_lectivo=self.anio_lectivo, regimen_materia=self.regimen_materia, subPeriodo=self.subPeriodo)
+            update_url=reverse('cursos:update_fechas', kwargs={'pk':existing_instance.pk})
+            raise ValidationError({
+                'anio_lectivo': [f'Ya existe una fecha definida para este año lectivo, régimen de materia y periodo. '
+                           f'<a href="{update_url}">Haz clic aquí para editar</a>.']
+            })
+
+        
+    def save(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        if request:
+            self.updated_by = request.current_user
+        super().save(*args, **kwargs)
+    
+    def clean(self):
+        super().clean()
+        # Validar que solo haya un plan vigente por especialidad
+        if self.fechaInicioCalificacion and self.fechaTopeCalificacion:
+            validate_fechas_comex_finex(self.fechaInicioCalificacion, self.fechaTopeCalificacion)

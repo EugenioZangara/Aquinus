@@ -197,7 +197,7 @@
                 </li>
                 <li class="nav-item dropdown {% if active_tab == 'planes_estudio' %}active-link{% endif %}">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-server"></i>Planes de Estudio</a>
-                  <ul class="dropdown-menu dropdown-megamenu">
+                  <ul class="dropdown-menu dropdown">
                     <li>
                       <a class="dropdown-item" href="{% url 'cursos:crear_nuevo_plan_estudio' %}"><span>Nuevo</span></a>
                     </li>
@@ -210,7 +210,7 @@
 
                 <li class="nav-item dropdown {% if active_tab == 'materias' %}active-link{% endif %}">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-package"></i>Materias</a>
-                  <ul class="dropdown-menu dropdown-megamenu">
+                  <ul class="dropdown-menu dropdown">
                     <li>
                       <a class="dropdown-item" href="{% url 'cursos:ver_materias' %}"><span>Ver Materias</span></a>
                     </li>
@@ -220,26 +220,21 @@
                   </ul>
                 </li>
 
-                <li class="nav-item dropdown {% if active_tab == 'definir_fechas' %}active-link{% endif %}">
-                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-drive_file_rename_outline"></i>Definir Fechas</a>
+                <li class="nav-item  dropdown {% if active_tab == 'definir_fechas' %}active-link{% endif %}">
+                  <a class="nav-link dropdown-toggle" href="{%url 'cursos:ver_fechas_materias' %}" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-calendar"></i>Fechas</a>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item" href="form-inputs.html"><span>Trimestrales</span></a>
+                      <a class="dropdown-item" href="{%url 'cursos:ver_fechas_materias' %}"><span>Consultar</span></a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="form-checkbox-radio.html"><span>Semestrales</span></a>
+                      <a class="dropdown-item" href="{%url 'cursos:definir_fechas'%}"><span>Fijar Fechas</span></a>
                     </li>
-                    <li>
-                      <a class="dropdown-item" href="form-file-input.html"><span>Cuatrimestrales</span></a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="form-validations.html"><span>Anuales</span></a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="form-layouts.html">Complementarios</a>
-                    </li>
+                    
                   </ul>
                 </li>
+                
+
+
 
                 <li class="nav-item dropdown {% if active_tab == 'usuarios' %}active-link{% endif %}">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-login"></i>Gestionar Usuarios</a>
@@ -291,7 +286,7 @@
                 {% for message in messages %}
                   <div class="alert {{ message.tags }} alert-dismissible d-flex align-items-center fade show" role="alert">
                     <i class="icon-layers fs-2 me-2 lh-1"></i>
-                    {{ message }}
+                    {{ message |safe}}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                   </div>
                 {% endfor %}

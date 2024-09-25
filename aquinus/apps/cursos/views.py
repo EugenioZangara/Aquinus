@@ -1,19 +1,21 @@
+import datetime
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import  get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.db.models import Count
 from django.db.models import Prefetch
-
+from datetime import timezone
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
-from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView, TemplateView
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView, TemplateView, FormView
 import json
 from django.db import IntegrityError, transaction
 from apps.alumnos.models import persona
 from apps.usuarios.models import Perfil
-from .models import Materia, PlanEstudio ,Curso, Cursante, Profesor
-from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm,  AsignarProfesoresForm
+from .models import Materia, PlanEstudio ,Curso, Cursante, Profesor, FechasExamenes
+from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm,  AsignarProfesoresForm, FechasCreateForm
 # Create your views here.
 
 class MateriaCreateView(CreateView):
@@ -348,7 +350,6 @@ class AlumnosCursoUpdateView(TemplateView):
                 # Ahora eliminar los cursantes que no están en la lista seleccionada
                 for cursante in cursantes_existentes:
                     if str(cursante.dni) not in alumnos_seleccionados:
-                        print(cursante.dni, "NO ESTÁ EN ", alumnos_seleccionados)
                         cursante.delete()
                         messages.warning(request, f'Cursante con DNI {cursante.dni} eliminado.')
                 # Crear o actualizar Cursantes
@@ -356,7 +357,6 @@ class AlumnosCursoUpdateView(TemplateView):
                     # Intentar obtener o crear el cursante
                     cursante, created = Cursante.objects.get_or_create(dni=int(alumno_dni), curso=curso)
                     if created:
-                        print("CREO EL USUARIO POR QUE NO EXISTIA COMO CURSANTE ", alumno_dni)
                         # Mensaje opcional si se crea un nuevo cursante
                         messages.info(request, f'Cursante con DNI {alumno_dni} creado.')
 
@@ -491,3 +491,859 @@ class ProfesorTemplateView(TemplateView):
 
         # Redirigir pasando los ids de curso y materia
         return redirect(reverse_lazy('cursos:asignar_profesores', kwargs={'pk': curso.id}))
+    
+    
+    
+class VerFechasMaterias(TemplateView):
+        template_name = "cursos/materias/ver_fechas.html"
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            anio_lectivo=datetime.date.today().year
+            
+            '''
+            Definimos como contexto las fechas de las materias.
+            para cada régimen de materia, creamos un diccionario, cuya clave es el subperiodo y el valor es la fecha correspondiente
+            '''
+            fechas_anuales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="ANUAL")
+            fechas_anuales={}
+            for fecha in fechas_anuales_registradas:
+                if fecha.subPeriodo:
+                    fechas_anuales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+
+            fechas_semestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL")
+            fechas_semestrales={}
+            for fecha in fechas_semestrales_registradas:
+                if fecha.subPeriodo:
+                    fechas_semestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+            
+            fechas_cuatrimestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL")
+            fechas_cuatrimestrales={}
+            for fecha in fechas_cuatrimestrales_registradas:
+                if fecha.subPeriodo:
+                    fechas_cuatrimestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+            
+            fechas_trimestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL")
+            fechas_trimestrales={}
+            for fecha in fechas_trimestrales_registradas:
+                if fecha.subPeriodo:
+                    fechas_trimestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+            
+            context["fechas_anuales"] =fechas_anuales
+            context["fechas_semestrales"] =fechas_semestrales 
+            context["fechas_cuatrimestrales"] =fechas_cuatrimestrales 
+            context["fechas_trimestrales"] =fechas_trimestrales 
+            return context
+        
+ 
+class DefinirFechas(TemplateView):
+    template_name='cursos/materias/definir_fechas.html'
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Verificamos si existe una fecha de inicio de ciclo lectivo definida.
+        
+        fechaAnual = FechasExamenes.objects.filter(anio_lectivo=datetime.date.today().year, regimen_materia="ANUAL", subPeriodo="1T").values_list('fechaInicioCalificacion', flat=True)
+        fechaSemestral = FechasExamenes.objects.filter(anio_lectivo=datetime.date.today().year, regimen_materia="SEMESTRAL", subPeriodo="1T_A").values_list('fechaInicioCalificacion', flat=True)
+        fechaCuatrimestrales = FechasExamenes.objects.filter(anio_lectivo=datetime.date.today().year, regimen_materia="CUATRIMESTRAL", subPeriodo="1B_A").values_list('fechaInicioCalificacion', flat=True)
+        fechasTrimestrales = FechasExamenes.objects.filter(anio_lectivo=datetime.date.today().year, regimen_materia="TRIMESTRAL", subPeriodo="1T").values_list('fechaInicioCalificacion', flat=True)
+
+        fecha_inicio_ciclo_lectivo = None
+        mensaje_advertencia = ""
+
+        # Crear un diccionario para almacenar los resultados
+        fechas_existentes = {
+            "Anual": list(fechaAnual),
+            "Semestral": list(fechaSemestral),
+            "Cuatrimestral": list(fechaCuatrimestrales),
+            "Trimestral": list(fechasTrimestrales),
+        }
+
+        # Filtrar las que existen
+        fechas_definidas = {materia: fechas for materia, fechas in fechas_existentes.items() if fechas}
+
+        if fechas_definidas:
+            # Extraer las fechas únicas y su correspondiente tipo
+            fechas_unicas = {}
+            for materia, fechas in fechas_definidas.items():
+                for fecha in fechas:
+                    fechas_unicas.setdefault(fecha, []).append(materia)
+
+            # Verificar si hay más de una fecha única
+            if len(fechas_unicas) > 1:
+                # Crear un mensaje con las fechas distintas, convirtiéndolas a string
+                fechas_distintas = ", ".join(sorted(f.strftime('%Y-%m-%d') for f in fechas_unicas.keys()))
+                tipos = ", ".join(sorted(set(materia for materias in fechas_unicas.values() for materia in materias)))
+                mensaje_advertencia = f"Advertencia: Existen diferentes fechas de inicio del ciclo lectivo: {fechas_distintas}. Tipos: {tipos}."
+            else:
+                mensaje_advertencia = "Ya existe una fecha de Inicio del ciclo lectivo, si la modifica, afectará el inicio de TODAS las materias."
+                fecha_inicio_ciclo_lectivo = list(fechas_unicas.keys())[0]  # Obtener la fecha única
+
+        context["fecha_default"] = fecha_inicio_ciclo_lectivo
+        context['mensaje_advertencia'] = mensaje_advertencia
+        context['form_anual'] = FechasCreateForm(regimen_materia="ANUAL")
+        context["form_semestral"] = FechasCreateForm(regimen_materia="SEMESTRAL")
+        context['form_cuatrimestral'] = FechasCreateForm(regimen_materia="CUATRIMESTRAL")
+        context['form_trimestral'] = FechasCreateForm(regimen_materia="TRIMESTRAL")
+        
+        return context
+    
+    def post(self, request, *args: str, **kwargs):
+        
+        submit_button = request.POST.get('submit_button')
+        if submit_button == 'inicio_ciclo_lectivo':
+            print(request.POST)
+        if submit_button == 'formulario_anuales':
+            form=FechasCreateForm(regimen_materia="ANUAL",data=request.POST)
+            
+            if form.is_valid():      
+                data=form.cleaned_data
+                try:
+                    if data['anual_primer_trimestre']:
+                        anual_1T=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="ANUAL",
+                                                    subPeriodo="1T",
+                                                    fechaInicioCalificacion=data['fecha_inicio_ciclo_lectivo'],
+                                                    fechaTopeCalificacion=data['anual_primer_trimestre']
+                                                    )
+                        anual_1T.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Primer Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                         f"para las materias Anuales")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="ANUAL",
+                        subPeriodo="1T"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                   f"para el Primer Trimestre de las materias Anuales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+              
+                try:
+                    if data['anual_segundo_trimestre']:
+                        anual_2T=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="ANUAL",
+                                                    subPeriodo="2T",
+                                                    fechaInicioCalificacion=data['anual_primer_trimestre'],
+                                                    fechaTopeCalificacion=data['anual_segundo_trimestre']
+                                                    )
+                        anual_2T.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Segundo Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                         f"para las materias Anuales")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="ANUAL",
+                        subPeriodo="2T"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                   f"para el Segundo Trimestre de las materias Anuales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                   
+                    
+                try:    
+                    if data['anual_tercer_trimestre']:
+                                                
+                        anual_3T=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="ANUAL",
+                                                    subPeriodo="3T",
+                                                    fechaInicioCalificacion=data['anual_segundo_trimestre'],
+                                                    fechaTopeCalificacion=data['anual_tercer_trimestre']
+                                                    )
+                        anual_3T.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Tercer Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                         f"para las materias Anuales")
+                    else:
+                        pass
+                    
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=data['anio_lectivo'],
+                        regimen_materia="ANUAL",
+                        subPeriodo="3T"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                   f"para el Tercer Trimestre de las materias Anuales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                try:    
+                    if data['anual_cierre']:
+                        anual_cierre=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="ANUAL",
+                                                    subPeriodo="CIERRE_ANUAL",
+                                                    fechaInicioCalificacion=data['anual_tercer_trimestre'],
+                                                    fechaTopeCalificacion=data['anual_cierre']
+                                                    )
+                        anual_cierre.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para el cierre de calificaciones del {form.cleaned_data['anio_lectivo']},  "
+                                         f"para las materias Anuales")
+                    else:
+                        pass
+                    
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="ANUAL",
+                        subPeriodo="CIERRE_ANUAL"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                        f"para el Cierre anual de las materias Anuales. "
+                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                  
+                    
+                try:
+                    if data['anual_examen_final']: 
+                        anual_final=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="ANUAL",
+                                                    subPeriodo="EXAMEN_FINAL",
+                                                    fechaInicioCalificacion=data['anual_cierre'],
+                                                    fechaTopeCalificacion=data['anual_examen_final']
+                                                    )
+                        anual_final.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones de Exámenes Finales del {form.cleaned_data['anio_lectivo']},  "
+                                         f"para las materias Anuales")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="ANUAL",
+                        subPeriodo="EXAMEN_FINAL"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                   f"para el cierre de exámenes finales de las materias Anuales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                 
+                    
+                    
+                
+            else:
+                print(form.errors)
+            
+            
+            #Materias SEMESTRALES
+                
+        if submit_button == 'formulario_semestrales':
+            form=FechasCreateForm(regimen_materia="SEMESTRAL",data=request.POST)
+            
+            if form.is_valid():
+                data=form.cleaned_data
+                #Primer Semestre - primera mitad de año= "A"
+                try:
+                    if data['semestral_primer_trimestre_a']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="SEMESTRAL",
+                                                    subPeriodo="1T_A",
+                                                    fechaInicioCalificacion=data['fecha_inicio_ciclo_lectivo'],
+                                                    fechaTopeCalificacion=data['semestral_primer_trimestre_a']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Primer Trimestres del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Semestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="SEMESTRAL",
+                        subPeriodo="1T_A"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Primer Trimestre de las materias Semestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                
+                #Cierre cursada Semestral - primera mitad de año= "A"
+                try:
+                    if data['semestral_cierre_a']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="SEMESTRAL",
+                                                    subPeriodo="2T_A",
+                                                    fechaInicioCalificacion=data['semestral_primer_trimestre_a'],
+                                                    fechaTopeCalificacion=data['semestral_cierre_a']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Cierre de Cursada del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Semestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="SEMESTRAL",
+                        subPeriodo="2T_A"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Cierre de Cursada de las materias Semestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                
+                #finales Semestrales - primera mitad de año ="A"
+                
+                try:
+                    if data['semestral_examen_final_a']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="SEMESTRAL",
+                                                    subPeriodo="FS_A",
+                                                    fechaInicioCalificacion=data['semestral_cierre_a'],
+                                                    fechaTopeCalificacion=data['semestral_examen_final_a']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Cierre de Cursada del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Semestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="SEMESTRAL",
+                        subPeriodo="2T_A"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Cierre de Cursada de las materias Semestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                
+                
+                #Primer Semestre - sEGUNDA mitad de año= "B"
+                try:
+                    if data['semestral_primer_trimestre_b']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="SEMESTRAL",
+                                                    subPeriodo="1T_B",
+                                                    fechaInicioCalificacion=data['semestral_cierre_a'],
+                                                    fechaTopeCalificacion=data['semestral_primer_trimestre_b']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Primer Trimestres del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Semestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="SEMESTRAL",
+                        subPeriodo="1T_B"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Primer Trimestre de las materias Semestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                
+                #Cierre cursada Semestral - segunda mitad de año= "B"
+                try:
+                    if data['semestral_cierre_b']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="SEMESTRAL",
+                                                    subPeriodo="2T_B",
+                                                    fechaInicioCalificacion=data['semestral_primer_trimestre_b'],
+                                                    fechaTopeCalificacion=data['semestral_cierre_b']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Cierre de Cursada del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Semestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="SEMESTRAL",
+                        subPeriodo="2T_B"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Cierre de Cursada de las materias Semestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                
+                #finales Semestrales - Segunda mitad de año ="B"
+                
+                try:
+                    if data['semestral_examen_final_b']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="SEMESTRAL",
+                                                    subPeriodo="FS_B",
+                                                    fechaInicioCalificacion=data['semestral_cierre_b'],
+                                                    fechaTopeCalificacion=data['semestral_examen_final_b']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Cierre de Cursada del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Semestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="SEMESTRAL",
+                        subPeriodo="2T_B"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Cierre de Cursada de las materias Semestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                
+                
+                    
+            else:
+                print(form.errors)
+                #fin de las semestrales
+                
+                #materias CUATRIMESTRALES
+                
+        if submit_button == 'formulario_cuatrimestrales':
+            form=FechasCreateForm(regimen_materia="CUATRIMESTRAL",data=request.POST)      
+     
+            if form.is_valid():
+                data=form.cleaned_data
+                print(data)
+                #Primer Bitrimestre - primera mitad de año= "A"
+                try:
+                    if data['cuatrimestral_primer_bimestre_a']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="CUATRIMESTRAL",
+                                                    subPeriodo="1B_A",
+                                                    fechaInicioCalificacion=data['fecha_inicio_ciclo_lectivo'],
+                                                    fechaTopeCalificacion=data['cuatrimestral_primer_bimestre_a']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Primer Bimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Cuatrimestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="CUATRIMESTRAL",
+                        subPeriodo="1B_A"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Primer Bimestre de las materias Cuatrimestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                
+                #Cierre cursada Cuatrimestral - primera mitad de año= "A"
+                try:
+                    if data['cuatrimestral_cierre_a']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="CUATRIMESTRAL",
+                                                    subPeriodo="2B_A",
+                                                    fechaInicioCalificacion=data['cuatrimestral_primer_bimestre_a'],
+                                                    fechaTopeCalificacion=data['cuatrimestral_cierre_a']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Cierre de Cursada del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Cuatrimestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="CUATRIMESTRAL",
+                        subPeriodo="2B_A"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Cierre de Cursada de las materias Cuatrimestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                
+                #finales Cuatrimestrales - primera mitad de año ="A"
+                
+                try:
+                    if data['cuatrimestral_examen_final_a']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="CUATRIMESTRAL",
+                                                    subPeriodo="FC_A",
+                                                    fechaInicioCalificacion=data['cuatrimestral_cierre_a'],
+                                                    fechaTopeCalificacion=data['cuatrimestral_examen_final_a']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Examenes Finales del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Cuatrimestrales, de la primera mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="CUATRIMESTRAL",
+                        subPeriodo="FC_A"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Examen Final de las materias Cuatrimestrales de la primera mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                
+                
+                #Primer Semestre - sEGUNDA mitad de año= "B"
+                try:
+                    if data['cuatrimestral_primer_bimestre_b']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="CUATRIMESTRAL",
+                                                    subPeriodo="1B_B",
+                                                    fechaInicioCalificacion=data['cuatrimestral_cierre_a'],
+                                                    fechaTopeCalificacion=data['cuatrimestral_primer_bimestre_b']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Primer Bimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Cuatrimestrales, de la segunda mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="CUATRIMESTRAL",
+                        subPeriodo="1B_B"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Primer Bimestre de las materias Cuatrimestrales de la Segunda mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                
+                #Cierre cursada Semestral - segunda mitad de año= "B"
+                try:
+                    if data['cuatrimestral_cierre_b']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="CUATRIMESTRAL",
+                                                    subPeriodo="2B_B",
+                                                    fechaInicioCalificacion=data['cuatrimestral_primer_bimestre_b'],
+                                                    fechaTopeCalificacion=data['cuatrimestral_cierre_b']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Cierre de Cursada del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Semestrales, de la segunda mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="SEMESTRAL",
+                        subPeriodo="2B_B"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Cierre de Cursada de las materias Cuatrimestrales de la segunda mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                
+                #finales Semestrales - Segunda mitad de año ="B"
+                
+                try:
+                    if data['cuatrimestral_examen_final_b']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="CUATRIMESTRAL",
+                                                    subPeriodo="FC_B",
+                                                    fechaInicioCalificacion=data['cuatrimestral_cierre_b'],
+                                                    fechaTopeCalificacion=data['cuatrimestral_examen_final_b']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones de los Exámenes Finales {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Cuatrimestrales, de la segunda mitad de año")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="CUATRIMESTRAL",
+                        subPeriodo="FC_B"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para los exámenes Finales de las materias Cuatrimestrales de la segunda mitad de año."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                
+                
+                    
+            else:
+                print(form.errors)
+        #fin cuatrimestrales     
+            
+            
+            #materias Trimestrales  
+        if submit_button == 'formulario_trimestrales':
+            form=FechasCreateForm(regimen_materia="TRIMESTRAL",data=request.POST)
+            
+            if form.is_valid():
+                #Primer trimestre
+                try:
+                    if data['primer_trimestre_cierre']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="TRIMESTRAL",
+                                                    subPeriodo="1T",
+                                                    fechaInicioCalificacion=data['fecha_inicio_ciclo_lectivo'],
+                                                    fechaTopeCalificacion=data['primer_trimestre_cierre']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Primer Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Trimestrales.")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="TRIMESTRAL",
+                        subPeriodo="1T"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Primer Trimestre de las materias Trimestrales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                    #Finales Primer trimestre
+                try:
+                    if data['primer_trimestre_examen_final']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="TRIMESTRAL",
+                                                    subPeriodo="FT1",
+                                                    fechaInicioCalificacion=data['primer_trimestre_cierre'],
+                                                    fechaTopeCalificacion=data['primer_trimestre_examen_final']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones de los exámenes Finales Primer Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Trimestrales.")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="TRIMESTRAL",
+                        subPeriodo="FT1"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para los exámenes Finales del Primer Trimestre de las materias Trimestrales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                    ################################################################
+                    #Segundo trimestre
+                try:
+                    if data['segundo_trimestre_cierre']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="TRIMESTRAL",
+                                                    subPeriodo="2T",
+                                                    fechaInicioCalificacion=data['primer_trimestre_cierre'],
+                                                    fechaTopeCalificacion=data['segundo_trimestre_cierre']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Segundo Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Trimestrales.")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="TRIMESTRAL",
+                        subPeriodo="2T"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Segundo Trimestre de las materias Trimestrales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                    #Finales Segundo trimestre
+                try:
+                    if data['segundo_trimestre_examen_final']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="TRIMESTRAL",
+                                                    subPeriodo="FT2",
+                                                    fechaInicioCalificacion=data['segundo_trimestre_cierre'],
+                                                    fechaTopeCalificacion=data['segundo_trimestre_examen_final']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones de los exámenes Finales Segundo Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Trimestrales.")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="TRIMESTRAL",
+                        subPeriodo="FT2"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para los exámenes Finales del Segundo Trimestre de las materias Trimestrales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                    
+                    #####################################################################################
+                    #tercer Trimestre
+                try:
+                    if data['tercer_trimestre_cierre']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="TRIMESTRAL",
+                                                    subPeriodo="3T",
+                                                    fechaInicioCalificacion=data['segundo_trimestre_cierre'],
+                                                    fechaTopeCalificacion=data['tercer_trimestre_cierre']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Tercer Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Trimestrales.")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="TRIMESTRAL",
+                        subPeriodo="3T"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Tercer Trimestre de las materias Trimestrales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                    #Finales Tercer trimestre
+                try:
+                    if data['tercer_trimestre_examen_final']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="TRIMESTRAL",
+                                                    subPeriodo="FT3",
+                                                    fechaInicioCalificacion=data['tercer_trimestre_cierre'],
+                                                    fechaTopeCalificacion=data['tercer_trimestre_examen_final']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones de los exámenes Finales Tercer Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Trimestrales.")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="TRIMESTRAL",
+                        subPeriodo="FT3"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para los exámenes Finales del Tercer Trimestre de las materias Trimestrales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.') 
+                    
+                    ##############################################################################
+                    
+                    #Cuarto Trimestre
+                    
+                
+                try:
+                    if data['cuarto_trimestre_cierre']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="TRIMESTRAL",
+                                                    subPeriodo="4T",
+                                                    fechaInicioCalificacion=data['tercer_trimestre_cierre'],
+                                                    fechaTopeCalificacion=data['cuarto_trimestre_cierre']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones del Cuarto Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Trimestrales.")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="TRIMESTRAL",
+                        subPeriodo="4T"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para el Cuarto Trimestre de las materias Trimestrales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')
+                    
+                    #Finales Cuarto trimestre
+                try:
+                    if data['cuarto_trimestre_examen_final']:
+                        semestral_1T_a=FechasExamenes.objects.create(anio_lectivo=data['anio_lectivo'],
+                                                    regimen_materia="TRIMESTRAL",
+                                                    subPeriodo="FT4",
+                                                    fechaInicioCalificacion=data['cuarto_trimestre_cierre'],
+                                                    fechaTopeCalificacion=data['cuarto_trimestre_examen_final']
+                                                    )
+                        semestral_1T_a.save()
+                        messages.success(request, f"Se ha fijado la fecha tope para las calificaciones de los exámenes Finales Cuarto Trimestre del {form.cleaned_data['anio_lectivo']},  "
+                                        f"para las materias Trimestrales.")
+                    else:
+                        pass
+                except IntegrityError:
+                    existing_instance = FechasExamenes.objects.get(
+                        anio_lectivo=form.cleaned_data['anio_lectivo'],
+                        regimen_materia="TRIMESTRAL",
+                        subPeriodo="FT4"
+                    )
+                    update_url = reverse('cursos:update_fechas', kwargs={'pk': existing_instance.pk})
+                    messages.error(request, f"Ya existe una fecha definida para el año lectivo {form.cleaned_data['anio_lectivo']}, "
+                                f"para los exámenes Finales del Cuarto Trimestre de las materias Trimestrales."
+                                        f'<a href="{update_url}">Haz clic aquí para editar</a>.')     
+                    
+            else:
+                print(form.errors)
+                
+    
+        return redirect(reverse_lazy('cursos:definir_fechas'))
+
+
+
+class update_fechas(UpdateView):
+    pass
+
+
+
+
+
+from django.shortcuts import redirect
+import datetime
+from .models import FechasExamenes
+
+from django.shortcuts import redirect
+import datetime
+from .models import FechasExamenes
+
+def fijarInicioAnioLectivo(request):
+    if request.method == "POST":
+        fecha_inicio_ciclo_lectivo = request.POST.get('fecha_inicio_ciclo_lectivo')
+        
+        # Verifica que la fecha de inicio no sea vacía
+        if not fecha_inicio_ciclo_lectivo:
+            # Maneja el caso en que no se proporciona una fecha
+            return redirect('cursos:definir_fechas')
+
+        print(fecha_inicio_ciclo_lectivo)
+
+        # Lista de tipos de regimen y subperiodo
+        tipos = [
+            ("ANUAL", "1T"),
+            ("SEMESTRAL", "1T_A"),
+            ("CUATRIMESTRAL", "1B_A"),
+            ("TRIMESTRAL", "1T"),
+        ]
+
+        for regimen, sub_periodo in tipos:
+            # Intentamos obtener la instancia
+            try:
+                fechas = FechasExamenes.objects.get(
+                    anio_lectivo=datetime.date.today().year,
+                    regimen_materia=regimen,
+                    subPeriodo=sub_periodo,
+                )
+                # Si la instancia ya existía, actualiza el campo
+                fechas.fechaInicioCalificacion = fecha_inicio_ciclo_lectivo
+                fechas.save()
+            except ObjectDoesNotExist:
+                # Si no existe, crea una nueva instancia
+                FechasExamenes.objects.create(
+                    anio_lectivo=datetime.date.today().year,
+                    regimen_materia=regimen,
+                    subPeriodo=sub_periodo,
+                    fechaInicioCalificacion=fecha_inicio_ciclo_lectivo,
+                )
+
+        return redirect('cursos:definir_fechas')
+
+    return redirect('cursos:definir_fechas')
+
