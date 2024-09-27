@@ -27,7 +27,7 @@
             </div>
             <div class="d-flex flex-column">
               <h2 class="m-0 lh-1">Anuales</h2>
-              <p class="m-0 opacity-50">Tickets</p>
+              {% comment %} <p class="m-0 opacity-50">Tickets</p> {% endcomment %}
             </div>
           </div>
 
@@ -49,21 +49,21 @@
                         Acción
                       </div>
                     </th>
+                    
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>1er. Trim.</td>
-
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_anuales.1T%}
-                        {{fechas_anuales.1T}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_anuales.T1 %}
+                          {{ fechas_anuales.T1 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
-
                     <td>
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
@@ -71,16 +71,15 @@
 
                   <tr>
                     <td>2do. Trim.</td>
-
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_anuales.2T%}
-                        {{fechas_anuales.2T}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_anuales.T2 %}
+                          {{ fechas_anuales.T2 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
-
                     <td>
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
@@ -88,16 +87,15 @@
 
                   <tr>
                     <td>3er. Trim.</td>
-
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_anuales.3T%}
-                        {{fechas_anuales.3T}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_anuales.T3 %}
+                          {{ fechas_anuales.T3 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
-
                     <td>
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
@@ -105,35 +103,35 @@
 
                   <tr>
                     <td>4to. Trim.</td>
-
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_anuales.CIERRE_ANUAL%}
-                        {{fechas_anuales.CIERRE_ANUAL}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_anuales.T4 %}
+                          {{ fechas_anuales.T4 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
-
                     <td>
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
-                    <tr >
-                      <td class="bg-light">Finales</td>
-  
-                      <td class="bg-light">
-                        <span class="badge bg-primary">
-                          {%if fechas_anuales.EXAMEN_FINAL%}
-                          {{fechas_anuales.EXAMEN_FINAL}}
-                          {%else%}Sin definir
-                          {%endif%}
-                        </span>
-                      </td>
-  
-                      <td class="bg-light">
-                        <a class="btn btn-primary"><span class="icon-edit"></span></a>
-                      </td>
+                  </tr>
 
+                  <!-- Aquí estaba el problema, faltaba cerrar el <tr> -->
+                  <tr>
+                    <td class="bg-light">Finales</td>
+                    <td class="bg-light">
+                      <span class="badge bg-primary">
+                        {% if fechas_anuales.FA %}
+                          {{ fechas_anuales.FA }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td class="bg-light">
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -151,7 +149,6 @@
             </div>
             <div class="d-flex flex-column">
               <h2 class="m-0 lh-1">Semestrales</h2>
-              <p class="m-0 opacity-50">InProgress</p>
             </div>
           </div>
 
@@ -184,11 +181,11 @@
 
                     <td>
                       <span class="badge bg-primary">
-                        
-                        {%if fechas_semestrales.1T_A%}
-                          {{fechas_semestrales.1T_A}}
-                          {%else%}Sin definir
-                          {%endif%}
+                        {% if fechas_semestrales.T1 %}
+                          {{ fechas_semestrales.T1 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
@@ -202,10 +199,11 @@
 
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_semestrales.2T_A%}
-                        {{fechas_semestrales.2T_A}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_semestrales.T2 %}
+                          {{ fechas_semestrales.T2 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
@@ -214,25 +212,23 @@
                     </td>
                   </tr>
 
-                  <tr >
+                  <tr>
                     <td class="bg-light">Finales</td>
 
                     <td class="bg-light">
                       <span class="badge bg-primary">
-                        {%if fechas_semestrales.FS_A%}
-                        {{fechas_semestrales.FS_A}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_semestrales.FS_A %}
+                          {{ fechas_semestrales.FS_A }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
                     <td class="bg-light">
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
-
-                </tr>
-
-
+                  </tr>
 
                   <td colspan="3" class="bg-dark">Segundo Semestre</td>
                   <tr>
@@ -240,10 +236,11 @@
 
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_semestrales.1T_B %}
-                        {{fechas_semestrales.1T_B}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_semestrales.T3 %}
+                          {{ fechas_semestrales.T3 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
@@ -257,33 +254,35 @@
 
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_semestrales.2T_B%}
-                        {{fechas_semestrales.2T_B}}
-                        {%else%}Sin definir
-                        {%endif%}</span>
+                        {% if fechas_semestrales.T4 %}
+                          {{ fechas_semestrales.T4 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
                     </td>
 
                     <td>
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
                   </tr>
-                  <tr >
+                  <tr>
                     <td class="bg-light">Finales</td>
 
                     <td class="bg-light">
                       <span class="badge bg-primary">
-                        {%if fechas_semestrales.FS_B%}
-                        {{fechas_semestrales.FS_B}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_semestrales.FS_B %}
+                          {{ fechas_semestrales.FS_B }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
                     <td class="bg-light">
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
-
-                </tr>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -300,7 +299,7 @@
             </div>
             <div class="d-flex flex-column">
               <h2 class="m-0 lh-1">Cuatrimestrales</h2>
-              <p class="m-0 opacity-50">On Hold</p>
+              {% comment %} <p class="m-0 opacity-50">On Hold</p> {% endcomment %}
             </div>
           </div>
 
@@ -333,10 +332,11 @@
 
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_cuatrimestrales.1B_A%}
-                          {{fechas_cuatrimestrales.1B_A}}
-                          {%else%}Sin definir
-                          {%endif%}
+                        {% if fechas_cuatrimestrales.B1_A %}
+                          {{ fechas_cuatrimestrales.B1_A }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
@@ -350,11 +350,11 @@
 
                     <td>
                       <span class="badge bg-primary">
-                        
-                        {%if fechas_cuatrimestrales.2B_A%}
-                          {{fechas_cuatrimestrales.2B_A}}
-                          {%else%}Sin definir
-                          {%endif%}
+                        {% if fechas_cuatrimestrales.B2_A %}
+                          {{ fechas_cuatrimestrales.B2_A }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
@@ -362,33 +362,35 @@
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
                   </tr>
-                  <tr >
+                  <tr>
                     <td class="bg-light">Finales</td>
 
                     <td class="bg-light">
                       <span class="badge bg-primary">
-                        {%if fechas_cuatrimestrales.FC_A%}
-                          {{fechas_cuatrimestrales.FC_A}}
-                          {%else%}Sin definir
-                          {%endif%}
+                        {% if fechas_cuatrimestrales.FC_A %}
+                          {{ fechas_cuatrimestrales.FC_A }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
                     <td class="bg-light">
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
-
-                </tr>
+                  </tr>
                   <td colspan="3" class="bg-dark">Segundo Cuatrimestre</td>
                   <tr>
                     <td>1er. Bim.</td>
 
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_cuatrimestrales.1B_B%}
-                        {{fechas_cuatrimestrales.1B_B}}
-                        {%else%}Sin definir
-                        {%endif%}</span>
+                        {% if fechas_cuatrimestrales.B1_B %}
+                          {{ fechas_cuatrimestrales.B1_B }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
                     </td>
 
                     <td>
@@ -401,10 +403,11 @@
 
                     <td>
                       <span class="badge bg-primary">
-                        {%if fechas_cuatrimestrales.2B_B%}
-                        {{fechas_cuatrimestrales.2B_B}}
-                        {%else%}Sin definir
-                        {%endif%}
+                        {% if fechas_cuatrimestrales.B2_B %}
+                          {{ fechas_cuatrimestrales.B2_B }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
@@ -412,23 +415,23 @@
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
                   </tr>
-                  <tr >
+                  <tr>
                     <td class="bg-light">Finales</td>
 
                     <td class="bg-light">
                       <span class="badge bg-primary">
-                        {%if fechas_cuatrimestrales.FC_B%}
-                          {{fechas_cuatrimestrales.FC_B}}
-                          {%else%}Sin definir
-                          {%endif%}
+                        {% if fechas_cuatrimestrales.FC_B %}
+                          {{ fechas_cuatrimestrales.FC_B }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
                       </span>
                     </td>
 
                     <td class="bg-light">
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
-
-                </tr>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -436,7 +439,7 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-4 col-12">
+    <div class="col-sm-6 col-12">
       <div class="card mb-3">
         <div class="card-body">
           <div class="d-flex mb-2">
@@ -462,6 +465,12 @@
                     </th>
                     <th>
                       <div class="d-flex align-items-center">
+                        <span class="icon-calendar me-2 fs-4"></span>
+                        Finales
+                      </div>
+                    </th>
+                    <th>
+                      <div class="d-flex align-items-center">
                         <span class="icon-settings me-2 fs-4"></span>
                         Acción
                       </div>
@@ -469,12 +478,26 @@
                   </tr>
                 </thead>
                 <tbody>
-                  
                   <tr>
                     <td>1er. Trim.</td>
 
                     <td>
-                      <span class="badge bg-primary">20/04/2023</span>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales.T1 %}
+                          {{ fechas_trimestrales.T1 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales.FT_1 %}
+                          {{ fechas_trimestrales.FT_1 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
                     </td>
 
                     <td>
@@ -486,19 +509,48 @@
                     <td>2do. Trim.</td>
 
                     <td>
-                      <span class="badge bg-primary">20/04/2023</span>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales.T2 %}
+                          {{ fechas_trimestrales.T2 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
                     </td>
-
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales.FT_2 %}
+                          {{ fechas_trimestrales.FT_2 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
                     <td>
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
-                  </tr><tr>
+                  </tr>
+                  <tr>
                     <td>3er. Trim</td>
 
                     <td>
-                      <span class="badge bg-primary">20/04/2023</span>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales.T3 %}
+                          {{ fechas_trimestrales.T3 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
                     </td>
-
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales.FT_3 %}
+                          {{ fechas_trimestrales.FT_3 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
                     <td>
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
@@ -508,9 +560,23 @@
                     <td>2to. Trim.</td>
 
                     <td>
-                      <span class="badge bg-primary">20/04/2023</span>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales.T4 %}
+                          {{ fechas_trimestrales.T4 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
                     </td>
-
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales.FT_4 %}
+                          {{ fechas_trimestrales.FT_4 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
                     <td>
                       <a class="btn btn-primary"><span class="icon-edit"></span></a>
                     </td>
@@ -519,15 +585,11 @@
               </table>
             </div>
           </div>
-          
-
-
-
         </div>
       </div>
     </div>
 
-    <div class="col-sm-4 col-12">
+    <div class="col-sm-6 col-12">
       <div class="card mb-3">
         <div class="card-body">
           <div class="d-flex mb-2">

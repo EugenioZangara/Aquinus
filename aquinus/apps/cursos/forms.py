@@ -137,156 +137,114 @@ class AsignarProfesoresForm(forms.Form):
         
         
 class FechasCreateForm(forms.Form):
-    anio_lectivo = forms.IntegerField(
-        initial=datetime.date.today().year,
-        label="Año Lectivo",
-        required=True
-    )
+    # anio_lectivo = forms.IntegerField(
+    #     initial=datetime.date.today().year,
+    #     label="Año Lectivo",
+    #     required=True
+    # )
     fecha_inicio_ciclo_lectivo = forms.DateField(
-        widget=forms.HiddenInput(attrs={'id': 'fecha_inicio_ciclo_lectivo_oculta', 'class':'fecha_inicio_ciclo_lectivo_oculta'}),
+        widget=forms.TextInput(attrs={'id': 'fecha_inicio_ciclo_lectivo', 'class':'form-control', 'type':'date'}),
         required=True
     )
-                            
 
     def __init__(self, *args, **kwargs):
         # Pop de kwargs para obtener el régimen de la materia, si está presente
         regimen_materia = kwargs.pop('regimen_materia', None)  # Default None si no se pasa el argumento
         super(FechasCreateForm, self).__init__(*args, **kwargs)
 
-        # Si se ha proporcionado el régimen de la materia, construimos los campos dinámicamente
-        if regimen_materia:
-            match regimen_materia:
-                case "ANUAL":
-                    self.fields['anual_primer_trimestre'] = forms.DateField(
-                        label="Fecha cierre 1er. Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['anual_segundo_trimestre'] = forms.DateField(
-                        label="Fecha cierre 2do. Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['anual_tercer_trimestre'] = forms.DateField(
-                        label="Fecha cierre 3er. Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['anual_cierre'] = forms.DateField(
-                        label="Fecha cierre cursada: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['anual_examen_final'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
+        # Diccionario que contiene los nombres de los campos como claves y sus labels como valores
+        campos_labels = {
+            "T1": "Fecha cierre 1er. Trimestre",
+            "T2": "Fecha cierre 2do. Trimestre",
+            "T3": "Fecha cierre 3er. Trimestre",
+            "T4": "Fecha cierre 4to. Trimestre",
+            "FT_1": "Final Primer Trimestre",
+            "FT_2": "Final Segundo Trimestre",
+            "FT_3": "Final Tercer Trimestre",
+            "FT_4": "Final Cuarto Trimestre",
+            "FA": "Final Anual",
+            "FS_A": "Final Primer Semestre",
+            "FS_B": "Final Segundo Semestre",
+            "B1_A": "Primer Bimestre - 1er. Cuatrimestre",
+            "B2_A": "Cierre Primer Cuatrimestre",
+            "FC_A": "Final Primer Cuatrimestre",
+            "B1_B": "Primer Bimestre - 2do. Cuatrimestre",
+            "B2_B": "Cierre Segundo Cuatrimestre",
+            "FC_B": "Final Segundo Cuatrimestre"
+        }
+        
+        
+        '''Obtenemos los valores almacenados para definir los valores iniciales'''
+        anio_lectivo=datetime.date.today().year
+            
+        '''
+        Definimos como contexto las fechas de las materias.
+        para cada régimen de materia, creamos un diccionario, cuya clave es el subperiodo y el valor es la fecha correspondiente
+        '''
+        fechas_anuales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="ANUAL")
+        fechas_default={}
+        # Inicializar las variables antes de los bucles
+        inicio_ciclo_para_anuales = None
+        inicio_ciclo_para_semestrales = None
+        inicio_ciclo_para_cuatrimestrales = None
+        inicio_ciclo_para_trimestrales = None
+        for fecha in fechas_anuales_registradas:
+            if fecha.subPeriodo:
+                fechas_default[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+            if fecha.subPeriodo=="T1":               
+                inicio_ciclo_para_anuales=fecha.fechaInicioCalificacion
+
+        fechas_semestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL")
+        for fecha in fechas_semestrales_registradas:
+            if fecha.subPeriodo:
+                fechas_default[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+            if fecha.subPeriodo=="T1":               
+                inicio_ciclo_para_semestrales=fecha.fechaInicioCalificacion
+        
+        fechas_cuatrimestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL")
+        for fecha in fechas_cuatrimestrales_registradas:
+            if fecha.subPeriodo:
+                fechas_default[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+            if fecha.subPeriodo=="B1_A":               
+                inicio_ciclo_para_cuatrimestrales=fecha.fechaInicioCalificacion
+        
+        fechas_trimestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL")
+        for fecha in fechas_trimestrales_registradas:
+            if fecha.subPeriodo:
+                fechas_default[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+            if fecha.subPeriodo=="T1":               
+                inicio_ciclo_para_trimestrales=fecha.fechaInicioCalificacion
+      
+      
+        # Asignar la fecha de inicio del ciclo lectivo si está disponible en el diccionario
+        fecha_inicio_ciclo = next((var for var in (inicio_ciclo_para_anuales, inicio_ciclo_para_semestrales, inicio_ciclo_para_trimestrales, inicio_ciclo_para_cuatrimestrales) if var), None)
+
+
+        if fecha_inicio_ciclo:
+            self.fields['fecha_inicio_ciclo_lectivo'].initial = fecha_inicio_ciclo
+        else:
+            self.fields['fecha_inicio_ciclo_lectivo'].widget.attrs.update({'class': 'form-control bg-info'})
+            
+        # Iterar sobre el diccionario para asignar campos y labels personalizados
+        for campo, label in campos_labels.items():
+            initial_value = fechas_default.get(campo, None)
+            
+            # Definir las clases del campo
+            field_classes = 'form-control date-input'  # Clase base para todos los campos
+
+            # Agregar la clase 'highlight' si el campo no tiene valor inicial
+            if not initial_value:
+                field_classes += ' bg-info'
+
+            self.fields[campo] = forms.DateField(
+                label=label,
+                required=False,
+                widget=forms.TextInput(attrs={'class': field_classes, 'type': 'date'}),
+                initial=initial_value
+            )
+
                     
-                case "SEMESTRAL":
-                    self.fields['semestral_primer_trimestre_a'] = forms.DateField(
-                        label="Fecha cierre 1er. Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['semestral_cierre_a'] = forms.DateField(
-                        label="Fecha cierre cursada: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['semestral_examen_final_a'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['semestral_primer_trimestre_b'] = forms.DateField(
-                        label="Fecha cierre 1er. Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['semestral_cierre_b'] = forms.DateField(
-                        label="Fecha cierre cursada: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['semestral_examen_final_b'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                case "CUATRIMESTRAL":
-                    self.fields['cuatrimestral_primer_bimestre_a'] = forms.DateField(
-                        label="Fecha cierre 1er. Bimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['cuatrimestral_cierre_a'] = forms.DateField(
-                        label="Fecha cierre cursada: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['cuatrimestral_examen_final_a'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    
-                    self.fields['cuatrimestral_primer_bimestre_b'] = forms.DateField(
-                        label="Fecha cierre 1er. Bimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['cuatrimestral_cierre_b'] = forms.DateField(
-                        label="Fecha cierre cursada: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['cuatrimestral_examen_final_b'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                case "TRIMESTRAL":
-                    self.fields['primer_trimestre_cierre'] = forms.DateField(
-                        label="Fecha cierre Primer Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['primer_trimestre_examen_final'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['segundo_trimestre_cierre'] = forms.DateField(
-                        label="Fecha cierre Segundo Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['segundo_trimestre_examen_final'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['tercer_trimestre_cierre'] = forms.DateField(
-                        label="Fecha cierre Tercer Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['tercer_trimestre_examen_final'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['cuarto_trimestre_cierre'] = forms.DateField(
-                        label="Fecha cierre Cuarto Trimestre: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
-                    self.fields['cuarto_trimestre_examen_final'] = forms.DateField(
-                        label="Fecha cierre Examen Final: ",
-                        required=False,
-                        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'})
-                    )
+       
                     
 class AbrirComplementariosForm(forms.Form):
     numero_complementario=forms.IntegerField()
