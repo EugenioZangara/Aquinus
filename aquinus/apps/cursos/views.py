@@ -506,34 +506,38 @@ class VerFechasMaterias(TemplateView):
             Definimos como contexto las fechas de las materias.
             para cada régimen de materia, creamos un diccionario, cuya clave es el subperiodo y el valor es la fecha correspondiente
             '''
-            fechas_anuales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="ANUAL")
-            fechas_anuales={}
-            for fecha in fechas_anuales_registradas:
-                if fecha.subPeriodo:
-                    fechas_anuales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+            aplica_para_opciones=("TODOS", "1","2", "3")
+            
+            for aplica_para in aplica_para_opciones:
+               
+                fechas_anuales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", aplica_para=aplica_para)
+                fechas_anuales={}
+                for fecha in fechas_anuales_registradas:
+                    if fecha.subPeriodo:
+                        fechas_anuales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
 
-            fechas_semestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL")
-            fechas_semestrales={}
-            for fecha in fechas_semestrales_registradas:
-                if fecha.subPeriodo:
-                    fechas_semestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+                fechas_semestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", aplica_para=aplica_para)
+                fechas_semestrales={}
+                for fecha in fechas_semestrales_registradas:
+                    if fecha.subPeriodo:
+                        fechas_semestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+                
+                fechas_cuatrimestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", aplica_para=aplica_para)
+                fechas_cuatrimestrales={}
+                for fecha in fechas_cuatrimestrales_registradas:
+                    if fecha.subPeriodo:
+                        fechas_cuatrimestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
+                
+                fechas_trimestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", aplica_para=aplica_para)
+                fechas_trimestrales={}
+                for fecha in fechas_trimestrales_registradas:
+                    if fecha.subPeriodo:
+                        fechas_trimestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
             
-            fechas_cuatrimestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL")
-            fechas_cuatrimestrales={}
-            for fecha in fechas_cuatrimestrales_registradas:
-                if fecha.subPeriodo:
-                    fechas_cuatrimestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
-            
-            fechas_trimestrales_registradas=FechasExamenes.objects.filter(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL")
-            fechas_trimestrales={}
-            for fecha in fechas_trimestrales_registradas:
-                if fecha.subPeriodo:
-                    fechas_trimestrales[fecha.subPeriodo]=fecha.fechaTopeCalificacion
-            
-            context["fechas_anuales"] =fechas_anuales
-            context["fechas_semestrales"] =fechas_semestrales 
-            context["fechas_cuatrimestrales"] =fechas_cuatrimestrales 
-            context["fechas_trimestrales"] =fechas_trimestrales 
+                context[f"fechas_anuales_{aplica_para}"] =fechas_anuales
+                context[f"fechas_semestrales_{aplica_para}"] =fechas_semestrales 
+                context[f"fechas_cuatrimestrales_{aplica_para}"] =fechas_cuatrimestrales 
+                context[f"fechas_trimestrales_{aplica_para}"] =fechas_trimestrales 
             return context
         
  
@@ -553,25 +557,28 @@ class DefinirFechas(TemplateView):
         anio_lectivo=datetime.date.today().year   
         actualizado=[]
         creado=[]
+        
         if form.is_valid():      
             data=form.cleaned_data
+            aplica_para = data.get('aplica_para', "TODOS")
+            print(data['aplica_para'])
             fecha_inicio_ciclo_lectivo=(data['fecha_inicio_ciclo_lectivo'])
             
             '''Definción de trimestres para anuales, trimestrales y semestrales'''
             if data['T1']:
-                anual_T1, an_t1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T1', defaults={'fechaInicioCalificacion':fecha_inicio_ciclo_lectivo,
+                anual_T1, an_t1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T1',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':fecha_inicio_ciclo_lectivo,
                 'fechaTopeCalificacion':data['T1']})
                 anual_T1.fechaInicioCalificacion=fecha_inicio_ciclo_lectivo
                 anual_T1.fechaTopeCalificacion=data['T1']  
                 anual_T1.save()     
                 
-                semestre_T1, sem_t1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T1', defaults={'fechaInicioCalificacion':fecha_inicio_ciclo_lectivo,
+                semestre_T1, sem_t1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T1',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':fecha_inicio_ciclo_lectivo,
                 'fechaTopeCalificacion':data['T1']})
                 semestre_T1.fechaInicioCalificacion=fecha_inicio_ciclo_lectivo
                 semestre_T1.fechaTopeCalificacion=data['T1']
                 semestre_T1.save()
                 
-                trimestre_T1, tri_t1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T1', defaults={'fechaInicioCalificacion':fecha_inicio_ciclo_lectivo,
+                trimestre_T1, tri_t1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T1',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':fecha_inicio_ciclo_lectivo,
                 'fechaTopeCalificacion':data['T1']})
                 trimestre_T1.fechaInicioCalificacion=fecha_inicio_ciclo_lectivo
                 trimestre_T1.fechaTopeCalificacion=data['T1']
@@ -584,19 +591,19 @@ class DefinirFechas(TemplateView):
                 
             if data['T2'] :
                 if data['T1']:
-                    anual_T1, an_t2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T2', defaults={'fechaInicioCalificacion':data['T1'],
+                    anual_T1, an_t2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T2',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T1'],
                     'fechaTopeCalificacion':data['T2']})
                     anual_T1.fechaInicioCalificacion=data['T1']
                     anual_T1.fechaTopeCalificacion=data['T2']  
                     anual_T1.save()  
                     
-                    semestre_T2, sem_t2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T2', defaults={'fechaInicioCalificacion':data['T1'],
+                    semestre_T2, sem_t2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T2',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T1'],
                     'fechaTopeCalificacion':data['T2']})
                     semestre_T2.fechaInicioCalificacion=data['T1']
                     semestre_T2.fechaTopeCalificacion=data['T2']
                     semestre_T2.save() 
                     
-                    trimestre_T2, tri_t2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T2', defaults={'fechaInicioCalificacion':data['T1'],
+                    trimestre_T2, tri_t2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T2',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T1'],
                     'fechaTopeCalificacion':data['T2']})
                     trimestre_T2.fechaInicioCalificacion=data['T1']
                     trimestre_T2.fechaTopeCalificacion=data['T2']
@@ -610,19 +617,19 @@ class DefinirFechas(TemplateView):
                 
             if data['T3'] :
                 if data['T2']:
-                    anual_T1, an_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T3', defaults={'fechaInicioCalificacion':data['T2'],
+                    anual_T1, an_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T3',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                     'fechaTopeCalificacion':data['T3']})
                     anual_T1.fechaInicioCalificacion=data['T2']
                     anual_T1.fechaTopeCalificacion=data['T3']  
                     anual_T1.save()  
                     
-                    semestre_T3, sem_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T3', defaults={'fechaInicioCalificacion':data['T2'],
+                    semestre_T3, sem_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T3',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                     'fechaTopeCalificacion':data['T3']})
                     semestre_T3.fechaInicioCalificacion=data['T2']
                     semestre_T3.fechaTopeCalificacion=data['T3']
                     semestre_T3.save()  
                     
-                    trimestre_T3, tri_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T3', defaults={'fechaInicioCalificacion':data['T2'],
+                    trimestre_T3, tri_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T3',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                     'fechaTopeCalificacion':data['T3']})
                     trimestre_T3.fechaInicioCalificacion=data['T2']
                     trimestre_T3.fechaTopeCalificacion=data['T3']
@@ -636,19 +643,19 @@ class DefinirFechas(TemplateView):
                 
             if data['T4'] :
                 if data['T3']:
-                    anual_T1, an_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T4', defaults={'fechaInicioCalificacion':data['T3'],
+                    anual_T1, an_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
                     'fechaTopeCalificacion':data['T4']})
                     anual_T1.fechaInicioCalificacion=data['T3']
                     anual_T1.fechaTopeCalificacion=data['T4']  
                     anual_T1.save() 
                     
-                    semestre_T4, sem_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T4', defaults={'fechaInicioCalificacion':data['T3'],
+                    semestre_T4, sem_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
                     'fechaTopeCalificacion':data['T4']})
                     semestre_T4.fechaInicioCalificacion=data['T3']
                     semestre_T4.fechaTopeCalificacion=data['T4']
                     semestre_T4.save()  
                     
-                    trimestre_T4, tri_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T4', defaults={'fechaInicioCalificacion':data['T3'],
+                    trimestre_T4, tri_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
                     'fechaTopeCalificacion':data['T4']})
                     trimestre_T4.fechaInicioCalificacion=data['T3']
                     trimestre_T4.fechaTopeCalificacion=data['T4']
@@ -663,7 +670,7 @@ class DefinirFechas(TemplateView):
                 '''Finales Trimestrales'''
             if data['FT_1'] :
                 if data['T1']:
-                    final_1trimestral, ft1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_1', defaults={'fechaInicioCalificacion':data['T1'],
+                    final_1trimestral, ft1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_1',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T1'],
                     'fechaTopeCalificacion':data['FT_1']})
                     final_1trimestral.save()
                     if ft1_created:
@@ -674,7 +681,7 @@ class DefinirFechas(TemplateView):
                     messages.error(request, "Es necesario fijar previamente el fin del 1° Trimestre, para definir el período de finales del 1° Trimestre")
             if data['FT_2'] :
                 if data['T2']:
-                    final_2trimestral, ft2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_2', defaults={'fechaInicioCalificacion':data['T2'],
+                    final_2trimestral, ft2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_2',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                     'fechaTopeCalificacion':data['FT_2']})
                     final_2trimestral.save()
                     if ft2_created:
@@ -686,7 +693,7 @@ class DefinirFechas(TemplateView):
                     
             if data['FT_3'] :
                 if data['T3']:
-                    final_3trimestral, ft3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_3', defaults={'fechaInicioCalificacion':data['T3'],
+                    final_3trimestral, ft3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_3',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
                     'fechaTopeCalificacion':data['FT_3']})
                     if ft3_created:
                         creado.append("Final Tercer Trimestre")
@@ -698,7 +705,7 @@ class DefinirFechas(TemplateView):
                     
             if data['FT_4'] :
                 if data['T4']:
-                    final_4trimestral, ft4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_4', defaults={'fechaInicioCalificacion':data['T4'],
+                    final_4trimestral, ft4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T4'],
                     'fechaTopeCalificacion':data['FT_4']})
                     if ft4_created:
                         creado.append("Final Cuarto Trimestre")
@@ -712,7 +719,7 @@ class DefinirFechas(TemplateView):
                     #Finales Semestrales         
             if data['FS_A']:
                 if data['T2']:
-                    final_semestre_A, fs_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='SEMESTRAL', subPeriodo='FS_A', defaults={'fechaInicioCalificacion':data['T2'],
+                    final_semestre_A, fs_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='SEMESTRAL', subPeriodo='FS_A',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                     'fechaTopeCalificacion':data['FS_A']})
                     if fs_a_created:
                         creado.append("Final Primer Semestre")
@@ -723,7 +730,7 @@ class DefinirFechas(TemplateView):
                     messages.error(request, "Es necesario fijar previamente el fin del Segundo Trimestre, para definir el período de finales Semestrales (1° Semestre)")
             if data['FS_B']:
                 if data['T4']:
-                    final_semestre_B, fs_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='SEMESTRAL', subPeriodo='FS_B', defaults={'fechaInicioCalificacion':data['T4'],
+                    final_semestre_B, fs_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='SEMESTRAL', subPeriodo='FS_B', aplica_para=aplica_para,defaults={'fechaInicioCalificacion':data['T4'],
                     'fechaTopeCalificacion':data['FS_B']})
                     if fs_b_created:
                         creado.append("Final Segundo Semestre")
@@ -737,7 +744,7 @@ class DefinirFechas(TemplateView):
             #finales anuales
             if data['FA']:
                 if data['T4']:
-                    final_anual, fa_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='ANUAL', subPeriodo='FA', defaults={'fechaInicioCalificacion':data['T4'],
+                    final_anual, fa_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='ANUAL', subPeriodo='FA',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T4'],
                     'fechaTopeCalificacion':data['FA']})
                     final_anual.fechaInicioCalificacion=data['T4']
                     final_anual.fechaTopeCalificacion=data['FA']
@@ -753,7 +760,7 @@ class DefinirFechas(TemplateView):
             
             #definición de bimestres:
             if data['B1_A']:
-                bimestre1_A, b1_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B1_A', defaults={'fechaInicioCalificacion':fecha_inicio_ciclo_lectivo,
+                bimestre1_A, b1_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B1_A',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':fecha_inicio_ciclo_lectivo,
                 'fechaTopeCalificacion':data['B1_A']})
                 bimestre1_A.fechaInicioCalificacion=fecha_inicio_ciclo_lectivo
                 bimestre1_A.fechaTopeCalificacion=data['B1_A']  
@@ -766,7 +773,7 @@ class DefinirFechas(TemplateView):
                 
             if data['B2_A']:
                 if data['B1_A']:
-                    bimestre2_A, b2_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B2_A', defaults={'fechaInicioCalificacion':data['B1_A'],
+                    bimestre2_A, b2_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B2_A',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['B1_A'],
                     'fechaTopeCalificacion':data['B2_A']})
                     bimestre2_A.fechaInicioCalificacion=data['B1_A']
                     bimestre2_A.fechaTopeCalificacion=data['B2_A'] 
@@ -781,7 +788,7 @@ class DefinirFechas(TemplateView):
 
             if data['B1_B']:
                 if data['B2_A']:
-                    bimestre1_B, b1_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B1_B', defaults={'fechaInicioCalificacion':data['B2_A'],
+                    bimestre1_B, b1_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B1_B',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['B2_A'],
                     'fechaTopeCalificacion':data['B1_B']})
                     bimestre1_B.fechaInicioCalificacion=data['B2_A']
                     bimestre1_B.fechaTopeCalificacion=data['B1_A']  
@@ -797,7 +804,7 @@ class DefinirFechas(TemplateView):
                 
             if data['B2_B']:
                 if data['B1_B']:
-                    bimestre1_B, b2_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B2_B', defaults={'fechaInicioCalificacion':data['B1_B'],
+                    bimestre1_B, b2_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B2_B',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['B1_B'],
                     'fechaTopeCalificacion':data['B2_B']})
                     bimestre1_B.fechaInicioCalificacion=data['B1_B']
                     bimestre1_B.fechaTopeCalificacion=data['B2_B'] 
@@ -815,7 +822,7 @@ class DefinirFechas(TemplateView):
         #       FINALES CUATRIMESTRALES
             if data['FC_A']:
                 if data['B2_A']:
-                    final_cuatrimestre_A, fc_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='CUATRIMESTRAL', subPeriodo='FC_A', defaults={'fechaInicioCalificacion':data['B2_A'],
+                    final_cuatrimestre_A, fc_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='CUATRIMESTRAL', subPeriodo='FC_A',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['B2_A'],
                     'fechaTopeCalificacion':data['FC_A']})
                     final_cuatrimestre_A.fechaInicioCalificacion=data['B2_A']
                     final_cuatrimestre_A.fechaTopeCalificacion=data['FC_A']
@@ -831,7 +838,7 @@ class DefinirFechas(TemplateView):
                     
             if data['FC_B']:
                 if data['B2_B']:
-                    final_cuatrimestre_B, fc_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='CUATRIMESTRAL', subPeriodo='FC_B', defaults={'fechaInicioCalificacion':data['B2_B'],
+                    final_cuatrimestre_B, fc_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='CUATRIMESTRAL', subPeriodo='FC_B',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['B2_B'],
                     'fechaTopeCalificacion':data['FC_B']})
                     final_cuatrimestre_B.fechaInicioCalificacion=data['B2_B']
                     final_cuatrimestre_B.fechaTopeCalificacion=data['FC_B']
@@ -895,13 +902,7 @@ class update_fechas(UpdateView):
 
 
 
-from django.shortcuts import redirect
-import datetime
-from .models import FechasExamenes
-
-from django.shortcuts import redirect
-import datetime
-from .models import FechasExamenes
+#
 
 def fijarInicioAnioLectivo(request):
     if request.method == "POST":

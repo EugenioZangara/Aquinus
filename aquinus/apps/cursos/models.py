@@ -300,12 +300,12 @@ class FechasExamenes(models.Model):
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     
     class Meta:
-        constraints=[models.UniqueConstraint(fields=['anio_lectivo', 'regimen_materia', 'subPeriodo'], name='combinacion_unica')]
+        constraints=[models.UniqueConstraint(fields=['anio_lectivo', 'regimen_materia', 'subPeriodo','aplica_para'], name='combinacion_unica')]
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude=exclude)
-        if FechasExamenes.objects.filter(anio_lectivo=self.anio_lectivo, regimen_materia=self.regimen_materia, subPeriodo=self.subPeriodo).exists():
-            existing_instance=FechasExamenes.objects.get(anio_lectivo=self.anio_lectivo, regimen_materia=self.regimen_materia, subPeriodo=self.subPeriodo)
+        if FechasExamenes.objects.filter(anio_lectivo=self.anio_lectivo, regimen_materia=self.regimen_materia, subPeriodo=self.subPeriodo, aplica_para=self.aplica_para).exists():
+            existing_instance=FechasExamenes.objects.get(anio_lectivo=self.anio_lectivo, regimen_materia=self.regimen_materia, subPeriodo=self.subPeriodo,aplica_para=self.aplica_para)
             update_url=reverse('cursos:update_fechas', kwargs={'pk':existing_instance.pk})
             raise ValidationError({
                 'anio_lectivo': [f'Ya existe una fecha definida para este año lectivo, régimen de materia y periodo. '

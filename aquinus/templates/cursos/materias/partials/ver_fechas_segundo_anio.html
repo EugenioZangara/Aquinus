@@ -1,0 +1,596 @@
+<div class="row gx-3">
+    <div class="col-sm-4 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex mb-2">
+            <div class="icons-box md bg-primary rounded-5 me-3">
+              <i class="icon-calendar fs-4 text-white"></i>
+            </div>
+            <div class="d-flex flex-column">
+              <h2 class="m-0 lh-1">Anuales</h2>
+              {% comment %} <p class="m-0 opacity-50">Tickets</p> {% endcomment %}
+            </div>
+          </div>
+
+          <div class="table-outer">
+            <div class="table-responsive">
+              <table class="table table align-middle m-0">
+                <thead>
+                  <tr>
+                    <th>Período</th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-calendar me-2 fs-4"></span>
+                        Cierre
+                      </div>
+                    </th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-settings me-2 fs-4"></span>
+                        Acción
+                      </div>
+                    </th>
+                    
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1er. Trim.</td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_anuales_2.T1 %}
+                          {{ fechas_anuales_2.T1 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>2do. Trim.</td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_anuales_2.T2 %}
+                          {{ fechas_anuales_2.T2 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>3er. Trim.</td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_anuales_2.T3 %}
+                          {{ fechas_anuales_2.T3 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>4to. Trim.</td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_anuales_2.T4 %}
+                          {{ fechas_anuales_2.T4 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <!-- Aquí estaba el problema, faltaba cerrar el <tr> -->
+                  <tr>
+                    <td class="bg-light">Finales</td>
+                    <td class="bg-light">
+                      <span class="badge bg-primary">
+                        {% if fechas_anuales_2.FA %}
+                          {{ fechas_anuales_2.FA }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td class="bg-light">
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex mb-2">
+            <div class="icons-box md bg-info rounded-5 me-3">
+              <i class="icon-calendar fs-4 text-white"></i>
+            </div>
+            <div class="d-flex flex-column">
+              <h2 class="m-0 lh-1">Semestrales</h2>
+            </div>
+          </div>
+
+          <div class="table-outer">
+            <div class="table-responsive">
+              <table class="table tablealign-middle m-0">
+                <thead>
+                  <tr>
+                    <th>Período</th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-calendar me-2 fs-4"></span>
+                        Cierre
+                      </div>
+                    </th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-settings me-2 fs-4"></span>
+                        Acción
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="3" class="bg-dark">Primer Semestre</td>
+                  </tr>
+                  <tr>
+                    <td>1er. Trim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_semestrales_2.T1 %}
+                          {{ fechas_semestrales_2.T1 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>2do. Trim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_semestrales_2.T2 %}
+                          {{ fechas_semestrales_2.T2 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="bg-light">Finales</td>
+
+                    <td class="bg-light">
+                      <span class="badge bg-primary">
+                        {% if fechas_semestrales_2.FS_A %}
+                          {{ fechas_semestrales_2.FS_A }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td class="bg-light">
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <td colspan="3" class="bg-dark">Segundo Semestre</td>
+                  <tr>
+                    <td>1er. Trim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_semestrales_2.T3 %}
+                          {{ fechas_semestrales_2.T3 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>2do. Trim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_semestrales_2.T4 %}
+                          {{ fechas_semestrales_2.T4 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="bg-light">Finales</td>
+
+                    <td class="bg-light">
+                      <span class="badge bg-primary">
+                        {% if fechas_semestrales_2.FS_B %}
+                          {{ fechas_semestrales_2.FS_B }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td class="bg-light">
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex mb-2">
+            <div class="icons-box md bg-danger rounded-5 me-3">
+              <i class="icon-calendar fs-4 text-white"></i>
+            </div>
+            <div class="d-flex flex-column">
+              <h2 class="m-0 lh-1">Cuatrimestrales</h2>
+              {% comment %} <p class="m-0 opacity-50">On Hold</p> {% endcomment %}
+            </div>
+          </div>
+
+          <div class="table-outer">
+            <div class="table-responsive">
+              <table class="table table align-middle m-0">
+                <thead>
+                  <tr>
+                    <th>Período</th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-calendar me-2 fs-4"></span>
+                        Cierre
+                      </div>
+                    </th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-settings me-2 fs-4"></span>
+                        Acción
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="3" class="bg-dark">Primer Cuatrimestre</td>
+                  </tr>
+                  <tr>
+                    <td>1er. Bim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_cuatrimestrales_2.B1_A %}
+                          {{ fechas_cuatrimestrales_2.B1_A }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>2do. Bim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_cuatrimestrales_2.B2_A %}
+                          {{ fechas_cuatrimestrales_2.B2_A }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="bg-light">Finales</td>
+
+                    <td class="bg-light">
+                      <span class="badge bg-primary">
+                        {% if fechas_cuatrimestrales_2.FC_A %}
+                          {{ fechas_cuatrimestrales_2.FC_A }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td class="bg-light">
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                  <td colspan="3" class="bg-dark">Segundo Cuatrimestre</td>
+                  <tr>
+                    <td>1er. Bim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_cuatrimestrales_2.B1_B %}
+                          {{ fechas_cuatrimestrales_2.B1_B }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>2to. Bim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_cuatrimestrales_2.B2_B %}
+                          {{ fechas_cuatrimestrales_2.B2_B }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="bg-light">Finales</td>
+
+                    <td class="bg-light">
+                      <span class="badge bg-primary">
+                        {% if fechas_cuatrimestrales_2.FC_B %}
+                          {{ fechas_cuatrimestrales_2.FC_B }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td class="bg-light">
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex mb-2">
+            <div class="icons-box md bg-success rounded-5 me-3">
+              <i class="icon-calendar fs-4 text-white"></i>
+            </div>
+            <div class="d-flex flex-column">
+              <h2 class="m-0 lh-1">Trimestrales</h2>
+              <p class="m-0 opacity-50">Completed</p>
+            </div>
+          </div>
+          <div class="table-outer">
+            <div class="table-responsive">
+              <table class="table table align-middle m-0">
+                <thead>
+                  <tr>
+                    <th>Período</th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-calendar me-2 fs-4"></span>
+                        Cierre
+                      </div>
+                    </th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-calendar me-2 fs-4"></span>
+                        Finales
+                      </div>
+                    </th>
+                    <th>
+                      <div class="d-flex align-items-center">
+                        <span class="icon-settings me-2 fs-4"></span>
+                        Acción
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1er. Trim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales_2.T1 %}
+                          {{ fechas_trimestrales_2.T1 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales_2.FT_1 %}
+                          {{ fechas_trimestrales_2.FT_1 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>2do. Trim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales_2.T2 %}
+                          {{ fechas_trimestrales_2.T2 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales_2.FT_2 %}
+                          {{ fechas_trimestrales_2.FT_2 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>3er. Trim</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales_2.T3 %}
+                          {{ fechas_trimestrales_2.T3 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales_2.FT_3 %}
+                          {{ fechas_trimestrales_2.FT_3 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>2to. Trim.</td>
+
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales_2.T4 %}
+                          {{ fechas_trimestrales_2.T4 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {% if fechas_trimestrales_2.FT_4 %}
+                          {{ fechas_trimestrales_2.FT_4 }}
+                        {% else %}
+                          Sin definir
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <a class="btn btn-primary"><span class="icon-edit"></span></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex mb-2">
+            <div class="icons-box md bg-warning rounded-5 me-3">
+              <i class="icon-calendar fs-4 text-white"></i>
+            </div>
+            <div class="d-flex flex-column">
+              <h2 class="m-0 lh-1">Complementarios</h2>
+              <p class="m-0 opacity-50">Completed</p>
+            </div>
+          </div>
+          <div class="m-0">
+            <div class="progress thin mb-2">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 90%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <p class="m-0 small fw-light opacity-75">90 percent completed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row end -->

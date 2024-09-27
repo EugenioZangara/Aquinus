@@ -146,6 +146,15 @@ class FechasCreateForm(forms.Form):
         widget=forms.TextInput(attrs={'id': 'fecha_inicio_ciclo_lectivo', 'class':'form-control', 'type':'date'}),
         required=True
     )
+    aplica_para=faplica_para = forms.ChoiceField(
+        widget=forms.Select(attrs={'id': 'aplica_para', 'class': 'form-select',"disabled":"true"}),
+        required=False , # Aquí defines que el campo no es obligatorio
+        choices=[("TODOS","Todos los años"),
+                                      ("1","Primer Año"),
+                                      ("2","Segundo Año"),
+                                      ("3","Tercer Año"),])
+    
+                             
 
     def __init__(self, *args, **kwargs):
         # Pop de kwargs para obtener el régimen de la materia, si está presente

@@ -15,29 +15,47 @@
 {% endblock %}
 {% block main_content1 %}
   <!-- Row start -->
+
   <div class="row gx-3">
-    {% if form_anual.errors %}
-      <div class="alert alert-danger">{{ form_anual.non_field_errors }}
-        {{ form_anual.anio_lectivo.errors|safe }}</div>
-    {% endif %}
-
-    {% if form_semestral.errors %}
-      <div class="alert alert-danger">{{ form_semestral.non_field_errors }}
-        {{ form_semestral.anio_lectivo.errors|safe }}</div>
-    {% endif %}
-
-    {% if form_trimestral.errors %}
-      <div class="alert alert-danger">{{ form_trimestral.non_field_errors }}
-        {{ form_trimestral.anio_lectivo.errors|safe }}</div>
-    {% endif %}
-
-    {% if form_cuatrimestral.errors %}
-      <div class="alert alert-danger">{{ form_cuatrimestral.non_field_errors }}
-        {{ form_cuatrimestral.anio_lectivo.errors|safe }}</div>
-    {% endif %}
-
-    <form method="post">
+    <form method="post" data-parsley-validate id="fechasForm">
       {% csrf_token %}
+
+      <div class="col-12">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row  g-3 align-items-center">
+              <div class="col-9">
+                <div class="alert alert-info rounded-3 g-3 align-items-center" role="alert">
+                  <div class="mb-3">
+                    <i class="icon-grid fs-1 me-2 lh-1"></i>
+                  </div>
+                  <div class="row row-cols-lg-auto">
+                    <div class="col-md-7">
+                      <span><h4 class="alert-heading">Info!</h4></span>
+
+                      <p>
+                        Si desea generar un calendario diferenciado por años, haga click <a id="btn-habilita-aplica-para" class="btn btn-sm btn-outline-info">Aquí</a>, y seleccione el año para el que desea fijar las fechas.
+                        En caso contrario, complete las fechas para generar un calendario de calificaciones común para <strong>todos los años</strong>
+                      </p>
+                    </div>
+                    <div class="col-md-5">
+                      <div class="col-12">{{ form.aplica_para.label }}</div>
+                      <div class="col-12">{{ form.aplica_para }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="alert border border-info alert-dismissible fade d-none text-info" role="alert" id="alert-aplica-para">
+                  <b>Info!</b> Seleccione el año para el que define el calendario
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="row gx-3">
         <div class="col-md-6">
           <div class="card mb-3">
@@ -45,21 +63,20 @@
               <h5 class="card-title">Definir <span class="text-info">Inicio Ciclo Lectivo</span></h5>
             </div>
             <div class="card-body">
-              <div class="row row-cols-lg-auto g-3 align-items-center">
+              <div class="row row-cols-lg-auto g-3 align-items-stretch">
                 <div class="col-12">{{ form.fecha_inicio_ciclo_lectivo.label }}</div>
                 <div class="col-12">{{ form.fecha_inicio_ciclo_lectivo }}</div>
               </div>
             </div>
           </div>
         </div>
-
         <div class="col-md-6">
           <div class="card mb-3">
             <div class="card-header">
               <h5 class="card-title">Definir <span class="text-info">Finales Anuales</span></h5>
             </div>
             <div class="card-body">
-              <div class="row row-cols-lg-auto g-3 align-items-center">
+              <div class="row row-cols-lg-auto g-3 align-items-stretch">
                 <div class="col-12">{{ form.FA.label }}</div>
                 <div class="col-12">{{ form.FA }}</div>
               </div>
@@ -150,18 +167,15 @@
             </div>
 
             <div class="card mb-3">
-              
               <div class="card-body">
                 <div class="row mb-3">
                   <button type="submit" class="btn btn-success btn-lg">Guardar Fechas</button>
                 </div>
-                
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </form>
   </div>
 
@@ -171,7 +185,10 @@
   <button type="button" class="btn btn-warning btn-lg">Abrir mesa de complementarios</button>
 {% endblock %}
 {% block scripts %}
+<script src="{% static 'assets/parsley/parsley.min.js' %}"></script>
+<script src="{% static 'assets/parsley/extra/validator/comparison.js' %}"></script>
   <script>
+    
     // Inicializa el campo oculto al cargar la página
     document.addEventListener('DOMContentLoaded', function () {
       const fechaInput = document.getElementById('fecha_inicio_ciclo_lectivo')
@@ -191,5 +208,143 @@
         })
       })
     })
+    
+    // habilitar el select de "aplica para" al hacer clic en el botón
+    const btnHabilitaAplicaPara = document.getElementById('btn-habilita-aplica-para') // Asegúrate de que el id sea correcto
+    const selectAplicaraPara = document.getElementById('aplica_para')
+    const alertAplicaPara = document.getElementById('alert-aplica-para')
+    btnHabilitaAplicaPara.addEventListener('click', function () {
+      selectAplicaraPara.removeAttribute('disabled') // Quitar el atributo "disabled"
+      alertAplicaPara.classList.remove('d-none')
+      alertAplicaPara.classList.add('show') // Añade la clase 'show' para que aparezca correctamente
+    })
   </script>
+  <script>
+    $(document).ready(function() {
+      // Definir el validador personalizado
+      window.Parsley.addValidator('fechaMayor', {
+          validateString: function(value, requirement) {
+              var fecha1 = new Date(value);
+              var fecha2 = new Date($(requirement).val());
+              return fecha1 > fecha2;
+          },
+          messages: {
+              en: 'La fecha debe ser mayor a la fecha indicada.',
+              es: 'La fecha debe ser mayor a la fecha indicada.'
+          }
+      });
+  
+      // Agregar atributos de validación de Parsley después de renderizar el formulario
+      $('#id_T1').attr({
+          'data-parsley-fecha-mayor': '#fecha_inicio_ciclo_lectivo',
+          'data-parsley-fecha-mayor-message': 'El 1er. trimestre debe ser posterior al inicio del ciclo lectivo.'
+      });
+      $('#id_T2').attr({
+          'data-parsley-fecha-mayor': '#id_T1',
+          'data-parsley-fecha-mayor-message': 'El 2do. trimestre debe ser posterior al 1ro.'
+      });
+      $('#id_T3').attr({
+          'data-parsley-fecha-mayor': '#id_T2',
+          'data-parsley-fecha-mayor-message': 'El 3er. trimestre debe ser posterior al 2do.'
+      });
+      $('#id_T4').attr({
+          'data-parsley-fecha-mayor': '#id_T3',
+          'data-parsley-fecha-mayor-message': 'El 4to. trimestre debe ser posterior al 3er.'
+      });
+  
+      $('#id_FT_1').attr({
+          'data-parsley-fecha-mayor': '#id_T1',
+          'data-parsley-fecha-mayor-message': 'El final del 1er. trimestre debe ser posterior al final del trimestre.'
+      });
+      $('#id_FT_2').attr({
+          'data-parsley-fecha-mayor': '#id_T2',
+          'data-parsley-fecha-mayor-message': 'El final del 2do. trimestre debe ser posterior al final del trimestre.'
+      });
+      $('#id_FT_3').attr({
+          'data-parsley-fecha-mayor': '#id_T3',
+          'data-parsley-fecha-mayor-message': 'El final del 3er. trimestre debe ser posterior al final del trimestre.'
+      });
+      $('#id_FT_4').attr({
+          'data-parsley-fecha-mayor': '#id_T4',
+          'data-parsley-fecha-mayor-message': 'El final del 4to. trimestre debe ser posterior al final del trimestre.'
+      });
+
+      $('#id_B1_A').attr({
+        'data-parsley-fecha-mayor': '#fecha_inicio_ciclo_lectivo',
+        'data-parsley-fecha-mayor-message': 'El 1er. bimestre debe ser posterior al inicio del ciclo lectivo.'
+    });
+    $('#id_B2_A').attr({
+        'data-parsley-fecha-mayor': '#id_B1_A',
+        'data-parsley-fecha-mayor-message': 'El 2do. bimestre debe ser posterior al 1ro.'
+    });
+    $('#id_B1_B').attr({
+        'data-parsley-fecha-mayor': '#id_B2_A',
+        'data-parsley-fecha-mayor-message': 'El 3er. bimestre debe ser posterior al 2do.'
+    });
+    $('#id_B2_B').attr({
+        'data-parsley-fecha-mayor': '#id_B1_B',
+        'data-parsley-fecha-mayor-message': 'El 4to. bimestre debe ser posterior al 3er.'
+    });
+  
+
+    $('#id_FC_A').attr({
+      'data-parsley-fecha-mayor': '#id_B2_A',
+      'data-parsley-fecha-mayor-message': 'El final del 1er cuatrimestre debe ser posterior al final del 2do bimestre.'
+  });
+  $('#id_FC_B').attr({
+    'data-parsley-fecha-mayor': '#id_B2_B',
+    'data-parsley-fecha-mayor-message': 'El final del 2do cuatrimestre debe ser posterior al final del 2do bimestre.'
+});
+
+
+$('#id_FA').attr({
+  'data-parsley-fecha-mayor': '#id_T4',
+  'data-parsley-fecha-mayor-message': 'El final Anual debe ser posterior a la finalización del último trimestre.'
+});
+      // Inicializar Parsley en el formulario
+      var form = $('#fechasForm');
+      if (form.length > 0) {
+          var parsleyForm = form.parsley({
+              errorClass: 'is-invalid',
+              successClass: 'is-valid',
+              errorsWrapper: '<div class="invalid-feedback"></div>',
+              errorTemplate: '<span></span>',
+              multiple: true,
+              trigger: 'change'
+          });
+  
+          // Configurar Parsley para mostrar todos los errores
+          parsleyForm.on('field:error', function() {
+              var $element = $(this.$element);
+              var messages = this.getErrorsMessages();
+              var feedbackElement = $element.next('.invalid-feedback');
+              
+              if (feedbackElement.length === 0) {
+                  feedbackElement = $('<div class="invalid-feedback"></div>').insertAfter($element);
+              }
+              
+              feedbackElement.html(messages.join('<br>'));
+          });
+  
+          form.on('submit', function(e) {
+              e.preventDefault();
+              if (parsleyForm.validate()) {
+                this.submit()
+              } else {
+                  console.log("Errores de validación:");
+                  var fields = form.find(':input').not('button');
+                  fields.each(function() {
+                      var field = $(this);
+                      if (!field.parsley().isValid()) {
+                          console.log(field.attr('name') + ": " + field.parsley().getErrorsMessages().join(', '));
+                      }
+                  });
+              }
+             
+          });
+      } else {
+          console.error("El formulario con ID 'fechasForm' no se encontró en el DOM");
+      }
+  });
+</script>
 {% endblock %}
