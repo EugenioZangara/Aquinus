@@ -137,7 +137,8 @@ class Materia(models.Model):
     abreviatura=models.CharField(max_length=20)
     tipo=models.CharField(max_length=50, choices=TIPO_DE_MATERIA)
     area=models.CharField(max_length=50)
-    regimen=models.CharField(max_length=50, choices=[('PROMOCIONABLE','PROMOCIONABLE'),('NO PROMOCIONABLE','NO PROMOCIONABLE'),('ESPECIAL','ESPECIAL')])
+    regimen=models.CharField(max_length=50, choices=[('PROMOCIONABLE','PROMOCIONABLE'),('NO PROMOCIONABLE','NO PROMOCIONABLE')])
+    regimen_especial=models.BooleanField(default=False)
     observaciones=models.TextField(max_length=500, null=True, blank=True)
     anio=models.IntegerField(choices=[(1,1),(2,2),(3,3)])
    
@@ -152,7 +153,7 @@ class Materia(models.Model):
         self.abreviatura=self.abreviatura.upper()
         super().save(*args, **kwargs)
 
-        
+       
     
 class PlanEstudio(models.Model):
     
@@ -272,10 +273,7 @@ CALIFICACIONES_CHOICES=[
     ('COMPLEMENTARIO', 'Complementario'), # Calificación correspondiente a un examen complementario, debe acompañar el campo numero_complementario
     ('ORDINARIA','Ordinaria') #Calificación volcada por el profesor durante la cursada en función de las evaluaciones que haga
 ]    
-class Calificaciones(models.Model):
-    
-
-    
+class Calificaciones(models.Model):  
     materia=models.ForeignKey(Materia,on_delete=models.DO_NOTHING,  related_name='calificacion_materia')
     cursante=models.ForeignKey(Cursante, on_delete=models.DO_NOTHING, related_name='nota_cursante')
     valor=models.DecimalField(decimal_places=2, max_digits=3)
@@ -286,8 +284,7 @@ class Calificaciones(models.Model):
     calificador = models.ForeignKey(Profesor, on_delete=models.SET_NULL, null=True, blank=True)
 
 
-class FechasExamenes(models.Model):
-    
+class FechasExamenes(models.Model):    
     anio_lectivo=models.IntegerField(validators=[validate_four_digits],  # Aplica la validación personalizada
         )
     regimen_materia=models.CharField(max_length=50, choices=REGIMEN_MATERIAS_CHOICES) #Define el régimen de la materia (cuatrimestral, anual, trimestral, etc)
