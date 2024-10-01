@@ -55,7 +55,7 @@
                           {% endif %}
                         </td>
                         <td>
-                          <a href="{% url 'cursos:actualizar_profesores_materias' materia.pk %}" class="btn btn-primary"><i class="icon-edit"></i></a> |
+                          <a href="{% url 'cursos:actualizar_profesores_materias' materia.pk %}" class="btn btn-primary"data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Modificar Profesores"><i class="icon-edit"></i></a> |
                           <a href="#" class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-info" data-bs-title="Ver Calificaciones"><i class="icon-school"></i></a>
                         </td>
                       </tr>

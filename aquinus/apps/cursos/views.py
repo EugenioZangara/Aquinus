@@ -309,12 +309,12 @@ class CursoDetailView(DetailView):
         
         # Accede al curso actual
         curso = self.object
-        
+        materias=Asignatura.objects.filter(curso=curso)
         # Accede al plan de estudio asociado al curso
-        plan_de_estudio = curso.plan_de_estudio
+       # plan_de_estudio = curso.plan_de_estudio
         
         # Obtén las materias asociadas al plan de estudio
-        materias = plan_de_estudio.materias.all()
+        #materias = plan_de_estudio.materias.all()
         dni_cursantes=Cursante.objects.filter(curso=curso).values_list('dni', flat=True)
         cursantes=persona.objects.using('id8').filter(dni__in=list(dni_cursantes))
         # Agrega las materias al contexto

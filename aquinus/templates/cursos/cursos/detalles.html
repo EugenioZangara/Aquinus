@@ -1,4 +1,4 @@
-{% extends "main.html" %} {%load static%} {% load custom_filters%}{% block breadcrumb %}
+{% extends "main.html" %} {%load static%}{% load cursos_filters %} {% load custom_filters %}{% block breadcrumb %}
 
 <ol class="breadcrumb mb-3">
   <li class="breadcrumb-item">
@@ -37,6 +37,10 @@
                   <div class="col">
                     <h6 class="fw-light">División:</h6>
                     <h5 class="m-0 fw-semibold">{{cursos.division}}</h5>
+                  </div>
+                  <div class="col">
+                    <h6 class="fw-light">Año:</h6>
+                    <h5 class="m-0 fw-semibold">{{cursos.anio}}</h5>
                   </div>
                 <div class="col-12 col-md-auto">
                   <a href="{%url 'cursos:modificar_plan_estudio' cursos.pk %}" class="btn btn-warning"> Modificar</a>
@@ -136,19 +140,22 @@
                             <th>Abreviatura</th>
                             <th>Tipo</th> 
                             <th>Año</th> 
+                            <th>Régimen</th>
+                            <th>Cursado</th>
                             <th>Observaciones</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {% for materia in materias %}
+                          {% for asignatura in materias %}
                           <tr>
-                            <td>{{materia.nombre}}</td>
-                            <td>{{materia.abreviatura}}</td>
-                            <td>{{materia.tipo}}</td>
-                           <td>{{materia.anio}}</td>
-                
+                            <td>{{asignatura.materia.nombre}}</td>
+                            <td>{{asignatura.materia.abreviatura}}</td>
+                            <td>{{asignatura.materia.tipo}}</td>
+                           <td>{{asignatura.materia.anio}}</td>
+                            <td>{{asignatura.materia.regimen}}</td>
+                            <td>{{asignatura.periodo_cursado|getPeriodoCursada:asignatura.materia.tipo}}</td>
                             <td>
-                             {{materia.observaciones|default:""}}
+                             {{asignatura.materia.observaciones|default:""}}
                             </td>
                           </tr>
                           {%endfor%}
