@@ -1,4 +1,4 @@
-from .views import MateriaCreateView, MateriaListView, MateriaDeleteView, MateriaUpdateView,PlanEstudioCreateView,PlanEstudioListView, PlanEstudioUpdateView, DeletePlanEstudio, PlanEstudioDetailView, CursoCreateView, CursoListView, CursoDeleteView, CursoDetailView, AsignarProfesores,  ProfesorTemplateView, AlumnosCursoUpdateView, VerFechasMaterias, DefinirFechas, update_fechas, fijarInicioAnioLectivo
+from .views import MateriaCreateView, MateriaListView, MateriaDeleteView, MateriaUpdateView,PlanEstudioCreateView,PlanEstudioListView, PlanEstudioUpdateView, DeletePlanEstudio, PlanEstudioDetailView, CursoCreateView, CursoListView, CursoDeleteView, CursoDetailView, AsignarProfesores,  ProfesorTemplateView, AlumnosCursoUpdateView, VerFechasMaterias, DefinirFechas, update_fechas, fijarInicioAnioLectivo, AsignarPeriodoCursada
 from .views_htmx import get_orientaciones, seleccionar_registro, quitar_registro, agregar_registro
 from django.urls import path
 
@@ -24,10 +24,12 @@ urlpatterns = [
      path('quitar_registro/<int:id>/',quitar_registro, name='quitar_registro'),
      path('asignar_profesores/<int:pk>/', AsignarProfesores.as_view(), name='asignar_profesores'),
   
-     path('actualizar_profesores_materias/<int:materia_id>/<int:curso_id>/', ProfesorTemplateView.as_view(), name='actualizar_profesores_materias'),
+     path('actualizar_profesores_materias/<int:materia_id>/', ProfesorTemplateView.as_view(), name='actualizar_profesores_materias'),
      path('modificar_alumnos_curso/<int:pk>/', AlumnosCursoUpdateView.as_view(), name='modificar_alumnos_curso'),
      path ('VerFechasMaterias/', VerFechasMaterias.as_view(),name='ver_fechas_materias'),
     path('definir_fechas/', DefinirFechas.as_view(), name="definir_fechas"),
     path('update_fechas/<int:pk>/', update_fechas.as_view(), name='update_fechas'),
-    path('fijarInicioAnioLectivo/',fijarInicioAnioLectivo, name="fijar_inicio_anio_lectivo")
+    path('fijarInicioAnioLectivo/',fijarInicioAnioLectivo, name="fijar_inicio_anio_lectivo"),
+    #path('asignar_periodos/', AsignarPeriodoCursada.as_view(), name="asignar_periodos"),
+    path('asignar_periodos/<int:pk>/', AsignarPeriodoCursada.as_view(), name="asignar_periodos")
 ]

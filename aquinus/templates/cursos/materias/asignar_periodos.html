@@ -1,0 +1,79 @@
+{% extends 'main.html' %} {% load static %}
+{% block head %}
+  <!-- Scrollbar CSS -->
+  <link rel="stylesheet" href="{% static 'assets/vendor/overlay-scroll/OverlayScrollbars.min.css' %}" />
+
+  <!-- Data Tables -->
+  <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5.css' %}" />
+  <link rel="stylesheet" href="{% static 'assets/vendor/datatables/dataTables.bs5-custom.css' %}" />
+  <link rel="stylesheet" href="{% static 'assets/vendor/datatables/buttons/dataTables.bs5-custom.css' %}" />
+{% endblock %}
+<!-- Breadcrumb start -->
+
+{% block breadcrumb %}
+  <ol class="breadcrumb mb-3">
+    <li class="breadcrumb-item">
+      <i class="icon-house_siding lh-1"></i>
+      <a href="{% url 'home' %}" class="text-decoration-none">Inicio</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'cursos:ver_cursos' %}">Cursos</a>
+    </li>
+    <li class="breadcrumb-item">{{ curso.nombre }}</li>
+    <li class="breadcrumb-item">Materias</li>
+    <li class="breadcrumb-item">Asignar Períodos</li>
+  </ol>
+{% endblock %}
+<!-- Breadcrumb end -->
+
+{% block main_content1 %}
+<form action="{%url 'cursos:asignar_periodos' curso.pk %}" method="post">
+  {% csrf_token %}
+  <div class="row gx-3">
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="mb-2 d-flex align-items-end justify-content-between">
+            <h5 class="card-title">Definir Períodos de cursada</h5>
+            
+            <button type="submit "class="btn btn-warning"><i class= "fs-4 icon-calendar"></i>Cargar Períodos</button>
+          </div>
+          <div class="table-outer">
+            <div class="table-responsive">
+              <table class="table table-striped align-middle m-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Materia</th>
+                    <th>Abreviatura</th>
+                    <th>Año</th>
+                    <th>Régimen</th>
+                    <th>Período Cursada</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for item in formularios_asignaturas %}
+                    <tr>
+                      <td>#</td>
+                      <td>{{ item.asignatura.materia.nombre }}</td>
+                      <td>{{ item.asignatura.materia.abreviatura }}</td>
+                      <td>{{item.asignatura.materia.anio}} Año</td>
+                      <td>{{ item.asignatura.materia.tipo }}</td>
+                      <td>{{item.formulario}}</td>
+                    
+                      <td>Modificar</td>
+                   
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+  <!-- Row end -->
+{% endblock %}

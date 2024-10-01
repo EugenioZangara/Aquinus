@@ -21,5 +21,5 @@ class CursanteAdmin(admin.ModelAdmin):
     
 @admin.register(Calificaciones)
 class CalificacionesAdmin(admin.ModelAdmin):
-    list_display=['materia', 'cursante', 'valor', 'tipo']
-    raw_id_fields=['materia', 'cursante']
+    list_display=['asignatura', 'cursante', 'valor', 'tipo']
+    raw_id_fields=['asignatura', 'cursante']

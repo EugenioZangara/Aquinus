@@ -37,70 +37,59 @@
         </div>
         <div class="card-body">
           <div class="row">
-            <div class="col-lg-3 col-sm-4 col-12">
+            <div class="col-lg-3 col-sm-3 col-12">
               <div class="mb-3">
                 <label class="form-label">{{ form.plan_de_estudio.label }}</label>
                 {{ form.plan_de_estudio }}
               </div>
             </div>
-
-            <div class="col-lg-3 col-sm-4 col-12">
+            <div class="col-lg-3 col-sm-3 col-12">
               <div class="mb-3">
                 <label class="form-label">{{ form.anio.label }}</label>
                 {{ form.anio }}
               </div>
             </div>
-
-            <div class="col-lg-4 col-sm-4 col-12">
+            <div class="col-lg-3 col-sm-4 col-12">
               <div class="row row-cols-lg-auto g-3 align-items-center">
                 <div class="col-lg-8">
                   <div class="mb-3">
                     <label class="form-label">{{ form.division.label }}</label>
                     {{ form.division }}
                   </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="unicaDivisionCheck" />
-                    <label class="form-check-label" for="gridCheck1">Única División</label>
-                  </div>
-                </div>
+                </div>              
               </div>
             </div>
-            <div class="col-lg-2 col-sm-4 col-12">
+            <div class="col-lg-3 col-sm-4 col-12 gx-3">
               <div class="row row-cols-lg-auto g-3 align-items-center">
                 <button type="submit" class="btn btn-warning btn-lg" id="btnCrearCurso">
                   <i class="fs-4 icon-file-plus"></i> Crear Curso
+                </button>
+                <button type="submit" class="btn btn-info btn-lg" id="btnCrearCurso2">
+                  <i class="fs-4 icon-file-plus"></i> Crear Curso y asignar profesores
                 </button>
               </div>
             </div>
           </div>
         </div>
-
         <div class="alert border border-info alert-dismissible fade show text-info" role="alert">
           <b>Info!</b> Aspirantes que <strong>no</strong> fueron <strong>promovidos</strong> al grado superior, crear el curso, y luego desde el menú de consulta, modificar alumnos, podrá agregarlos.
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-
-
       </div>
     </div>
   </div>
-{% endblock %} {% block main_content2 %}
+{% endblock %}
 
-
-  <div class="row gx-2" id="bloqueCargaAlumnos" >
-    
+{% block main_content2 %}
+  <div class="row gx-2" id="bloqueCargaAlumnos">  
     <div class="col-lg-6 col-12">
       <div class="card mb-3">
         <div class="card-header">
           <h5 class="card-title">Aspirantes</h5>
-        </div>
-    
+        </div>   
         <div class="card-body" id="tablaListadoAspirantes">
           <div class="table-responsive">
             <table id="scrollVertical" class="table table-striped">
-              <!-- El contenido que antes estaba dentro de los divs de la tabla ahora sigue la estructura correcta -->
               <thead>
                 <tr>
                   <th>Grado</th>
@@ -110,30 +99,26 @@
                   <th>Agregar</th>
                 </tr>
               </thead>
-              <tbody id='listadoAspirantes'>
-               
-<tr>
-  <td>-</td>
-  <td>-</td>
-  <td>-</td>
-  <td>-</td>
-  <td>-</td>
-</tr>
-
+              <tbody id="listadoAspirantes">
+                <tr>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
-    
     <div class="col-lg-6 col-12">
       <div class="card mb-3">
         <div class="card-header">
           <h5 class="card-title">Aspirantes asignados a la División</h5>
         </div>
         <div class="card-body">
-          <!-- Segunda tabla: Registros seleccionados -->
           <div class="table-responsive">
             <table id="scrollVertical2" class="table table-striped">
               <thead>
@@ -146,7 +131,6 @@
                 </tr>
               </thead>
               <tbody id="tablaSeleccionados">
-
                 <tr>
                   <td></td>
                   <td></td>
@@ -154,19 +138,19 @@
                   <td></td>
                   <td></td>
                 </tr>
-                <!--Aspirants seleccionados para el curso-->
               </tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
-    
   </div>
-
+  <!-- Cierra el formulario aquí -->
 </form>
-
 {% endblock %}
+
+
+
 {% block scripts %}
  
 
@@ -254,7 +238,6 @@
     if (form) {
       form.addEventListener('submit', function(e) {
         e.preventDefault(); // Prevenimos el envío del formulario temporalmente
- console.log("llama la funcion")
         // Recopila los datos de los alumnos seleccionados
         var alumnosSeleccionados = Array.from(document.querySelectorAll('#tablaSeleccionados input[name="alumnos_pk"]'))
           .map(input => input.value);

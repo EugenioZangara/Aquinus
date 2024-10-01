@@ -153,7 +153,9 @@ class Materia(models.Model):
         self.abreviatura=self.abreviatura.upper()
         super().save(*args, **kwargs)
 
-       
+
+
+
     
 class PlanEstudio(models.Model):
     
@@ -251,11 +253,22 @@ class Cursante(models.Model):
 
 class Profesor (models.Model):
     usuario=models.ForeignKey(Perfil, on_delete=models.CASCADE)
-    curso=models.ManyToManyField(Curso, related_name='profesor_curso')
-    materias=models.ManyToManyField(Materia, related_name='profesor_materia')
+    #curso=models.ManyToManyField(Curso, related_name='profesor_curso')
+    #materias=models.ManyToManyField(Materia, related_name='profesor_materia')
 
+class Asignatura(models.Model):
+    materia = models.ForeignKey(Materia, on_delete=models.CASCADE)
+    periodo_cursado = models.IntegerField( null=True, blank=True)  # Cambiado para usar choices correctamente
+    profesor = models.ManyToManyField(Perfil, related_name="profesores_de_asignaturas", blank=True)
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name="asignaturas")
+    enabled = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
-
+        
+        
+        
 REGIMEN_MATERIAS_CHOICES=[
     ('BIMESTRAL','Bimestral'), #Calificación promedio de las calificaciones ordinarias del bimestre
     ('TRIMESTRAL','Trimestral'), # Calificación promedio de las calificaciones ordinarias del trimestre 
@@ -274,7 +287,7 @@ CALIFICACIONES_CHOICES=[
     ('ORDINARIA','Ordinaria') #Calificación volcada por el profesor durante la cursada en función de las evaluaciones que haga
 ]    
 class Calificaciones(models.Model):  
-    materia=models.ForeignKey(Materia,on_delete=models.DO_NOTHING,  related_name='calificacion_materia')
+    asignatura=models.ForeignKey(Asignatura,on_delete=models.DO_NOTHING,  related_name='calificacion_materia')
     cursante=models.ForeignKey(Cursante, on_delete=models.DO_NOTHING, related_name='nota_cursante')
     valor=models.DecimalField(decimal_places=2, max_digits=3)
     tipo=models.CharField(max_length=50, choices=CALIFICACIONES_CHOICES)

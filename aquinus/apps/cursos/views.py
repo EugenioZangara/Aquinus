@@ -15,8 +15,8 @@ import json
 from django.db import IntegrityError, transaction
 from apps.alumnos.models import persona
 from apps.usuarios.models import Perfil
-from .models import Materia, PlanEstudio ,Curso, Cursante, Profesor, FechasExamenes
-from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm,  AsignarProfesoresForm, FechasCreateForm
+from .models import Materia, PlanEstudio ,Curso, Cursante, Profesor, FechasExamenes, Asignatura
+from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm,  AsignarProfesoresForm, FechasCreateForm, PeriodoCursadaForm
 # Create your views here.
 
 class MateriaCreateView(CreateView):
@@ -176,6 +176,7 @@ class CursoCreateView(CreateView):
     form_class = CursoCreateForm
 
     def form_valid(self, form):
+     
         try:
             # Crea el curso pero no lo guarda aún
             self.curso = form.save(commit=False)
@@ -198,16 +199,13 @@ class CursoCreateView(CreateView):
     def post(self, request, *args, **kwargs):
         # Procesar el formulario
         response = super().post(request, *args, **kwargs)
-
         # Obtener los alumnos seleccionados del request
         alumnos = request.POST.get('alumnos_seleccionados')
         try:
             alumnos_seleccionados = json.loads(alumnos)
         except json.JSONDecodeError:
             alumnos_seleccionados = []
-
-        curso = self.curso  # Curso no guardado aún
-        
+        curso = self.curso  # Curso no guardado aún       
         # Empezar una transacción
         with transaction.atomic():
             try:
@@ -216,6 +214,9 @@ class CursoCreateView(CreateView):
                 
                 # Guardar el curso después de asociar todos los alumnos
                 curso.save(request=request)  #PASAMOS EL REQUEST PARA ALMACENAR EL USUARIO QUE REALIZÓ EL CAMBIO
+                for materia in curso.plan_de_estudio.materias.filter(anio=curso.anio):
+                    asignatura=Asignatura.objects.create(materia=materia, curso=curso)
+                    asignatura.save()
                 # Mensaje de éxito
                 messages.success(request, 'El curso se ha creado y se han asociado los alumnos correctamente.')
             except IntegrityError as e:
@@ -245,28 +246,35 @@ class CursoListView(ListView):
         
         cursos_activos = Curso.objects.filter(activo=True)
         cursos_con_materias_y_profesores = {}
+        todas_materias_con_periodos_definidos=True
         for curso in cursos_activos:
             plan_estudio = curso.plan_de_estudio  # Suponiendo que existe un campo plan_de_estudio en Curso
             #materias = plan_estudio.materias.all()
+            asignaturas=Asignatura.objects.filter(curso=curso)
             materias = plan_estudio.materias.filter(anio=curso.anio)
             todas_materias_con_profesores = True  # Se asume que todas tienen profesor inicialmente
             cantidad_alumnos_por_curso = Cursante.objects.filter(curso=curso).aggregate(total=Count('id'))['total']
             # Para cada materia, verificamos si tiene profesores asociados
             materias_con_profesores = []
-            for materia in materias:
-                tiene_profesor = Profesor.objects.filter(materias=materia).exists()
-                materias_con_profesores.append({
-                    'materia': materia,
-                    'tiene_profesor': tiene_profesor
-                })
-                 # Si alguna materia no tiene profesor, cambia el flag a False
-                if not tiene_profesor:
-                    todas_materias_con_profesores = False
+            for materia in asignaturas:  
+                # Verificamos si hay al menos un profesor asociado
+                tiene_profesor = materia.profesor.exists()  # Utiliza el método exists() para verificar
+                if tiene_profesor:
+                    materias_con_profesores.append({
+                        'materia': materia,
+                        'tiene_profesor': tiene_profesor
+                    })
+                else:
+                    todas_materias_con_profesores = False  # Cambia a False si no hay profesores
+                if materia.materia.tipo!="ANUAL":
+                    if materia.periodo_cursado==None:
+                        todas_materias_con_periodos_definidos=False
+                    
+                   
             cursos_con_materias_y_profesores[curso]=[cantidad_alumnos_por_curso, todas_materias_con_profesores]
-            
-            
-        print(cursos_con_materias_y_profesores)
+           
         context['cursos_con_materias_y_profesores'] = cursos_con_materias_y_profesores
+        context['todas_materias_con_periodos_definidos'] = todas_materias_con_periodos_definidos
         context['active_tab'] = "cursos"
         return context
     
@@ -392,8 +400,8 @@ class AsignarProfesores(ListView):
     def get_queryset(self):
         curso_id=self.kwargs.get('pk')
         curso = Curso.objects.get(id=curso_id)
-        materias = Materia.objects.filter(materias_plan_de_estudio=curso.plan_de_estudio).prefetch_related(
-                Prefetch('profesor_materia', queryset=Profesor.objects.filter(curso=curso))
+        materias = Asignatura.objects.filter(curso=curso).prefetch_related(
+                Prefetch('profesores_de_asignaturas')
                     )
         
         return materias
@@ -404,9 +412,10 @@ class AsignarProfesores(ListView):
         #materias = curso.plan_de_estudio.materias.all()
 
 
-        materias = Materia.objects.filter(materias_plan_de_estudio=curso.plan_de_estudio).prefetch_related(
-                Prefetch('profesor_materia', queryset=Profesor.objects.filter(curso=curso))
-                    )
+        materias = Asignatura.objects.filter(curso=curso).prefetch_related(
+    Prefetch('profesor')
+)
+
         # Crear una lista de tuplas (materia, formulario)
         
         context['curso']=curso
@@ -420,69 +429,69 @@ class ProfesorTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
        
         context = super().get_context_data(**kwargs)
-        materia_id = kwargs.get('materia_id')
-        curso_id = kwargs.get('curso_id')
-        materia = get_object_or_404(Materia, id=materia_id)
-        curso = get_object_or_404(Curso, id=curso_id)
+        asignatura_id = kwargs.get('materia_id')
+        asignatura = get_object_or_404(Asignatura, id=asignatura_id)
     
         
         # Obtener los profesores existentes para este curso y materia
-        profesores_existentes = Profesor.objects.filter(curso=curso, materias=materia)
+        profesores_existentes = asignatura.profesor.all()
         
         # Obtener los IDs de los usuarios de los profesores existentes
-        usuarios_existentes = [prof.usuario.usuario.id for prof in profesores_existentes]
+        usuarios_existentes = [prof.usuario.id for prof in profesores_existentes]
         
         form = AsignarProfesoresForm(initial={'usuario': usuarios_existentes})
         context["form"]=form
-        context["materia"] =materia
-        context["curso"]=curso 
+        context["materia"] =asignatura
         return context
     
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        curso = context['curso']
-        materia = context['materia']
+        
+        asignatura = context['materia']
         form = AsignarProfesoresForm(request.POST)
         
         if form.is_valid():
+        #
             usuarios_seleccionados = set(form.cleaned_data['usuario'])
             
-            # Obtener todos los profesores actualmente asignados a este curso y materia
-            profesores_actuales = Profesor.objects.filter(curso=curso, materias=materia)
-            usuarios_actuales = set(profesor.usuario.usuario for profesor in profesores_actuales)
+        #     # Obtener todos los profesores actualmente asignados a este curso y materia
+            profesores_actuales = asignatura.profesor.all()
+    
+        
+        # # Obtener los profesores existentes para este curso y materia
+        #     profesores_actuales = asignatura.profesor.all()
+            usuarios_actuales = set(profesor.usuario for profesor in profesores_actuales)
             
-            # Identificar usuarios deseleccionados
+        #     # Identificar usuarios deseleccionados
             usuarios_deseleccionados = usuarios_actuales - usuarios_seleccionados
-            print(curso, "CUROOOOOSSS")
-            # Eliminar las asignaciones existentes para usuarios deseleccionados
-            # Eliminar las asignaciones existentes para usuarios deseleccionados de forma más eficiente
+           
+        #     # Eliminar las asignaciones existentes para usuarios deseleccionados
+        #     # Eliminar las asignaciones existentes para usuarios deseleccionados de forma más eficiente
             
-           # Obtener los profesores que coinciden con los usuarios deseleccionados
-            profesores = Profesor.objects.filter(usuario__usuario__in=usuarios_deseleccionados, curso=curso)
+        #    # Obtener los profesores que coinciden con los usuarios deseleccionados
+            profesores_deseleccionados = Profesor.objects.filter(usuario__usuario__in=usuarios_deseleccionados)
 
-            # Iterar sobre los profesores y remover la materia de cada uno
-            for profesor in profesores:
-                profesor.materias.remove(materia)  # Esto desasigna la materia del profesor
+        #     # Iterar sobre los profesores y remover la materia de cada uno
+            for profesor in profesores_deseleccionados:
+                asignatura.profesor.remove(profesor.usuario)  # Esto desasigna la materia del profesor
 
 
                 messages.warning(request, f'Se ha eliminado la asignación del profesor {profesor.usuario} para este curso y materia.')
            
              
             # Crear o actualizar las nuevas asignaciones
-             # Crear o actualizar las nuevas asignaciones
             for usuario in usuarios_seleccionados:
-                perfil = usuario.perfil
-                # Crear o recuperar el profesor sin el campo ManyToMany
-                profesor, created = Profesor.objects.get_or_create(usuario=perfil)
+                 perfil = usuario.perfil
+                 # Crear o recuperar el profesor sin el campo ManyToMany
+                 profesor, created = Profesor.objects.get_or_create(usuario=perfil)
                 
-                # Añadir el curso y la materia al profesor
-                profesor.curso.add(curso)  # Relacionar con el curso
-                profesor.materias.add(materia)  # Relacionar con la materia
-
-                if created:
-                    messages.success(request, f'El profesor {perfil} ha sido creado y asignado correctamente.')
-                else:
+        #         # Añadir el curso y la materia al profesor
+                 asignatura.profesor.add(profesor.usuario)
+                 
+                 if created:
+                     messages.success(request, f'El profesor {perfil} ha sido creado y asignado correctamente.')
+                 else:
                     messages.success(request, f'El profesor {perfil} ha sido asignado correctamente.')
 
         else:
@@ -490,8 +499,8 @@ class ProfesorTemplateView(TemplateView):
             context['form'] = form
             return self.render_to_response(context)
 
-        # Redirigir pasando los ids de curso y materia
-        return redirect(reverse_lazy('cursos:asignar_profesores', kwargs={'pk': curso.id}))
+       # Redirigir pasando los ids de curso y materia
+        return redirect(reverse_lazy('cursos:asignar_profesores', kwargs={'pk': asignatura.curso.id}))
     
     
     
@@ -902,7 +911,67 @@ class update_fechas(UpdateView):
 
 
 
-#
+class AsignarPeriodoCursada(TemplateView):
+    template_name='cursos/materias/asignar_periodos.html'
+    
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)
+        curso = Curso.objects.get(pk=self.kwargs['pk'])
+       
+        asignaturas = Asignatura.objects.filter(curso=curso).exclude(materia__tipo="ANUAL")
+        # Crear un formulario para cada asignatura si no tiene el campo 'periodo_cursada'
+        formularios_asignaturas = []
+        for asignatura in asignaturas:
+               
+                if asignatura.periodo_cursado is None:
+                   formulario = PeriodoCursadaForm(instance=asignatura, tipo=asignatura.materia.tipo,  prefix=f'asignatura_{asignatura.pk}')
+                else:
+                   formulario = asignatura.periodo_cursado  # Si el periodo ya existe, no mostramos formulario
+                formularios_asignaturas.append({
+            'asignatura': asignatura,
+            'formulario': formulario,
+        })
+        
+        context['formularios_asignaturas']= formularios_asignaturas
+        context['curso']=curso
+        context['asignaturas']=asignaturas
+        return  context
+
+   
+    def post(self, request, *args, **kwargs):
+        curso = Curso.objects.get(pk=self.kwargs['pk'])
+        asignaturas = Asignatura.objects.filter(curso=curso).exclude(materia__tipo="ANUAL")
+        
+        formularios_asignaturas = []
+        
+        for asignatura in asignaturas:
+            prefix = f'asignatura_{asignatura.pk}'
+            if any(key.startswith(prefix) for key in request.POST.keys()):
+                data = {key: value for key, value in request.POST.items() if key.startswith(prefix)}
+
+                formulario = PeriodoCursadaForm(data, instance=asignatura, prefix=prefix)
+                
+                if formulario.is_valid():
+                    periodo_cursado = formulario.cleaned_data.get('periodo_cursado')
+                    messages.success(request,f"Se ha asignado el período {periodo_cursado} a la materia {asignatura.materia.nombre}")
+                    formulario.save()
+                else:
+                    print(f"Error en el formulario de la asignatura {asignatura.pk}")
+                    
+                    messages.success(request, 'Ha ocurrido un error')
+                    
+                formularios_asignaturas.append({
+                    'asignatura': asignatura,
+                    'formulario': formulario,
+                })
+        
+        
+        return redirect(reverse_lazy('cursos:ver_cursos'))
+
+
+
+
+
 
 def fijarInicioAnioLectivo(request):
     if request.method == "POST":

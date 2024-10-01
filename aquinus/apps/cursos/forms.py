@@ -4,7 +4,7 @@ from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 from apps.usuarios.models import Perfil
-from .models import Materia, PlanEstudio, Curso, Cursante, Profesor, FechasExamenes, REGIMEN_MATERIAS_CHOICES
+from .models import Materia, PlanEstudio, Curso, Cursante, Profesor, FechasExamenes, REGIMEN_MATERIAS_CHOICES, Asignatura
 
 import logging
 from django.contrib.auth import get_user_model
@@ -253,7 +253,44 @@ class FechasCreateForm(forms.Form):
             )
 
                     
-       
+class PeriodoCursadaForm(forms.ModelForm):
+    class Meta:
+        model = Asignatura
+        fields = ['periodo_cursado']
+        widgets={
+            'periodo_cursado': forms.Select(attrs={'class':'form-control'})
+        }
+    
+    def __init__(self, *args, **kwargs):
+        # Extraer el parámetro adicional
+        tipo = kwargs.pop('tipo', None)
+        super(PeriodoCursadaForm, self).__init__(*args, **kwargs)
+        
+        # Aquí puedes utilizar el parámetro `regimen` como necesites
+        if tipo == 'SEMESTRAL':
+            self.fields['periodo_cursado'].choices = [('', '---------'),
+                ('1', 'Primer Semestre'),
+                ('2', 'Segundo Semestre')
+            ]
+        elif tipo == 'CUATRIMESTRAL':
+            self.fields['periodo_cursado'].choices = [('', '---------'),
+                ('1', 'Primer Cuatrimestre'),
+                ('2', 'Segundo Cuatrimestre')
+            ]
+        elif tipo == 'TRIMESTRAL':
+            self.fields['periodo_cursado'].choices = [('', '---------'),
+                ('1', 'Primer Trimestre'),
+                ('2', 'Segundo Trimestre'),
+                ('3', 'Tercer Trimestre'),
+                ('4', 'Cuarto Trimestre')
+            ]
+        else:
+            # Opciones por defecto si el tipo no coincide
+            self.fields['periodo_cursado'].choices = [
+                ('sin_periodo', 'Sin Período Definido')
+            ]
+        self.fields['periodo_cursado'].widget.choices = self.fields['periodo_cursado'].choices
+
                     
 class AbrirComplementariosForm(forms.Form):
     numero_complementario=forms.IntegerField()
