@@ -5,8 +5,11 @@
     <i class="icon-house_siding lh-1"></i>
     <a href="{%url 'home' %}" class="text-decoration-none">Inicio</a>
   </li>
-  <li class="breadcrumb-item">Plan de Estudio</li>
-  <li class="breadcrumb-item">Detalles</li>
+  <li class="breadcrumb-item">
+     <a href="{%url 'cursos:ver_planes_estudio' %}">Plan de Estudio</li></a>
+  <li class="breadcrumb-item">
+    <a href="{%url 'cursos:ver_planes_estudio' %}"> Detalles</a>
+   </li>
   <li class="breadcrumb-item">{{plan_de_estudio}}</li>
 </ol>
 
