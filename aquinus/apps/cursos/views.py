@@ -15,8 +15,9 @@ import json
 from django.db import IntegrityError, transaction
 from apps.alumnos.models import persona
 from apps.usuarios.models import Perfil
-from .models import Materia, PlanEstudio ,Curso, Cursante, Profesor, FechasExamenes, Asignatura
+from .models import Materia, PlanEstudio ,Curso, Cursante,  FechasExamenes, Asignatura
 from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm,  AsignarProfesoresForm, FechasCreateForm, PeriodoCursadaForm
+from .templatetags.cursos_filters import getPeriodoCursada
 # Create your views here.
 
 class MateriaCreateView(CreateView):
@@ -423,7 +424,7 @@ class AsignarProfesores(ListView):
         return context
     
 class ProfesorTemplateView(TemplateView):
-    model = Profesor
+    model = Perfil
     template_name = "cursos/materias/actualizar_profesores.html"
     
     def get_context_data(self, **kwargs):
@@ -470,29 +471,23 @@ class ProfesorTemplateView(TemplateView):
         #     # Eliminar las asignaciones existentes para usuarios deseleccionados de forma más eficiente
             
         #    # Obtener los profesores que coinciden con los usuarios deseleccionados
-            profesores_deseleccionados = Profesor.objects.filter(usuario__usuario__in=usuarios_deseleccionados)
+            profesores_deseleccionados = Perfil.objects.filter(usuario__in=usuarios_deseleccionados)
 
         #     # Iterar sobre los profesores y remover la materia de cada uno
             for profesor in profesores_deseleccionados:
-                asignatura.profesor.remove(profesor.usuario)  # Esto desasigna la materia del profesor
+                asignatura.profesor.remove(profesor)  # Esto desasigna la materia del profesor
 
 
-                messages.warning(request, f'Se ha eliminado la asignación del profesor {profesor.usuario} para este curso y materia.')
+                messages.warning(request, f'Se ha eliminado la asignación del profesor {profesor} para este curso y materia.')
            
              
             # Crear o actualizar las nuevas asignaciones
             for usuario in usuarios_seleccionados:
-                 perfil = usuario.perfil
-                 # Crear o recuperar el profesor sin el campo ManyToMany
-                 profesor, created = Profesor.objects.get_or_create(usuario=perfil)
-                
-        #         # Añadir el curso y la materia al profesor
-                 asignatura.profesor.add(profesor.usuario)
-                 
-                 if created:
-                     messages.success(request, f'El profesor {perfil} ha sido creado y asignado correctamente.')
-                 else:
-                    messages.success(request, f'El profesor {perfil} ha sido asignado correctamente.')
+                asignatura.profesor.add(usuario.perfil)
+                if usuario not in usuarios_actuales:
+                    messages.success(request, f'El profesor {usuario.perfil} ha sido creado y asignado correctamente.')
+                #  else:
+                #     messages.success(request, f'El profesor {perfil} ha sido asignado correctamente.')
 
         else:
             messages.error(request, 'Por favor, corrija los errores en el formulario.')
@@ -926,7 +921,7 @@ class AsignarPeriodoCursada(TemplateView):
                 if asignatura.periodo_cursado is None:
                    formulario = PeriodoCursadaForm(instance=asignatura, tipo=asignatura.materia.tipo,  prefix=f'asignatura_{asignatura.pk}')
                 else:
-                   formulario = asignatura.periodo_cursado  # Si el periodo ya existe, no mostramos formulario
+                   formulario = getPeriodoCursada(asignatura.periodo_cursado, asignatura.materia.tipo)  # Si el periodo ya existe, no mostramos formulario
                 formularios_asignaturas.append({
             'asignatura': asignatura,
             'formulario': formulario,

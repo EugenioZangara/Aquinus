@@ -7,9 +7,9 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.models import User
 from .models import Perfil
 from django.contrib.auth.views import LoginView
-from django.views.generic import CreateView, ListView, UpdateView, FormView
+from django.views.generic import CreateView, ListView, UpdateView, FormView, DetailView
 from django.views import View
-
+from apps.cursos.models import  Asignatura, Cursante
 from .forms import CustomLoginForm, UserForm, PerfilForm, UserEditForm, PerfilEditForm, CustomPasswordChangeForm
 
 # Vista personalizada de inicio de sesión.
@@ -209,3 +209,37 @@ class ProfesoresListView(ListView):
         # Filtramos solo los usuarios que están activos (is_active=True)
         return User.objects.filter(is_active=True, is_staff=False, perfil__es_profesor=True).select_related('perfil')
     
+    
+class ProfesorDetailView(DetailView):
+    template_name = 'usuarios/detalles_profesores.html'
+    model = User
+    context_object_name="profesor"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            # Obtenemos el perfil relacionado al usuario actual
+            perfil = self.object.perfil
+            # Buscamos las asignaturas relacionadas con ese perfil/profesor
+            asignaturas = Asignatura.objects.filter(profesor=perfil)
+        except Perfil.DoesNotExist:
+            asignaturas = []
+        except Asignatura.DoesNotExist:
+            asignaturas = []
+
+        # Lista para almacenar la información de asignatura + número de cursantes
+        asignaturas_con_cursantes = []
+
+        for asignatura in asignaturas:
+            # Contamos los cursantes por cada asignatura
+            cursantes = Cursante.objects.filter(curso=asignatura.curso).count()
+            # Añadimos un diccionario con la asignatura y la cantidad de cursantes
+            asignaturas_con_cursantes.append({
+                'asignatura': asignatura,
+                'cursantes': cursantes
+            })
+
+        # Añadimos la nueva estructura al contexto
+        context['asignaturas_con_cursantes'] = asignaturas_con_cursantes
+        context['active_tab']="profesores"
+        return context

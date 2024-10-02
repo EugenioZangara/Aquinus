@@ -1,0 +1,66 @@
+{% extends 'main.html' %} {% load static %} {%load cursos_filters %}{% block breadcrumb %}
+  <ol class="breadcrumb mb-3">
+    <li class="breadcrumb-item">
+      <i class="icon-house_siding lh-1"></i>
+      <a href="{% url 'home' %}" class="text-decoration-none">Inicio</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'usuarios:consultar_profesores' %}">Profesores</a>
+    </li>
+    <li class="breadcrumb-item">{{profesor.tratamiento|default:"Sr/a."}}{{profesor.first_name}} {{profesor.last_name}}</li>
+    <li class="breadcrumb-item">Ver Detalle</li>
+  </ol>
+{% endblock %}
+{% block main_content1 %}
+<div class="col-12">
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="table-outer">
+          <div class="table-responsive">
+            <table class="table table-striped align-middle m-0">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  
+                  <th>Nombre Materia</th>
+                  <th>Abreviatura</th>
+                  <th>Curso</th>
+                  <th>Año</th>
+                  <th>Tipo</th>
+                  <th>Régimen</th>
+                  <th>Periodo Cursada</th>
+                  <th>Cant. Alumnos</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%for asignatura_info in asignaturas_con_cursantes %}
+                <tr>
+                  <td>1</td>
+                  
+                  <td>{{asignatura_info.asignatura.materia.nombre}}</td>
+                  <td>{{asignatura_info.asignatura.materia.abreviatura}}</td>
+                  <td>{{asignatura_info.asignatura.curso}}</td>
+                  <td>
+                    {{asignatura_info.asignatura.curso.anio}} Año
+                  </td>
+         
+                  <td>
+                    {{asignatura_info.asignatura.materia.tipo}}
+                  </td>
+                  <td>{{asignatura_info.asignatura.materia.regimen}}</td>
+                  <td>{{asignatura_info.asignatura.periodo_cursado|getPeriodoCursada:asignatura_info.asignatura.materia.tipo}}</td>
+                  <td>
+                    {{asignatura_info.cursantes}}
+                </td>
+                <td>botones</td>
+                </tr>
+                {%endfor%}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock main_content1 %}

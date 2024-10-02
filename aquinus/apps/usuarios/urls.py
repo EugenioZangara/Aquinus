@@ -1,6 +1,6 @@
 # myapp/urls.py
 from django.urls import path
-from .views import CustomLoginView, UsuarioPerfilCreateView, UserListView, DeleteUser,UserUpdateView, CambiarContrasenaView, ProfesoresListView
+from .views import CustomLoginView, UsuarioPerfilCreateView, UserListView, DeleteUser,UserUpdateView, CambiarContrasenaView, ProfesoresListView, ProfesorDetailView
 from django.contrib.auth import views as auth_views
 
 app_name='usuarios'
@@ -12,7 +12,8 @@ urlpatterns = [
              path('usuarios/eliminar/<int:pk>/', DeleteUser.as_view(), name='eliminar_usuario'),
     path('modificar_usuario/<int:pk>/', UserUpdateView.as_view(), name='modificar_usuario'),
     path('cambiar_contrasena/', CambiarContrasenaView.as_view(), name='cambiar_contrasena'),
-    path('vonsultar_profesores/', ProfesoresListView.as_view(), name='consultar_profesores')
+    path('consultar_profesores/', ProfesoresListView.as_view(), name='consultar_profesores'),
+    path('ver_detalles_profesor/<int:pk>/', ProfesorDetailView.as_view(), name="ver_detalles_profesor")
 
 
 ]

@@ -60,9 +60,11 @@
                       <td>{{ item.asignatura.materia.abreviatura }}</td>
                       <td>{{item.asignatura.materia.anio}} Año</td>
                       <td>{{ item.asignatura.materia.tipo }}</td>
-                      <td>{{item.formulario}}</td>
+                      <td id="formularioCarga_{{item.asignatura.pk}}">{{item.formulario}}</td>
                     
-                      <td>Modificar</td>
+                      <td><a class="btn btn-success">
+                        <i class="icon icon-edit" hx-post="{%url 'cursos:agregar_formulario_periodo_cursada' item.asignatura.pk %}"
+                        hx-target="#formularioCarga_{{item.asignatura.pk}}"></i></a></td>
                    
                     </tr>
                   {% endfor %}

@@ -18,7 +18,7 @@ class Perfil(models.Model):
     puede_calificar=models.BooleanField(default=False)
     debe_cambiar_contraseña = models.BooleanField(default=True)  # Este campo controla si debe cambiar la contraseña
     area=models.CharField(max_length=100, choices=AREAS_USUARIOS)
-    tratamiento=models.CharField(max_length=50, null=True, blank=True)
+    tratamiento=models.CharField(max_length=50, null=True, blank=True, default="Sr/a.")
 
     
     

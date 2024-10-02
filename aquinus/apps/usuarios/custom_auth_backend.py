@@ -5,17 +5,14 @@ from .models import Perfil
 class DNIAuthBackend(ModelBackend):
     def authenticate(self, request, dni=None, password=None, **kwargs):
         UserModel = get_user_model()
-        print("llamo al autenticate carajo")
         try:
             # Intenta obtener el perfil con el DNI proporcionado
             
             perfil = Perfil.objects.get(dni=dni)
             user = perfil.usuario
             # Verifica la contraseña del usuario
-            print(user)
-            print(password)
+          
             if user.check_password(password):
-                print(user)
                 return user
         except Perfil.DoesNotExist:
             # Si no se encuentra un perfil con ese DNI, retorna None

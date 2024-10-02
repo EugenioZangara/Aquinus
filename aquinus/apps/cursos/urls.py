@@ -1,5 +1,5 @@
 from .views import MateriaCreateView, MateriaListView, MateriaDeleteView, MateriaUpdateView,PlanEstudioCreateView,PlanEstudioListView, PlanEstudioUpdateView, DeletePlanEstudio, PlanEstudioDetailView, CursoCreateView, CursoListView, CursoDeleteView, CursoDetailView, AsignarProfesores,  ProfesorTemplateView, AlumnosCursoUpdateView, VerFechasMaterias, DefinirFechas, update_fechas, fijarInicioAnioLectivo, AsignarPeriodoCursada
-from .views_htmx import get_orientaciones, seleccionar_registro, quitar_registro, agregar_registro
+from .views_htmx import get_orientaciones, seleccionar_registro, quitar_registro, agregar_registro, agregarFormularioPeriodoCursada
 from django.urls import path
 
 app_name='cursos'
@@ -31,5 +31,6 @@ urlpatterns = [
     path('update_fechas/<int:pk>/', update_fechas.as_view(), name='update_fechas'),
     path('fijarInicioAnioLectivo/',fijarInicioAnioLectivo, name="fijar_inicio_anio_lectivo"),
     #path('asignar_periodos/', AsignarPeriodoCursada.as_view(), name="asignar_periodos"),
-    path('asignar_periodos/<int:pk>/', AsignarPeriodoCursada.as_view(), name="asignar_periodos")
+    path('asignar_periodos/<int:pk>/', AsignarPeriodoCursada.as_view(), name="asignar_periodos"),
+    path('agregarFormularioPeriodoCursada/<int:id>/', agregarFormularioPeriodoCursada, name='agregar_formulario_periodo_cursada')
 ]

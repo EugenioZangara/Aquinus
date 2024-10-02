@@ -4,7 +4,7 @@ from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 from apps.usuarios.models import Perfil
-from .models import Materia, PlanEstudio, Curso, Cursante, Profesor, FechasExamenes, REGIMEN_MATERIAS_CHOICES, Asignatura
+from .models import Materia, PlanEstudio, Curso,   FechasExamenes, REGIMEN_MATERIAS_CHOICES, Asignatura
 
 import logging
 from django.contrib.auth import get_user_model

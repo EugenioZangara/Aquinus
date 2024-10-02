@@ -4,6 +4,9 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from apps.alumnos.models import persona
+from .forms import PeriodoCursadaForm
+from .models import Asignatura
+
 
 combinaciones_permitidas = {
     'SH': ['ME', 'HI', 'OC', 'BA'],
@@ -77,3 +80,8 @@ def agregar_registro(request, id):
     response = f"{new_row}{remove_row}"
     
     return HttpResponse(response)
+
+def agregarFormularioPeriodoCursada(request, id):
+    asignatura=Asignatura.objects.get(id=id)
+    formulario=PeriodoCursadaForm(instance=asignatura, tipo=asignatura.materia.tipo,  prefix=f'asignatura_{asignatura.pk}')
+    return render(request,'cursos/materias/partials/formularioPeriodoCursada.html', {'form':formulario} )

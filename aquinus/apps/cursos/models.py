@@ -251,8 +251,8 @@ class Cursante(models.Model):
     def __str__(self):
         return str(self.dni)
 
-class Profesor (models.Model):
-    usuario=models.ForeignKey(Perfil, on_delete=models.CASCADE)
+# class Profesor (models.Model):
+#     usuario=models.ForeignKey(Perfil, on_delete=models.CASCADE)
     #curso=models.ManyToManyField(Curso, related_name='profesor_curso')
     #materias=models.ManyToManyField(Materia, related_name='profesor_materia')
 
@@ -294,7 +294,7 @@ class Calificaciones(models.Model):
     numero_complementario=models.IntegerField(blank=True, null=True)
     fecha_examen=models.DateField()
     fecha=models.DateTimeField( auto_now_add=True)
-    calificador = models.ForeignKey(Profesor, on_delete=models.SET_NULL, null=True, blank=True)
+    calificador = models.ForeignKey(Perfil, on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class FechasExamenes(models.Model):    
