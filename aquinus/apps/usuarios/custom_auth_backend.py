@@ -5,6 +5,7 @@ from .models import Perfil
 class DNIAuthBackend(ModelBackend):
     def authenticate(self, request, dni=None, password=None, **kwargs):
         UserModel = get_user_model()
+       
         try:
             # Intenta obtener el perfil con el DNI proporcionado
             

@@ -11,6 +11,7 @@ from django.views.generic import CreateView, ListView, UpdateView, FormView, Det
 from django.views import View
 from apps.cursos.models import  Asignatura, Cursante
 from .forms import CustomLoginForm, UserForm, PerfilForm, UserEditForm, PerfilEditForm, CustomPasswordChangeForm
+from .mixins.roles_mixins import MultipleRolesRequiredMixin
 
 # Vista personalizada de inicio de sesión.
 class CustomLoginView(LoginView):
@@ -29,11 +30,12 @@ class CustomLoginView(LoginView):
         return super().form_valid(form)
 
 # Vista para crear un usuario y perfil.
-class UsuarioPerfilCreateView(CreateView):
+class UsuarioPerfilCreateView(MultipleRolesRequiredMixin,CreateView):
     model = User  # Modelo base es User de Django.
     form_class = UserForm  # Formulario para el modelo User.
     template_name = 'usuarios/crear_usuario.html'  # Plantilla para crear el usuario.
     success_url = reverse_lazy('home')  # Redirige al home después de crear el usuario.
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
     def get_context_data(self, **kwargs):
         """
@@ -46,6 +48,7 @@ class UsuarioPerfilCreateView(CreateView):
             context['perfil_form'] = PerfilForm(self.request.POST)  # Formulario de perfil con datos enviados.
         else:
             context['perfil_form'] = PerfilForm()  # Formulario de perfil vacío.
+            
         return context
 
     def form_valid(self, form):
@@ -92,8 +95,9 @@ class UserListView(ListView):
         # Filtramos solo los usuarios que están activos (is_active=True)
         return User.objects.filter(is_active=True, is_staff=False).select_related('perfil')
     
-class DeleteUser(View):
+class DeleteUser(MultipleRolesRequiredMixin,View):
     success_url = reverse_lazy('usuarios:ver_usuarios')  # Redirigir al listado de usuarios
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
     def post(self, request, pk, *args, **kwargs):
         # Obtiene el usuario por el pk (clave primaria) o devuelve 404 si no existe
@@ -109,11 +113,13 @@ class DeleteUser(View):
 
 
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(MultipleRolesRequiredMixin,UpdateView):
     model = User
     form_class = UserEditForm
     template_name = "usuarios/actualizar_usuarios.html"
     success_url = reverse_lazy('usuarios:ver_usuarios')  # Redirigir al listado de usuarios
+    required_roles = ['STAFF', 'ADMINISTRADOR']
+
 
     def get_object(self, queryset=None):
         # Obtener el pk de la URL

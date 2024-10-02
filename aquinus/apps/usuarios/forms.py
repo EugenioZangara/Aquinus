@@ -92,12 +92,14 @@ class UserForm(forms.ModelForm):
 class PerfilForm(forms.ModelForm):
     class Meta:
         model = Perfil
-        fields = ['dni', 'es_profesor', 'puede_calificar', 'tratamiento']
+        fields = ['dni', 'es_profesor', 'puede_calificar', 'tratamiento','areas', 'roles']
         widgets = {
             'dni': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de DNI (sin puntos)'}),
             'es_profesor': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'puede_calificar': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'tratamiento':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lic., Ing, TN, CC, Prof....'}),
+            'areas':forms.SelectMultiple(attrs={'class': 'js-example-basic-multiple',}),
+            'roles': forms.SelectMultiple(attrs={'class': 'js-example-basic-multiple',})
         }
         
 class CustomPasswordChangeForm(PasswordChangeForm):
