@@ -166,11 +166,11 @@ class FechasCreateForm(forms.Form):
             "T1": "Fecha cierre 1er. Trimestre",
             "T2": "Fecha cierre 2do. Trimestre",
             "T3": "Fecha cierre 3er. Trimestre",
-            "T4": "Fecha cierre 4to. Trimestre",
+            
             "FT_1": "Final Primer Trimestre",
             "FT_2": "Final Segundo Trimestre",
             "FT_3": "Final Tercer Trimestre",
-            "FT_4": "Final Cuarto Trimestre",
+            
             "FA": "Final Anual",
             "FS_A": "Final Primer Semestre",
             "FS_B": "Final Segundo Semestre",

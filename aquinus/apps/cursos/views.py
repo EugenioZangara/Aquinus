@@ -25,6 +25,12 @@ class MateriaCreateView(CreateView):
     template_name = "cursos/materias/crear_materia.html"
     success_url=reverse_lazy('home')
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab'] = "materias"
+        return context
+    
+    
     def form_valid(self, form):
        
         if form.is_valid() :
@@ -542,6 +548,7 @@ class VerFechasMaterias(TemplateView):
                 context[f"fechas_semestrales_{aplica_para}"] =fechas_semestrales 
                 context[f"fechas_cuatrimestrales_{aplica_para}"] =fechas_cuatrimestrales 
                 context[f"fechas_trimestrales_{aplica_para}"] =fechas_trimestrales 
+                context['active_tab'] = "definir_fechas"
             return context
         
  
@@ -552,7 +559,8 @@ class DefinirFechas(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form']=FechasCreateForm()
-        
+        context['active_tab'] = "definir_fechas"
+
         return context
     
     def post(self, request, *args: str, **kwargs):
@@ -645,31 +653,31 @@ class DefinirFechas(TemplateView):
                 else:
                     messages.error(request, "Es necesario fijar previamente el fin del 2° Trimestre, para definir el 3° Trimestre")             
                 
-            if data['T4'] :
-                if data['T3']:
-                    anual_T1, an_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
-                    'fechaTopeCalificacion':data['T4']})
-                    anual_T1.fechaInicioCalificacion=data['T3']
-                    anual_T1.fechaTopeCalificacion=data['T4']  
-                    anual_T1.save() 
+            # if data['T4'] :
+            #     if data['T3']:
+            #         anual_T1, an_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
+            #         'fechaTopeCalificacion':data['T4']})
+            #         anual_T1.fechaInicioCalificacion=data['T3']
+            #         anual_T1.fechaTopeCalificacion=data['T4']  
+            #         anual_T1.save() 
                     
-                    semestre_T4, sem_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
-                    'fechaTopeCalificacion':data['T4']})
-                    semestre_T4.fechaInicioCalificacion=data['T3']
-                    semestre_T4.fechaTopeCalificacion=data['T4']
-                    semestre_T4.save()  
+            #         semestre_T4, sem_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
+            #         'fechaTopeCalificacion':data['T4']})
+            #         semestre_T4.fechaInicioCalificacion=data['T3']
+            #         semestre_T4.fechaTopeCalificacion=data['T4']
+            #         semestre_T4.save()  
                     
-                    trimestre_T4, tri_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
-                    'fechaTopeCalificacion':data['T4']})
-                    trimestre_T4.fechaInicioCalificacion=data['T3']
-                    trimestre_T4.fechaTopeCalificacion=data['T4']
-                    trimestre_T4.save() 
-                    if an_t4_created and tri_t4_created and sem_t4_created:
-                        creado.append("Cuarto Trimestre")
-                    else:    
-                        actualizado.append("Cuarto Trimestre")  
-                else:
-                    messages.error(request, "Es necesario fijar previamente el fin del 3° Trimestre, para definir el 4° Trimestre")
+            #         trimestre_T4, tri_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
+            #         'fechaTopeCalificacion':data['T4']})
+            #         trimestre_T4.fechaInicioCalificacion=data['T3']
+            #         trimestre_T4.fechaTopeCalificacion=data['T4']
+            #         trimestre_T4.save() 
+            #         if an_t4_created and tri_t4_created and sem_t4_created:
+            #             creado.append("Cuarto Trimestre")
+            #         else:    
+            #             actualizado.append("Cuarto Trimestre")  
+            #     else:
+            #         messages.error(request, "Es necesario fijar previamente el fin del 3° Trimestre, para definir el 4° Trimestre")
                 
                 '''Finales Trimestrales'''
             if data['FT_1'] :
@@ -707,17 +715,17 @@ class DefinirFechas(TemplateView):
                 else:
                     messages.error(request, "Es necesario fijar previamente el fin del 3° Trimestre, para definir el período de finales del 3° Trimestre")
                     
-            if data['FT_4'] :
-                if data['T4']:
-                    final_4trimestral, ft4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T4'],
-                    'fechaTopeCalificacion':data['FT_4']})
-                    if ft4_created:
-                        creado.append("Final Cuarto Trimestre")
-                    else:
-                        actualizado.append("Final Cuarto Trimestre")
-                    final_4trimestral.save()
-                else:
-                    messages.error(request, "Es necesario fijar previamente el fin del 4° Trimestre, para definir el período de finales del 4° Trimestre")
+            # if data['FT_4'] :
+            #     if data['T4']:
+            #         final_4trimestral, ft4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T4'],
+            #         'fechaTopeCalificacion':data['FT_4']})
+            #         if ft4_created:
+            #             creado.append("Final Cuarto Trimestre")
+            #         else:
+            #             actualizado.append("Final Cuarto Trimestre")
+            #         final_4trimestral.save()
+            #     else:
+            #         messages.error(request, "Es necesario fijar previamente el fin del 4° Trimestre, para definir el período de finales del 4° Trimestre")
                     
                     
                     #Finales Semestrales         
