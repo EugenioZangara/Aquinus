@@ -17,12 +17,16 @@ from apps.alumnos.models import persona
 from apps.usuarios.models import Perfil
 from .models import Materia, PlanEstudio ,Curso, Cursante, Profesor, FechasExamenes
 from .forms import MateriaForm, MateriaEditForm,PlanEstudioForm, CursoCreateForm,  AsignarProfesoresForm, FechasCreateForm
+from apps.usuarios.mixins.roles_mixins import MultipleRolesRequiredMixin
+
 # Create your views here.
 
-class MateriaCreateView(CreateView):
+class MateriaCreateView(MultipleRolesRequiredMixin,CreateView):
     form_class = MateriaForm
     template_name = "cursos/materias/crear_materia.html"
     success_url=reverse_lazy('home')
+    required_roles = ['STAFF', 'ADMINISTRADOR']
+
     
     def form_valid(self, form):
        
@@ -44,10 +48,11 @@ class MateriaListView(ListView):
         context['active_tab']="materias"   
         return context
     
-class MateriaDeleteView(SuccessMessageMixin,DeleteView):
+class MateriaDeleteView(MultipleRolesRequiredMixin,SuccessMessageMixin,DeleteView):
     model = Materia
     success_url = reverse_lazy('cursos:ver_materias')  
     success_message = "La materia %(nombre)s ha sido eliminada exitosamente."
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
     # Este método se asegura de pasar el objeto al success_message
     def get_success_message(self, cleaned_data):
@@ -57,12 +62,13 @@ class MateriaDeleteView(SuccessMessageMixin,DeleteView):
         )
         
 
-class MateriaUpdateView(SuccessMessageMixin, UpdateView):
+class MateriaUpdateView(MultipleRolesRequiredMixin,SuccessMessageMixin, UpdateView):
     model = Materia
     template_name = "cursos/materias/modificar_materia.html"
     form_class = MateriaForm
     success_url = reverse_lazy('cursos:ver_materias') 
     success_message = "La materia %(nombre)s ha sido modificada exitosamente."
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
     
     # Este método se asegura de pasar el objeto al success_message
@@ -76,11 +82,13 @@ class MateriaUpdateView(SuccessMessageMixin, UpdateView):
         context['active_tab']="materias"   
         return context
        
-class PlanEstudioCreateView(CreateView):
+class PlanEstudioCreateView(MultipleRolesRequiredMixin,CreateView):
     model = PlanEstudio
     template_name = "cursos/planes_estudio/crear_plan_estudios.html"
     success_url=reverse_lazy('home')
     form_class=PlanEstudioForm
+    required_roles = ['STAFF', 'ADMINISTRADOR']
+
     #success_message = "Se ha creado el plan de estudio para la especialidad %(especialidad) exitosamente."
     
     
@@ -125,12 +133,13 @@ class PlanEstudioListView(ListView):
         # Filtramos solo los usuarios que están activos (is_active=True)
         return PlanEstudio.objects.filter(vigente=True)
     
-class PlanEstudioUpdateView(SuccessMessageMixin,UpdateView):
+class PlanEstudioUpdateView(MultipleRolesRequiredMixin,SuccessMessageMixin,UpdateView):
     model = PlanEstudio
     template_name = "cursos/planes_estudio/modificar_plan_estudio.html"
     form_class = PlanEstudioForm
     success_url = reverse_lazy('cursos:ver_planes_estudio') 
     success_message = "El Plan de Estudio perteneciente a la especialidad %(especialidad) ha sido modificado exitosamente."
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
     
     # Este método se asegura de pasar el objeto al success_message
@@ -145,8 +154,9 @@ class PlanEstudioUpdateView(SuccessMessageMixin,UpdateView):
         return context
     
 
-class DeletePlanEstudio(View):
+class DeletePlanEstudio(MultipleRolesRequiredMixin,View):
     success_url = reverse_lazy('cursos:ver_planes_estudio')  # Redirigir al listado de planes de estudio
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
     def post(self, request, pk, *args, **kwargs):
         # Obtiene el plan de estudio por el pk (clave primaria) o devuelve 404 si no existe
@@ -169,11 +179,12 @@ class PlanEstudioDetailView(DetailView):
         context['active_tab']="planes_estudio"   
         return context
     
-class CursoCreateView(CreateView):
+class CursoCreateView(MultipleRolesRequiredMixin,CreateView):
     model = Curso
     template_name = "cursos/cursos/crear_curso.html"
     success_url = reverse_lazy('home')
     form_class = CursoCreateForm
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
     def form_valid(self, form):
         try:
@@ -270,10 +281,11 @@ class CursoListView(ListView):
         context['active_tab'] = "cursos"
         return context
     
-class CursoDeleteView(SuccessMessageMixin, DeleteView):
+class CursoDeleteView(MultipleRolesRequiredMixin,SuccessMessageMixin, DeleteView):
     model = Curso
     success_url = reverse_lazy('cursos:ver_cursos')  # Redirigir al listado de planes de estudio
     success_message = "El curso %(nombre) ha sido eliminado exitosamente."
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
 
       # Sobrescribir el método delete para hacer la eliminación lógica
@@ -316,9 +328,10 @@ class CursoDetailView(DetailView):
         return context
  
  
-class AlumnosCursoUpdateView(TemplateView):
+class AlumnosCursoUpdateView(MultipleRolesRequiredMixin,TemplateView):
     template_name='cursos/cursos/modificar_alumnos_curso.html' 
     success_url = reverse_lazy('home')
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
     
     def get_context_data(self, **kwargs):
@@ -383,11 +396,12 @@ class AlumnosCursoUpdateView(TemplateView):
  
  
     
-class AsignarProfesores(ListView):
+class AsignarProfesores(MultipleRolesRequiredMixin,ListView):
     model=Materia
     template_name='cursos/materias/asignar_profesores.html'
     context_object_name='materias'
-    
+    required_roles = ['STAFF', 'ADMINISTRADOR']
+   
 
     def get_queryset(self):
         curso_id=self.kwargs.get('pk')
@@ -541,8 +555,9 @@ class VerFechasMaterias(TemplateView):
             return context
         
  
-class DefinirFechas(TemplateView):
+class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
     template_name='cursos/materias/definir_fechas.html'
+    required_roles = ['STAFF', 'ADMINISTRADOR']
 
 
     def get_context_data(self, **kwargs):
