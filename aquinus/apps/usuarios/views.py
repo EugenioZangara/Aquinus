@@ -7,7 +7,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.models import User
 from .models import Perfil
 from django.contrib.auth.views import LoginView
-from django.views.generic import CreateView, ListView, UpdateView, FormView, DetailView
+from django.views.generic import CreateView, ListView, UpdateView, FormView, DetailView, TemplateView
 from django.views import View
 from apps.cursos.models import  Asignatura, Cursante
 from .forms import CustomLoginForm, UserForm, PerfilForm, UserEditForm, PerfilEditForm, CustomPasswordChangeForm
@@ -47,7 +47,7 @@ class UsuarioPerfilCreateView(MultipleRolesRequiredMixin,CreateView):
         if self.request.POST:
             context['perfil_form'] = PerfilForm(self.request.POST)  # Formulario de perfil con datos enviados.
         else:
-            context['perfil_form'] = PerfilForm()  # Formulario de perfil vacío.
+            context['perfil_form'] = PerfilForm(user=self.request.user)  # Formulario de perfil vacío.
             
         return context
 
@@ -197,6 +197,36 @@ class CambiarContrasenaView(FormView):
         if not request.user.perfil.debe_cambiar_contraseña:
             return redirect('home')  # Si no necesita cambiar contraseña, redirigir
         return super().dispatch(request, *args, **kwargs)
+
+class ResetearContrasenaView(MultipleRolesRequiredMixin,TemplateView):
+    template_name = 'usuarios/resetear_contrasena.html'  # Tu plantilla HTML para el cambio de contraseña
+    success_url = reverse_lazy('home')  # Redirigir a esta URL después del cambio 
+    required_roles = ['STAFF', 'ADMINISTRADOR']
+    
+    def post(self, request, *args, **kwargs):
+        pk = self.request.POST.get('perfil_id') 
+        perfil=get_object_or_404(Perfil, id=pk)      
+        usuario = perfil.usuario       
+        usuario_actual=request.user
+        perfil_actual=Perfil.objects.get(usuario=usuario_actual)
+        if usuario==usuario_actual:
+            messages.warning(self.request,'Para resetear su propia contraseña, de ingresar al menú "Cambiar Contraseña')
+
+        else:
+            if "STAFF" not in [rol.nombre for rol in perfil_actual.roles.all()] and "STAFF" in [rol.nombre for rol in perfil.roles.all()]:
+                messages.error(self.request, "Lo siento no tiene permisos para resetear la contraseña de ese tipo de usuarios")
+            else:
+                usuario.set_password("armada2024")
+                perfil.debe_cambiar_contraseña=True
+                perfil.save()
+                usuario.save()
+                messages.success(self.request,'Contraseña reseteada correctamente, el usuario deberá ingresar con la contraseña "armada2024" y actualizarla')
+        return redirect(self.success_url)
+    
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)
+        context['active_tab']='usuarios'
+        return context
     
     
 class ProfesoresListView(ListView):

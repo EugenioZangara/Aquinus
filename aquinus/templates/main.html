@@ -245,9 +245,18 @@
                     <li>
                       <a class="dropdown-item" href="{% url 'usuarios:ver_usuarios' %}"><span>Ver Usuarios</span></a>
                     </li>
-                    <li>
-                      <a class="dropdown-item" href="#"><span>Usuarios Inactivos</span></a>
-                    </li>
+                    {% for rol in request.user.perfil.roles.all %}
+                    {% if rol.nombre == "STAFF" or rol.nombre == "ADMINISTRADOR" %}
+                        <li>
+                            <a class="dropdown-item" href="#"><span>Usuarios Inactivos</span></a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" href="{%url 'usuarios:resetear_contrasenia' %}"><span>Resetear Contraseñas</span></a>
+                      </li>
+                    {% endif %}
+                {% endfor %}
+                    
+                    
                   </ul>
                 </li>
               </ul>
@@ -264,7 +273,6 @@
             <div class="row gx-3">
               <div class="col-12 col-xl-6">
                 <!-- Breadcrumb start -->
-
                 {% block breadcrumb %}
                   <ol class="breadcrumb mb-3">
                     <li class="breadcrumb-item">

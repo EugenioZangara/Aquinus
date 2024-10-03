@@ -10,6 +10,14 @@ from .models import Perfil
 from django.contrib.auth.forms import UserCreationForm
 
 
+AREAS_USUARIOS=[('CUERPO', 'CUERPO'), ('DOCENTE', 'DOCENTE'),
+                                                       ('CAL_Y_EST', 'CALIFICACIONES Y ESTADÍSTICA'), 
+                                                       ('CURSOS', 'CURSOS')]   
+ROL_USUARIOS=[('PROFESOR', 'PROFESOR'), 
+                                                       ('ADMINISTRADOR', 'ADMINISTRADOR'), 
+                                                       ('CONSUMIDOR', 'SOLO LECTURA'), 
+                                                       ('STAFF', 'STAFF')] 
+
 '''
 Formulario para el login al sistema
 '''
@@ -88,6 +96,8 @@ class UserForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
+    
 
 class PerfilForm(forms.ModelForm):
     class Meta:
@@ -101,6 +111,26 @@ class PerfilForm(forms.ModelForm):
             'areas':forms.SelectMultiple(attrs={'class': 'js-example-basic-multiple',}),
             'roles': forms.SelectMultiple(attrs={'class': 'js-example-basic-multiple',})
         }
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Tomar el usuario logueado
+        super(PerfilForm, self).__init__(*args, **kwargs)
+        print(user.perfil.roles.all() , "rol del usuario", user.perfil.id)
+        # Filtrar opciones de rol basado en el rol del usuario logueado
+        if user:
+            user_roles = user.perfil.roles.all()
+
+            # Si el usuario tiene el rol "staff", puede ver todos los roles
+            if user_roles.filter(nombre='STAFF').exists():
+                print("valoido aca")
+                # El usuario "staff" puede ver todos los roles
+                self.fields['roles'].choices = ROL_USUARIOS
+            elif user_roles.filter(nombre='ADMINISTRADOR').exists():
+                # El "administrador" no puede ver la opción "staff"
+                self.fields['roles'].choices = [role for role in ROL_USUARIOS if role[0] != 'STAFF']
+            elif user.perfil.roles in ['PROFESOR', 'CONSUMIDOR']:
+                # Los usuarios "profesor" o "consumidor" no pueden crear otros usuarios
+                self.fields['roles'].choices = []
         
 class CustomPasswordChangeForm(PasswordChangeForm):
     class Meta:
@@ -122,3 +152,4 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             'class': 'form-control', 
             'placeholder': 'Confirmar nueva contraseña'
         })
+        

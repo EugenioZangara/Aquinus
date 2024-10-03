@@ -1,0 +1,27 @@
+<div class="row gx-3">
+  <div class="col-6">
+    <div class="mb-3">
+      <p class="text-secondary">Nombre/s:</p>
+      <h5>{{ perfil.usuario.first_name }}</h5>
+    </div>
+    <div class="mb-3">
+      <p class="text-secondary">Area:</p>
+      {% for area in perfil.areas.all %}
+        <p class="m-0">{{ area }}</p>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="mb-3">
+      <p class="text-secondary">Apellido/s:</p>
+      <h5>{{ perfil.usuario.last_name }}</h5>
+    </div>
+    <div class="mb-3">
+      <p class="text-secondary">Rol:</p>
+      {% for rol in perfil.roles.all %}
+        <p class="m-0">{{ rol }}</p>
+      {% endfor %}
+    </div>
+  </div>
+  <input type="hidden" name="perfil_id" value="{{ perfil.id }}" />
+</div>
