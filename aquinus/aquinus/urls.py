@@ -27,6 +27,8 @@ urlpatterns = [
     path('', include('apps.main.urls')),  # Incluye las URLs de la aplicación 'main'
     path('cursos/', include('apps.cursos.urls',namespace='cursos')),  # Incluye las URLs de la aplicación 'cursos'
 path('alumnos/', include('apps.alumnos.urls',namespace='alumnos')),  # Incluye las URLs de la aplicación 'alumnos'
+path('calificaciones/', include('apps.calificaciones.urls',namespace='calificaciones')),  # Incluye las URLs de la aplicación 'calificaciones'
+
 ]
 
 

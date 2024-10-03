@@ -20,7 +20,14 @@ class CustomLoginView(LoginView):
     form_class = CustomLoginForm
     
     def get_success_url(self):
-        return reverse_lazy('home')  # Asegúrate de que 'home' es el nombre correcto de tu URL
+        # Obtener el perfil del usuario logeado
+        perfil = self.request.user.perfil
+
+        # Redirigir según el valor de es_profesor
+        if perfil.es_profesor:
+            return reverse_lazy('calificaciones:home')  # URL para profesores
+        else:
+            return reverse_lazy('home')  # URL para otros usuarios
 
     def form_valid(self, form):
         remember_me = form.cleaned_data.get('rememberPassword')
@@ -166,8 +173,17 @@ class UserUpdateView(MultipleRolesRequiredMixin,UpdateView):
 class CambiarContrasenaView(FormView):
     template_name = 'usuarios/cambiar_contrasena.html'  # Tu plantilla HTML para el cambio de contraseña
     form_class = CustomPasswordChangeForm
-    success_url = reverse_lazy('home')  # Redirigir a esta URL después del cambio
+    #success_url = reverse_lazy('home')  # Redirigir a esta URL después del cambio
 
+    def get_success_url(self):
+        # Obtener el perfil del usuario logeado
+        perfil = self.request.user.perfil
+
+        # Redirigir según el valor de es_profesor
+        if perfil.es_profesor:
+            return reverse_lazy('calificaciones:home')  # URL para profesores
+        else:
+            return reverse_lazy('home')  # URL para otros usuarios
     def get_form_kwargs(self):
         """
         Pasa el usuario autenticado al formulario.

@@ -153,6 +153,8 @@ class Materia(models.Model):
         self.abreviatura=self.abreviatura.upper()
         super().save(*args, **kwargs)
 
+    class Meta:
+        ordering = ['nombre']  # Define el orden por defecto por el campo 'nombre'
 
 
 
