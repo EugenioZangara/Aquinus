@@ -1,0 +1,124 @@
+{% extends 'main.html' %} {% load static %}
+{% load custom_filters %}
+
+{% block breadcrumb %}
+  <ol class="breadcrumb mb-3">
+    <li class="breadcrumb-item">
+      <i class="icon-house_siding lh-1"></i>
+      <a href="{% url 'home' %}" class="text-decoration-none">Inicio</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'cursos:ver_cursos' %}">Cursos</a>
+    </li>
+    <li class="breadcrumb-item">Nuevo Curso</li>
+  </ol>
+{% endblock %}
+
+{% block main_content1 %}
+  <div class="row gx-3">
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <form method="post">
+            
+            {% csrf_token %}{{ formset.management_form }}
+            <div class="mb-2 d-flex align-items-end justify-content-between">
+              <div class="col-6">
+                <h5 class="card-title">Planilla de Registro de Calificaciones</h5>
+              </div>
+
+              <div class="row row-cols-lg-auto g-3 align-items-center">
+                <div class="col-12">
+                  <label for="misma_fecha_examen">Misma fecha para todo el curso:</label>
+                  <input type="checkbox" id="misma_fecha_examen" class="form-check-input" />
+                </div>
+                <div class="col-12">
+                  <input type="date" name="fecha_examen" id="fecha_examen" class="form-control" disabled />
+                </div>
+              </div>
+            </div>
+
+            <div class="table-outer">
+              <div class="table-responsive">
+                <table class="table table-striped align-middle m-0">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>
+                        <div class="d-flex align-items-center">Grado</div>
+                      </th>
+                      <th>
+                        <div class="d-flex align-items-center">Apellido</div>
+                      </th>
+                      <th>
+                        <div class="d-flex align-items-center">Nombre</div>
+                      </th>
+                      <th>
+                        <div class="d-flex align-items-center">
+                          <span class="icon-calendar me-2 fs-4"></span>
+                          Fecha de Examen
+                        </div>
+                      </th>
+                      <th>
+                        <div class="d-flex align-items-center">
+                          <span class="icon-playlist_add_check me-2 fs-4"></span>
+                          Calificación
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for form, alumno in forms_and_alumnos %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ alumno.grado|convertirGrado }} {{ alumno.especialidad|convertirEspecialidad }}{{ alumno.orientacion|convertirOrientaciones }}</td>
+                        <td>
+                          <span class="fw-semibold">{{ alumno.apellidos }}</span>
+                        </td>
+                        <td>
+                          <span>{{ alumno.nombres }}</span>
+                        </td>
+                        <td>{{ form.fecha_examen }}</td>
+                        <td>{{ form.valor }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="d-flex flex-wrap gap-2 justify-content-end">
+                <button type="submit" class="btn btn-success">Cargar Calificaciones</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const misma_fecha_checkbox = document.getElementById('misma_fecha_examen')
+    const fechaExamenInput = document.getElementById('fecha_examen')
+    const fechasIndividualesInput = document.querySelectorAll('.fecha_examen_individual')
+    misma_fecha_checkbox.addEventListener('change', function () {
+      if (this.checked) {
+        fechaExamenInput.disabled = false
+      } else {
+        fechaExamenInput.disabled = true
+      }
+    })
+    console.log(fechaExamenInput)
+    
+    fechaExamenInput.addEventListener('change', function () {
+      console.log('cambio')
+      if (misma_fecha_checkbox.checked) {
+        fechasIndividualesInput.forEach((input) => {
+          input.value = fechaExamenInput.value
+        })
+      }
+    })
+  </script>
+{% endblock %}

@@ -13,7 +13,22 @@ especialidades = {
     'OP': 12,
     'CO': 13,
     'SH': 14,
-    'MU': 15
+    'MU': 15,
+      1: 'IN',
+    2: 'EL',
+    3: 'AE',
+    4: 'MW',
+    5: 'AN',
+    6: 'IM',
+    7: 'MA',
+    8: 'AG',
+    9: 'MQ',
+    10: 'EN',
+    11: 'FU',
+    12: 'OP',
+    13: 'CO',
+    14: 'SH',
+    15: 'MU'
 }
 
 
@@ -66,19 +81,66 @@ orientaciones={
     "Salvamento": 47,
     "SO": 48,
     "SU": 49,
-    "TB": 50
+    "TB": 50,2: 'AA',
+    3: 'AC',
+    4: 'AE',
+    5: 'AG',
+    6: 'Armas',
+    7: 'AN',
+    8: 'AS',
+    9: 'AU',
+    10: 'AV',
+    11: 'BA',
+    12: 'Buceo Táctico',
+    13: 'Buceo',
+    14: 'CA',
+    15: 'CC',
+    16: 'CD',
+    17: 'CM',
+    18: 'CO',
+    19: 'CP',
+    20: 'Control Tiro',
+    21: 'EE',
+    22: 'EL',
+    23: 'EM',
+    25: 'FU',
+    26: 'GN',
+    27: 'HI',
+    28: 'IF',
+    29: 'IM',
+    30: 'IN',
+    31: 'MA',
+    32: 'MC',
+    33: 'ME',
+    34: 'MN',
+    35: 'Motores',
+    36: 'MQ',
+    37: 'MW',
+    38: 'MO',
+    39: 'MU',
+    40: 'OC',
+    41: 'OP',
+    42: 'PE',
+    43: 'RC',
+    44: 'Radar',
+    45: 'SC',
+    46: 'SH',
+    47: 'Salvamento',
+    48: 'SO',
+    49: 'SU',
+    50: 'TB'
 }
 # Diccionario invertido
 especialidades_invertidas = {v: k for k, v in especialidades.items()}
 
 # Función para convertir entre string y número
 def convertirEspecialidad(valor):
-   
-        return especialidades.get(valor)
+       
+        return especialidades.get(int(valor))
    
 
 def convertirOrientaciones(orientacion):
-    print("ORIENTACION", orientacion)
+    
     return orientaciones.get(orientacion)  
 
 grados={1:"ANPA",2:"ANSA", 3:"ANTA", 4:"POSTULANTE", 5:"CSCOM"}
