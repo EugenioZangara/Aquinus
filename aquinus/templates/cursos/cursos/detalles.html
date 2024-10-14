@@ -96,6 +96,7 @@
                                 <th>Espe./Or.</th>
                                 <th>Apellido</th>
                                 <th>Nombre</th>
+                                <th>Boletín</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -110,6 +111,7 @@
                                 <td>{{aspirante.especialidad|convertirEspecialidad}} {{aspirante.orientacion}}</td>
                                 <td>{{aspirante.apellidos}}</td>
                                 <td>{{aspirante.nombres}}</td>
+                                <td>Ver boletín</td>
                               </tr>
                               {% endfor %}
                             </tbody>
@@ -155,7 +157,7 @@
                             <td>{{asignatura.materia.regimen}}</td>
                             <td>{{asignatura.periodo_cursado|getPeriodoCursada:asignatura.materia.tipo}}</td>
                             <td>
-                             {{asignatura.materia.observaciones|default:""}}
+                             {{asignatura.materia.observaciones|default:""}} <a href="{%url 'calificaciones:calificaciones_asignatura' asignatura.pk %}">Ver calificaciones</a>
                             </td>
                           </tr>
                           {%endfor%}

@@ -136,7 +136,7 @@ especialidades_invertidas = {v: k for k, v in especialidades.items()}
 # Función para convertir entre string y número
 def convertirEspecialidad(valor):
        
-        return especialidades.get(int(valor))
+        return especialidades.get(valor)
    
 
 def convertirOrientaciones(orientacion):

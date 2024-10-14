@@ -132,7 +132,7 @@
                     <a id="userSettings" class="dropdown-toggle d-flex py-2 align-items-center text-decoration-none" href="#!" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       <img src="{% static 'assets/images/user2.png' %}" class="rounded-2 img-3x" alt="Bootstrap Gallery" />
                       <div class="ms-2 text-truncate d-lg-block d-none text-white">
-                        <span class="d-flex opacity-50 small">Admin</span>
+                        <span class="d-flex opacity-50 small">{{user.first_name}} {{user.last_name}}</span>
                         <span>{{ user.username }}</span>
                       </div>
                     </a>
@@ -183,6 +183,16 @@
                    
                   </ul>
                 </li>
+
+                <li class="nav-item {% if active_tab == 'calificaciones' %}active-link{% endif %}">
+                  <a class="nav-link" href="{%url 'calificaciones:home'%}"><i class="icon-spellcheck"></i>Calificar
+                  </a>
+                </li>
+
+
+
+
+
                 <li class="nav-item dropdown {% if active_tab == 'profesores' %}active-link{% endif %}">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon-add_task"></i>Profesores</a>
                   <ul class="dropdown-menu">

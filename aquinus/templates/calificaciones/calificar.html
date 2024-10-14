@@ -1,5 +1,6 @@
 {% extends 'main.html' %} {% load static %}
 {% load custom_filters %}
+{% load cursos_filters %}
 
 {% block breadcrumb %}
   <ol class="breadcrumb mb-3">
@@ -8,9 +9,9 @@
       <a href="{% url 'home' %}" class="text-decoration-none">Inicio</a>
     </li>
     <li class="breadcrumb-item">
-      <a href="{% url 'cursos:ver_cursos' %}">Cursos</a>
+      <a href="{% url 'calificaciones:home' %}">Calificaciones</a>
     </li>
-    <li class="breadcrumb-item">Nuevo Curso</li>
+    <li class="breadcrumb-item">Calificar</li>
   </ol>
 {% endblock %}
 
@@ -20,11 +21,22 @@
       <div class="card mb-3">
         <div class="card-body">
           <form method="post">
-            
-            {% csrf_token %}{{ formset.management_form }}
+            {% csrf_token %}
+            {{ formset.management_form }}
+
             <div class="mb-2 d-flex align-items-end justify-content-between">
-              <div class="col-6">
-                <h5 class="card-title">Planilla de Registro de Calificaciones</h5>
+              <div class="col-5">
+                <h5 class="card-title">Materia: {{ asignatura.materia.nombre }} - ({{ asignatura.materia.abreviatura }})</h5>
+                <h6>Tipo de Materia: {{ asignatura.materia.tipo }} / <span class="fs-6">Año: {{ asignatura.materia.anio }}° Año</span></h6>
+                <div class="row">
+                  <div class="col-6">
+                    <h6>
+                      Ud. está calificando
+                      <span class="badge bg-info">{{ periodoCalificacion }}</span>
+                    </h6>
+                  </div>
+                  <div class="col-6">({{ fechasPeriodoCalificacion.0|date:'d-m-Y' }} al {{ fechasPeriodoCalificacion.1|date:'d-m-Y' }})</div>
+                </div>
               </div>
 
               <div class="row row-cols-lg-auto g-3 align-items-center">
@@ -33,7 +45,7 @@
                   <input type="checkbox" id="misma_fecha_examen" class="form-check-input" />
                 </div>
                 <div class="col-12">
-                  <input type="date" name="fecha_examen" id="fecha_examen" class="form-control" disabled />
+                  <input type="date" name="fecha_examen" id="fecha_examen" class="form-control" disabled min="{{ fechasPeriodoCalificacion.0|date:'Y-m-d' }}" max="{{ fechasPeriodoCalificacion.1|date:'Y-m-d' }}" />
                 </div>
               </div>
             </div>
@@ -86,6 +98,7 @@
                 </table>
               </div>
             </div>
+
             <div class="row mt-3">
               <div class="d-flex flex-wrap gap-2 justify-content-end">
                 <button type="submit" class="btn btn-success">Cargar Calificaciones</button>

@@ -280,6 +280,7 @@ class CursoListView(ListView):
                     todas_materias_con_profesores = False  # Cambia a False si no hay profesores
                 if materia.materia.tipo!="ANUAL":
                     if materia.periodo_cursado==None:
+                        print(materia.materia.nombre, materia.periodo_cursado)
                         todas_materias_con_periodos_definidos=False
                     
                    
@@ -581,8 +582,11 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
         
         if form.is_valid():      
             data=form.cleaned_data
-            aplica_para = data.get('aplica_para', "TODOS")
-            print(data['aplica_para'])
+            if data['aplica_para']:
+                aplica_para = data.get('aplica_para', "TODOS")
+            else:
+                aplica_para="TODOS"
+            
             fecha_inicio_ciclo_lectivo=(data['fecha_inicio_ciclo_lectivo'])
             
             '''Definción de trimestres para anuales, trimestrales y semestrales'''
@@ -750,8 +754,8 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                 else:
                     messages.error(request, "Es necesario fijar previamente el fin del Segundo Trimestre, para definir el período de finales Semestrales (1° Semestre)")
             if data['FS_B']:
-                if data['T4']:
-                    final_semestre_B, fs_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='SEMESTRAL', subPeriodo='FS_B', aplica_para=aplica_para,defaults={'fechaInicioCalificacion':data['T4'],
+                if data['T3']:
+                    final_semestre_B, fs_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='SEMESTRAL', subPeriodo='FS_B', aplica_para=aplica_para,defaults={'fechaInicioCalificacion':data['T2'],
                     'fechaTopeCalificacion':data['FS_B']})
                     if fs_b_created:
                         creado.append("Final Segundo Semestre")
@@ -764,10 +768,10 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
             
             #finales anuales
             if data['FA']:
-                if data['T4']:
-                    final_anual, fa_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='ANUAL', subPeriodo='FA',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T4'],
+                if data['T3']:
+                    final_anual, fa_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='ANUAL', subPeriodo='FA',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
                     'fechaTopeCalificacion':data['FA']})
-                    final_anual.fechaInicioCalificacion=data['T4']
+                    final_anual.fechaInicioCalificacion=data['T3']
                     final_anual.fechaTopeCalificacion=data['FA']
                     if fa_created:
                         creado.append("Final Anual")
@@ -812,7 +816,7 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                     bimestre1_B, b1_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="CUATRIMESTRAL", subPeriodo='B1_B',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['B2_A'],
                     'fechaTopeCalificacion':data['B1_B']})
                     bimestre1_B.fechaInicioCalificacion=data['B2_A']
-                    bimestre1_B.fechaTopeCalificacion=data['B1_A']  
+                    bimestre1_B.fechaTopeCalificacion=data['B1_B']  
                     if b1_b_created:
                             creado.append("Primer Bimestre - Segundo Cuatrimestre")
                     else:
@@ -965,8 +969,9 @@ class AsignarPeriodoCursada(TemplateView):
                 
                 if formulario.is_valid():
                     periodo_cursado = formulario.cleaned_data.get('periodo_cursado')
-                    messages.success(request,f"Se ha asignado el período {periodo_cursado} a la materia {asignatura.materia.nombre}")
-                    formulario.save()
+                    if periodo_cursado:
+                        messages.success(request,f"Se ha asignado el período {periodo_cursado} a la materia {asignatura.materia.nombre}")
+                        formulario.save()
                 else:
                     print(f"Error en el formulario de la asignatura {asignatura.pk}")
                     

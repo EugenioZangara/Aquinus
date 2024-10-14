@@ -1,4 +1,7 @@
+from datetime import datetime
 from django import template
+
+from apps.cursos.models import FechasExamenes
 
 register = template.Library()
 
@@ -7,16 +10,22 @@ def getPeriodoCursada(periodo,tipo):
     """
     Filtro que devuelve el período de la cursada de las materias.
     """
-    print(tipo,periodo)
-    match tipo:
-        case "ANUAL":
+    if periodo:
+        match tipo:
+            case "ANUAL":
+                return "No aplica"
+            case "CUATRIMESTRAL":
+                return f'{periodo}° Cuatrim.'
+            case "SEMESTRAL":
+                return f'{periodo}° Sem.'
+            case "TRIMESTRAL":
+                return f'{periodo}° Trim.'
+            case _:
+                
+                return "Desconocido"
+    else: 
+        if tipo=="ANUAL":
             return "No aplica"
-        case "CUATRIMESTRAL":
-            return f'{periodo}° Cuatrim.'
-        case "SEMESTRAL":
-            return f'{periodo}° Sem.'
-        case "TRIMESTRAL":
-            return f'{periodo}° Trim.'
-        case _:
-            
-            return "Desconocido"
+        else:
+            return "SIN ASIGNAR"
+

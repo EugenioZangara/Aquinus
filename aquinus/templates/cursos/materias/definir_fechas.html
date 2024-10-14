@@ -100,9 +100,9 @@
                 <div class="row mb-3">
                   <label class="col">{{ form.T3.label }} {{ form.T3 }}</label>
                 </div>
-                <div class="row mb-3">
+                {% comment %} <div class="row mb-3">
                   <label class="col">{{ form.T4.label }} {{ form.T4 }}</label>
-                </div>
+                </div> {% endcomment %}
               </div>
             </div>
           </div>
@@ -247,10 +247,10 @@
           'data-parsley-fecha-mayor': '#id_T2',
           'data-parsley-fecha-mayor-message': 'El 3er. trimestre debe ser posterior al 2do.'
       });
-      $('#id_T4').attr({
+      {% comment %} $('#id_T4').attr({
           'data-parsley-fecha-mayor': '#id_T3',
           'data-parsley-fecha-mayor-message': 'El 4to. trimestre debe ser posterior al 3er.'
-      });
+      }); {% endcomment %}
   
       $('#id_FT_1').attr({
           'data-parsley-fecha-mayor': '#id_T1',
@@ -264,10 +264,10 @@
           'data-parsley-fecha-mayor': '#id_T3',
           'data-parsley-fecha-mayor-message': 'El final del 3er. trimestre debe ser posterior al final del trimestre.'
       });
-      $('#id_FT_4').attr({
+      {% comment %} $('#id_FT_4').attr({
           'data-parsley-fecha-mayor': '#id_T4',
           'data-parsley-fecha-mayor-message': 'El final del 4to. trimestre debe ser posterior al final del trimestre.'
-      });
+      }); {% endcomment %}
 
       $('#id_B1_A').attr({
         'data-parsley-fecha-mayor': '#fecha_inicio_ciclo_lectivo',
@@ -298,7 +298,7 @@
 
 
 $('#id_FA').attr({
-  'data-parsley-fecha-mayor': '#id_T4',
+  'data-parsley-fecha-mayor': '#id_T3',
   'data-parsley-fecha-mayor-message': 'El final Anual debe ser posterior a la finalización del último trimestre.'
 });
       // Inicializar Parsley en el formulario

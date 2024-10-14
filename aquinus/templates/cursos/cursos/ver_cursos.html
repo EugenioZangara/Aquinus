@@ -24,6 +24,7 @@
             <tr>
               <th>Nombre</th>
               <th>Plan de Estudio</th>
+              <th>Año</th>
               <th>División</th>
               <th>Total Alumnos</th>
               <th>Profesores</th>
@@ -39,6 +40,7 @@
                   {{ curso.plan_de_estudio }}
                   <a href="{% url 'cursos:detalles_plan_estudio' curso.plan_de_estudio.pk %}" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-primary" data-bs-title="Detalles" aria-describedby="tooltip599725"><i class="icon-eye"></i></a>
                 </td>
+                <td>{{ curso.anio }}</td>
                 <td>{{ curso.division }}</td>
                 <td>{{ materias_con_profesores.0 }}</td>
                 <td>

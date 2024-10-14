@@ -291,7 +291,7 @@ CALIFICACIONES_CHOICES=[
 class Calificaciones(models.Model):  
     asignatura=models.ForeignKey(Asignatura,on_delete=models.DO_NOTHING,  related_name='calificacion_materia')
     cursante=models.ForeignKey(Cursante, on_delete=models.DO_NOTHING, related_name='nota_cursante')
-    valor=models.DecimalField(decimal_places=2, max_digits=3)
+    valor=models.DecimalField(decimal_places=2, max_digits=4)
     tipo=models.CharField(max_length=50, choices=CALIFICACIONES_CHOICES)
     numero_complementario=models.IntegerField(blank=True, null=True)
     fecha_examen=models.DateField()

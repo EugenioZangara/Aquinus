@@ -27,7 +27,7 @@
   <div class="row align-items-center justify-content-center">
     <div class="col-xl-10 col-sm-12 col-12">
       <div class="row gx-3">
-        <div class="col-12">
+        <div class="col-xxl-12">
 
 
 
@@ -39,7 +39,7 @@
             <div class="card-body">
               <form method="post">
                 <div class="row align-items-center justify-content-center">
-                  <div class="col-sm-4 col-12">
+                  <div class="col-4">
                     {% csrf_token %}
                     {{ form.especialidad.label }}
                     {{ form.especialidad }}
@@ -53,7 +53,7 @@
                     </div>
                   </div>
 
-                  <div class="col-lg-8 col-sm-4 col-12">
+                  <div class="col-8">
                     <div class="mb-3">
                       {{ form.materias.label }}
                       <div class="table-responsive" >
