@@ -111,7 +111,7 @@
                                 <td>{{aspirante.especialidad|convertirEspecialidad}} {{aspirante.orientacion}}</td>
                                 <td>{{aspirante.apellidos}}</td>
                                 <td>{{aspirante.nombres}}</td>
-                                <td>Ver boletín</td>
+                                <td><a href="{%url 'calificaciones:boletin' aspirante.pk %}">Ver boletín</a></td>
                               </tr>
                               {% endfor %}
                             </tbody>

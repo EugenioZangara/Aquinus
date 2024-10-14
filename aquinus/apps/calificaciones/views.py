@@ -122,8 +122,20 @@ class CalificarView(TemplateView):
         return context
     
     def post(self, request, *args, **kwargs):
-        formset, alumnos = self.get_formset(request.POST)
+        
+        
         asignatura = self.get_asignatura()
+          # Obtener las fechas del periodo de calificación para la asignatura
+        fechasPeriodoCalificacion = getFechasPeriodoCursada(
+            periodoMateria(asignatura), 
+            asignatura.materia.tipo, 
+            asignatura.materia.anio
+        )
+        CalificacionFormSet = modelformset_factory(Calificaciones, form=CalificacionesForm, extra=len(self.get_alumnos(asignatura)))
+        queryset = Calificaciones.objects.none()
+        formset = CalificacionFormSet(request.POST, queryset=queryset, form_kwargs={'fechas_periodo': fechasPeriodoCalificacion})
+        alumnos = self.get_alumnos(asignatura)
+        #formset, alumnos = self.get_formset(request.POST)
         perfil_usuario=self.request.user.perfil
         if perfil_usuario.puede_calificar==False:
             messages.error(request, f'No tiene permisos para calificar.')
@@ -178,10 +190,10 @@ def obtenerCalificacionesAnual(asignatura, alumno):
 
 
     # Calcular el promedio de la cursada
-    promedio_cursada = round(statistics.mean([promedio_1T , promedio_2T , promedio_3T]))
+    promedio_cursada = round(statistics.mean([promedio_1T , promedio_2T , promedio_3T]),2)
     try:
         calificacion_examen_final=calificaciones.get(fecha_examen__gte=tercer_trimestre.fechaTopeCalificacion, fecha_examen__lte=fechas_examen_final.fechaTopeCalificacion)
-        calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_cursada])
+        calificacion_final=round(statistics.mean([calificacion_examen_final.valor,promedio_cursada]),2)
     except Calificaciones.DoesNotExist:
         calificacion_final="N/A"
         calificacion_examen_final="Sin Calificación"
@@ -408,3 +420,27 @@ class CalificacionesAsignatura(TemplateView):
 
         return context
     
+class BoletinView(TemplateView):
+    template_name = "calificaciones/boletin.html"
+    
+    def get_alumno(self):
+        alumno = get_object_or_404(persona.objects.using('id8'), dni=self.kwargs['dni'])
+        return alumno
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        materias_con_calificaciones={}
+        alumno=self.get_alumno()
+        cursante=Cursante.objects.get(dni=alumno.dni)
+     
+        asignaturas_anuales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="ANUAL")
+        calificaciones=Calificaciones.objects.filter(cursante=cursante, asignatura__in=asignaturas_anuales)
+        for asignatura in asignaturas_anuales:
+            materias_con_calificaciones[asignatura]=obtenerCalificacionesAnual(asignatura, alumno)
+       
+        context['materias_con_calificaciones']=materias_con_calificaciones
+        context['alumno']=alumno
+        context['asignaturas_anuales']=asignaturas_anuales
+        context['calificaciones']=calificaciones
+        
+        return context
