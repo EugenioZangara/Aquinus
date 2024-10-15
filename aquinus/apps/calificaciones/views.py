@@ -35,29 +35,46 @@ class HomeCalificaciones(TemplateView):
 def getFechasPeriodoCursada(periodo,tipo, anio):
     """
     Filtro que devuelve las fechas de los períodos de las materias.
+    
     """
-    try:
-        trimestre1=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T1", aplica_para=anio)
-        trimestre2=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T2", aplica_para=anio)
-        trimestre3=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T3", aplica_para=anio)
+    anio_lectivo=date.today().year
+    if tipo=="ANUAL" or tipo=="TRIMESTRAL":
+        try:
+            trimestre1=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T1", aplica_para=anio, anio_lectivo=anio_lectivo)
+            trimestre2=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T2", aplica_para=anio, anio_lectivo=anio_lectivo)
+            trimestre3=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T3", aplica_para=anio, anio_lectivo=anio_lectivo)
+            
+        except FechasExamenes.DoesNotExist:
+            trimestre1=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T1", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+            trimestre2=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T2", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+            trimestre3=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T3", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+        trimestres=[trimestre1,trimestre2,trimestre3]
         
-    except FechasExamenes.DoesNotExist:
-        trimestre1=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T1", aplica_para="TODOS")
-        trimestre2=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T2", aplica_para="TODOS")
-        trimestre3=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="T3", aplica_para="TODOS")
-    trimestres=[trimestre1,trimestre2,trimestre3]
+    elif tipo=="CUATRIMESTRAL":
+        try:
+            bimestre1_A=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="B1_A", aplica_para=anio, anio_lectivo=anio_lectivo)
+            bimestre2_A=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="B2_A", aplica_para=anio, anio_lectivo=anio_lectivo)
+            bimestre1_B=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="B1_B", aplica_para=anio, anio_lectivo=anio_lectivo)
+            bimestre2_B=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="B2_B", aplica_para=anio, anio_lectivo=anio_lectivo)
+        except:
+            bimestre1_A=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="B1_A", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+            bimestre2_A=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="B2_A", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+            bimestre1_B=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="B1_B", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+            bimestre2_B=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="B2_B", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+            
+        cuatrimestre1=[bimestre1_A, bimestre1_B, bimestre2_A, bimestre2_B]
+        cuatrimestre2=[bimestre1_A, bimestre1_B, bimestre2_A, bimestre2_B]
+
+
     if periodo: 
-        
-        
+        hoy = date.today()       
         match tipo:
             case "ANUAL":
                 try:
-                    finales=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="FA", aplica_para=anio)
+                    finales=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="FA", aplica_para=anio, anio_lectivo=anio_lectivo)
                 except FechasExamenes.DoesNotExist:
-                    finales=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="FA", aplica_para="TODOS")
-                    
-                hoy = date.today()
-
+                    finales=FechasExamenes.objects.get(regimen_materia=tipo,subPeriodo="FA", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+    
                 for trimestre in trimestres:
                     if hoy>=trimestre.fechaInicioCalificacion and hoy<=trimestre.fechaTopeCalificacion:
                         return trimestre.fechaInicioCalificacion ,trimestre.fechaTopeCalificacion
@@ -65,11 +82,90 @@ def getFechasPeriodoCursada(periodo,tipo, anio):
                     return finales.fechaInicioCalificacion,finales.fechaTopeCalificacion
                 
             case "CUATRIMESTRAL":
-                return f'{periodo.fecha_inicio} - {periodo.fecha_fin}'
+                if periodo in("Primer Bimestre - 1er. Cuatrimestre","Cierre Primer Cuatrimestre","Final Primer Cuatrimestre"):
+                    try:
+                        fechas_finales_cuatrimestre1=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FC_A", aplica_para=anio, anio_lectivo=anio_lectivo)
+                    except:
+                        fechas_finales_cuatrimestre1=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FC_A", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+                    for bimestre in cuatrimestre1:
+                        if hoy>=bimestre.fechaInicioCalificacion and hoy<=bimestre.fechaTopeCalificacion:
+                            return bimestre.fechaInicioCalificacion, bimestre.fechaTopeCalificacion
+                    if hoy>=fechas_finales_cuatrimestre1.fechaInicioCalificacion and hoy<=fechas_finales_cuatrimestre1.fechaTopeCalificacion:
+                        return fechas_finales_cuatrimestre1.fechaInicioCalificacion, fechas_finales_cuatrimestre1.fechaTopeCalificacion
+                if periodo in("Primer Bimestre - 2do. Cuatrimestre","Cierre Segundo Cuatrimestre","Final Segundo Cuatrimestre"):
+                    try:
+                        fechas_finales_cuatrimestre1=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FC_B", aplica_para=anio, anio_lectivo=anio_lectivo)
+                    except:
+                        fechas_finales_cuatrimestre1=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FC_B", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+                    for bimestre in cuatrimestre1:
+                        if hoy>=bimestre.fechaInicioCalificacion and hoy<=bimestre.fechaTopeCalificacion:
+                            return bimestre.fechaInicioCalificacion, bimestre.fechaTopeCalificacion
+                    if hoy>=fechas_finales_cuatrimestre1.fechaInicioCalificacion and hoy<=fechas_finales_cuatrimestre1.fechaTopeCalificacion:
+                        return fechas_finales_cuatrimestre1.fechaInicioCalificacion, fechas_finales_cuatrimestre1.fechaTopeCalificacion   
+                
+            
+                    
             case "SEMESTRAL":
-                return f'{periodo.fecha_inicio} - {periodo.fecha_fin}'
+                match periodo:
+                    case "Primer Semestre":
+                        try:
+                            finales_semestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FS_1", aplica_para=anio, anio_lectivo=anio_lectivo)
+                        except:
+                            finales_semestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FS_1", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+                        if hoy>=trimestre1.fechaInicioCalificacion and hoy<=trimestre1.fechaTopeCalificacion:
+                            return trimestre1.fechaInicioCalificacion, trimestre1.fechaTopeCalificacion
+                        if hoy>=trimestre2.fechaInicioCalificacion and hoy<=trimestre2.fechaTopeCalificacion:
+                            return trimestre2.fechaInicioCalificacion, trimestre2.fechaTopeCalificacion
+                        if hoy>=finales_semestrales.fechaInicioCalificacion and hoy<=finales_semestrales.fechaTopeCalificacion:
+                            return finales_semestrales.fechaInicioCalificacion, finales_semestrales.fechaTopeCalificacion
+                    case "Segundo Semestre":
+                        try:
+                            finales_semestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FS_2", aplica_para=anio, anio_lectivo=anio_lectivo)
+                        except:
+                            finales_semestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FS_2", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+                        if hoy>=trimestre3.fechaInicioCalificacion and hoy<=trimestre3.fechaTopeCalificacion:
+                            return trimestre3.fechaInicioCalificacion, trimestre3.fechaTopeCalificacion
+                        if hoy>=trimestre2.fechaInicioCalificacion and hoy<=trimestre2.fechaTopeCalificacion:
+                            return trimestre2.fechaInicioCalificacion, trimestre2.fechaTopeCalificacion
+                        if hoy>=finales_semestrales.fechaInicioCalificacion and hoy<=finales_semestrales.fechaTopeCalificacion:
+                            return finales_semestrales.fechaInicioCalificacion, finales_semestrales.fechaTopeCalificacion
+                                                 
             case "TRIMESTRAL":
-                return f'{periodo.fecha_inicio} - {periodo.fecha_fin}'
+                match periodo:
+                    case "Primer Trimestre":
+                        try:
+                            finales_trimestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FT_1", aplica_para=anio, anio_lectivo=anio_lectivo)
+                        except:
+                            finales_trimestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FT_1", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+                        if hoy>=trimestre1.fechaInicioCalificacion and hoy<=trimestre1.fechaTopeCalificacion:
+                            return trimestre1.fechaInicioCalificacion, trimestre1.fechaTopeCalificacion
+                        if hoy>=finales_trimestrales.fechaInicioCalificacion and hoy<=finales_trimestrales.fechaTopeCalificacion:
+                            return finales_trimestrales.fechaInicioCalificacion, finales_trimestrales.fechaTopeCalificacion
+                        else:
+                            return "error en el cálculo de las fechas del trimestre"
+                    case "Segundo Trimestre":
+                        try:
+                            finales_trimestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FT_2", aplica_para=anio, anio_lectivo=anio_lectivo)
+                        except:
+                            finales_trimestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FT_2", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+                        if hoy>=trimestre2.fechaInicioCalificacion and hoy<=trimestre2.fechaTopeCalificacion:
+                            return trimestre2.fechaInicioCalificacion, trimestre2.fechaTopeCalificacion
+                        if hoy>=finales_trimestrales.fechaInicioCalificacion and hoy<=finales_trimestrales.fechaTopeCalificacion:
+                            return finales_trimestrales.fechaInicioCalificacion, finales_trimestrales.fechaTopeCalificacion
+                        else:
+                            return "error en el cálculo de las fechas del trimestre"
+                    case "Tercer Trimestre":
+                        try:
+                            finales_trimestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FT_3", aplica_para=anio, anio_lectivo=anio_lectivo)
+                        except:
+                            finales_trimestrales=FechasExamenes.objects.get(regimen_materia=tipo, subPeriodo="FT_3", aplica_para="TODOS", anio_lectivo=anio_lectivo)
+                        if hoy>=trimestre3.fechaInicioCalificacion and hoy<=trimestre3.fechaTopeCalificacion:
+                            return trimestre3.fechaInicioCalificacion, trimestre3.fechaTopeCalificacion
+                        if hoy>=finales_trimestrales.fechaInicioCalificacion and hoy<=finales_trimestrales.fechaTopeCalificacion:
+                            return finales_trimestrales.fechaInicioCalificacion, finales_trimestrales.fechaTopeCalificacion
+                        else:
+                            return "error en el cálculo de las fechas del trimestre"
+     
             case _:
 
                 return "Desconocido"
