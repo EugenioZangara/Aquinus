@@ -665,32 +665,7 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                         actualizado.append("Tercer Trimestre")
                 else:
                     messages.error(request, "Es necesario fijar previamente el fin del 2° Trimestre, para definir el 3° Trimestre")             
-                
-            # if data['T4'] :
-            #     if data['T3']:
-            #         anual_T1, an_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
-            #         'fechaTopeCalificacion':data['T4']})
-            #         anual_T1.fechaInicioCalificacion=data['T3']
-            #         anual_T1.fechaTopeCalificacion=data['T4']  
-            #         anual_T1.save() 
-                    
-            #         semestre_T4, sem_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
-            #         'fechaTopeCalificacion':data['T4']})
-            #         semestre_T4.fechaInicioCalificacion=data['T3']
-            #         semestre_T4.fechaTopeCalificacion=data['T4']
-            #         semestre_T4.save()  
-                    
-            #         trimestre_T4, tri_t4_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="TRIMESTRAL", subPeriodo='T4',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
-            #         'fechaTopeCalificacion':data['T4']})
-            #         trimestre_T4.fechaInicioCalificacion=data['T3']
-            #         trimestre_T4.fechaTopeCalificacion=data['T4']
-            #         trimestre_T4.save() 
-            #         if an_t4_created and tri_t4_created and sem_t4_created:
-            #             creado.append("Cuarto Trimestre")
-            #         else:    
-            #             actualizado.append("Cuarto Trimestre")  
-            #     else:
-            #         messages.error(request, "Es necesario fijar previamente el fin del 3° Trimestre, para definir el 4° Trimestre")
+            
                 
                 '''Finales Trimestrales'''
             if data['FT_1'] :

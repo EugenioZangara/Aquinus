@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
 from django.conf.urls import handler403
 from django.shortcuts import render
 
@@ -37,7 +37,11 @@ path('calificaciones/', include('apps.calificaciones.urls',namespace='calificaci
 
 # Función personalizada para manejar el error 403
 def error_403_view(request, exception=None):
-    return render(request, 'errores/403-forbidden/403.html', status=403)
+    context = {
+        'mensaje': str(exception) if exception else "No tienes permiso para acceder a esta página.",
+        'redirect_url': getattr(exception, 'redirect_url', reverse_lazy('home'))
+    }
+    return render(request, 'errores/403-forbidden/403.html',context, status=403)
 
 # Asigna la vista personalizada al handler 403
 handler403 = error_403_view

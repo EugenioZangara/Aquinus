@@ -6,7 +6,7 @@
 <div class="wrapper">
   <div class="box">
   <h1>403</h1>
-  <p>Lo siento, no tiene permisos para esta acción!</p>
-  <p><a href="/">Por favor vuelva atrás.</a></p>
+  <p>{%if mensaje%}{{ mensaje }}{%else%}Lo siento, no tiene permisos para esta acción!{%endif%}</p>
+  <p><a href="{%if redirect_url%}{{ redirect_url }}{%else%}/{%endif%}">Por favor vuelva atrás.</a></p>
   </div>
   </div>

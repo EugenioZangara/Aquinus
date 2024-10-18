@@ -66,7 +66,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% for asignatura, calificaciones in materias_con_calificaciones.items %}
+                  {% for asignatura, calificaciones in materias_con_calificaciones_anuales.items %}
                     <tr>
                       <td>{{ asignatura.materia.nombre }}</td>
                       <td data-bs-toggle="tooltip"
@@ -74,8 +74,7 @@
                         data-bs-custom-class="custom-tooltip-info"
                         data-bs-title="Calificaciones: {% for nota in calificaciones.primer_trimestre %}
                           {{ nota.valor }}{% if not forloop.last %} - {% endif %}
-                        {% endfor %}">{{ calificaciones.promedio_1T }}
-                      </td>
+                        {% endfor %}">{{ calificaciones.promedio_1T }}</td>
                       <td data-bs-toggle="tooltip"
                         data-bs-placement="top"
                         data-bs-custom-class="custom-tooltip-info"
@@ -94,6 +93,175 @@
                       </td>
                       <td>
                         <span class="badge bg-info">{{ calificaciones.examen_final.valor }}</span>
+                      </td>
+                      <td>
+                        <div class="bg-info p-2 rounded-2 text-white">{{ calificaciones.calificacion_final }}</div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materias SEMESTRALES -->
+
+  <div class="row gx-3">
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="mb-2 d-flex align-items-end justify-content-between">
+            <h5 class="card-title">Materias Semestrales</h5>
+          </div>
+          <div class="table-outer">
+            <div class="table-responsive">
+              <table class="table align-middle m-0">
+                <thead>
+                  <tr>
+                    <th class="border bg-primary">Materia</th>
+                    <th class="border bg-primary">1° Trimestre</th>
+                    <th class="border bg-primary">2° Trimestre</th>
+                    <th class="border bg-primary">Nota Cursada</th>
+                    <th class="border bg-primary">Examen Final</th>
+                    <th class="border bg-primary">Calificación Final</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for asignatura, calificaciones in materias_con_calificaciones_semestrales.items %}
+                    <tr>
+                      <td>{{ asignatura.materia.nombre }}</td>
+                      <td data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip-info"
+                        data-bs-title="Calificaciones: {% for nota in calificaciones.primer_trimestre %}
+                          {{ nota.valor }}{% if not forloop.last %} - {% endif %}
+                        {% endfor %}">{{ calificaciones.promedio_1T }}</td>
+                      <td data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip-info"
+                        data-bs-title="Calificaciones: {% for nota in calificaciones.segundo_trimestre %}
+                          {{ nota.valor }}{% if not forloop.last %} - {% endif %}
+                        {% endfor %}">{{ calificaciones.promedio_2T }}</td>
+
+                      <td>
+                        <span class="badge border border-info text-info">{{ calificaciones.promedio_cursada }}</span>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">{{ calificaciones.examen_final.valor }}</span>
+                      </td>
+                      <td>
+                        <div class="bg-info p-2 rounded-2 text-white">{{ calificaciones.calificacion_final }}</div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materias TRIMESTRALES -->
+  <div class="row gx-3">
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="mb-2 d-flex align-items-end justify-content-between">
+            <h5 class="card-title">Materias Trimestrales</h5>
+          </div>
+          <div class="table-outer">
+            <div class="table-responsive">
+              <table class="table align-middle m-0">
+                <thead>
+                  <tr>
+                    <th class="border bg-primary">Materia</th>
+                    <th class="border bg-primary">Trimestre</th>
+
+                    <th class="border bg-primary">Nota Cursada</th>
+                    <th class="border bg-primary">Examen Final</th>
+                    <th class="border bg-primary">Calificación Final</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for asignatura, calificaciones in materias_con_calificaciones_trimestrales.items %}
+                    <tr>
+                      <td>{{ asignatura.materia.nombre }}</td>
+                      <td data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip-info"
+                        data-bs-title="Calificaciones: {% for nota in calificaciones.calificaciones_trimestre %}
+                          {{ nota.valor }}{% if not forloop.last %} - {% endif %}
+                        {% endfor %}">{{ calificaciones.promedio_T }}</td>
+
+                      <td>
+                        <span class="badge border border-info text-info">{{ calificaciones.promedio_T }}</span>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">{{ calificaciones.examen_final.valor }}</span>
+                      </td>
+                      <td>
+                        <div class="bg-info p-2 rounded-2 text-white">{{ calificaciones.calificacion_final }}</div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materias cuatriMESTRALES -->
+  <div class="row gx-3">
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="mb-2 d-flex align-items-end justify-content-between">
+            <h5 class="card-title">Materias Cuatrimestrales</h5>
+          </div>
+          <div class="table-outer">
+            <div class="table-responsive">
+              <table class="table align-middle m-0">
+                <thead>
+                  <tr>
+                    <th class="border bg-primary">Materia</th>
+                    <th class="border bg-primary">1° Bimestre</th>
+                    <th class="border bg-primary">2° Bimestre</th>
+                    <th class="border bg-primary">Nota Cursada</th>
+                    <th class="border bg-primary">Examen Final</th>
+                    <th class="border bg-primary">Calificación Final</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for asignatura, calificaciones in materias_con_calificaciones_cuatrimestrales.items %}
+                    <tr>
+                      <td>{{ asignatura.materia.nombre }}</td>
+                      <td data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip-info"
+                        data-bs-title="Calificaciones: {% for nota in calificaciones.primer_bimestre %}
+                          {{ nota.valor }}{% if not forloop.last %} - {% endif %}
+                        {% endfor %}">{{ calificaciones.promedio_1B }}</td>
+                      <td data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip-info"
+                        data-bs-title="Calificaciones: {% for nota in calificaciones.segundo_bimestre %}
+                          {{ nota.valor }}{% if not forloop.last %} - {% endif %}
+                        {% endfor %}">{{ calificaciones.promedio_2B }}</td>
+
+                      <td>
+                        <span class="badge border border-info text-info">{{ calificaciones.promedio_cursada }}</span>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">{{ calificaciones.examen_final }}</span>
                       </td>
                       <td>
                         <div class="bg-info p-2 rounded-2 text-white">{{ calificaciones.calificacion_final }}</div>

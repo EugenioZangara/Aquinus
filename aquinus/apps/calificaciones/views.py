@@ -9,6 +9,8 @@ from django.forms import  modelformset_factory
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView
+
+from apps.calificaciones.decorators import verificar_periodo_curso
 from .utils import periodoMateria
 from apps.alumnos.models import persona
 from .forms import CalificacionesForm
@@ -174,7 +176,9 @@ def getFechasPeriodoCursada(periodo,tipo, anio):
             return "No aplica"
         else:
             return "SIN ASIGNAR"
-
+        
+        
+@verificar_periodo_curso
 class CalificarView(TemplateView):
     template_name = "calificaciones/calificar.html"
     success_url = 'calificaciones:home'
@@ -292,7 +296,7 @@ def obtenerCalificacionesAnual(asignatura, alumno):
         calificacion_final=round(statistics.mean([calificacion_examen_final.valor,promedio_cursada]),2)
     except Calificaciones.DoesNotExist:
         calificacion_final="N/A"
-        calificacion_examen_final="Sin Calificación"
+        calificacion_examen_final={"valor":"Sin Calificación"}
         
     calificaciones_anuales={'primer_trimestre':calificaciones_1T,'promedio_1T':promedio_1T, 'segundo_trimestre':calificaciones_2T,'promedio_2T':promedio_2T, 'tercer_trimestre':calificaciones_3T, 'promedio_3T':promedio_3T,'promedio_cursada':promedio_cursada, "examen_final":calificacion_examen_final,"calificacion_final":calificacion_final }
     return calificaciones_anuales
@@ -344,25 +348,27 @@ def obtenerCalificacionesCuatrimestral(asignatura, alumno):
             
 def obtenerCalificacionesSemestral(asignatura, alumno):
     calificaciones = Calificaciones.objects.filter(asignatura=asignatura, cursante__dni=alumno.dni)
+    print(asignatura.materia.tipo, asignatura.materia.anio)
     #OBTENEMOS FECHAS PARA CADA SUBPERIODO DE LAS MATERIAS ANUALES
     try:
+        # Asumimos que la fecha de los finales semestrales, se corresponden con la del trimestre correspondiente
         if asignatura.periodo_cursado==1:
             primer_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T1", aplica_para=asignatura.materia.anio)
             segundo_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T2", aplica_para=asignatura.materia.anio)
-            fechas_examen_final=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="FS_A", aplica_para=asignatura.materia.anio)
+            fechas_examen_final=FechasExamenes.objects.get( regimen_materia="TRIMESTRAL", subPeriodo="FT_2", aplica_para=asignatura.materia.anio) 
         else:
             primer_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T2", aplica_para=asignatura.materia.anio)
             segundo_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T3", aplica_para=asignatura.materia.anio)
-            fechas_examen_final=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="FS_B", aplica_para=asignatura.materia.anio)
+            fechas_examen_final=FechasExamenes.objects.get( regimen_materia="TRIMESTRAL", subPeriodo="FT_3", aplica_para=asignatura.materia.anio)
     except FechasExamenes.DoesNotExist:
         if asignatura.periodo_cursado==1:
             primer_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T1", aplica_para="TODOS")
             segundo_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T2", aplica_para="TODOS")
-            fechas_examen_final=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="FS_A", aplica_para="TODOS")
+            fechas_examen_final=FechasExamenes.objects.get( regimen_materia="TRIMESTRAL", subPeriodo="FT_2", aplica_para="TODOS")
         else:
             primer_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T2", aplica_para="TODOS")
             segundo_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T3", aplica_para="TODOS")
-            fechas_examen_final=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="FS_B", aplica_para="TODOS")
+            fechas_examen_final=FechasExamenes.objects.get( regimen_materia="TRIMESTRAL", subPeriodo="FT_3", aplica_para="TODOS")
     #OBTENES LAS CALIFICACIONES DE CADA TRIMESTRE EN FUNCIÓN DE LAS FECHAS OBTENIDAS ANTES
     calificaciones_1T=calificaciones.filter(fecha_examen__gte=primer_trimestre.fechaInicioCalificacion, fecha_examen__lte=primer_trimestre.fechaTopeCalificacion)  
     calificaciones_2T=calificaciones.filter(fecha_examen__gte=segundo_trimestre.fechaInicioCalificacion, fecha_examen__lte=segundo_trimestre.fechaTopeCalificacion)
@@ -379,7 +385,7 @@ def obtenerCalificacionesSemestral(asignatura, alumno):
         calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_cursada])
     except Calificaciones.DoesNotExist:
         calificacion_final="N/A"
-        calificacion_examen_final="Sin Calificación"
+        calificacion_examen_final={"valor":"Sin Calificación"}
         
     calificaciones_semestrales={'primer_trimestre':calificaciones_1T,'promedio_1T':promedio_1T, 'segundo_trimestre':calificaciones_2T,'promedio_2T':promedio_2T,  'promedio_cursada':promedio_cursada, "examen_final":calificacion_examen_final,"calificacion_final":calificacion_final }
     return calificaciones_semestrales
@@ -405,8 +411,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
-                calificacion_examen_final="Sin Calificación"
- 
+                calificacion_examen_final={"valor":"Sin Calificación"} 
         elif asignatura.periodo_cursado==2:
             segundo_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T2", aplica_para=asignatura.materia.anio)
             fechas_examen_final=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="FT_2", aplica_para=asignatura.materia.anio)
@@ -418,7 +423,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
-                calificacion_examen_final="Sin Calificación"
+                calificacion_examen_final={"valor":"Sin Calificación"}
 
         else:
             tercer_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T3", aplica_para=asignatura.materia.anio)
@@ -431,7 +436,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
-                calificacion_examen_final="Sin Calificación"
+                calificacion_examen_final={"valor":"Sin Calificación"}
             
     except FechasExamenes.DoesNotExist:
         if asignatura.periodo_cursado==1:
@@ -446,7 +451,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
-                calificacion_examen_final="Sin Calificación"
+                calificacion_examen_final={"valor":"Sin Calificación"}
         elif asignatura.periodo_cursado==2:
             segundo_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T2", aplica_para="TODOS")
             fechas_examen_final=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="FT_2", aplica_para="TODOS")
@@ -458,7 +463,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
-                calificacion_examen_final="Sin Calificación"
+                calificacion_examen_final={"valor":"Sin Calificación"}
         else:
             tercer_trimestre=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="T3", aplica_para="TODOS")
             fechas_examen_final=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="FT_3", aplica_para="TODOS")
@@ -470,7 +475,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
-                calificacion_examen_final="Sin Calificación"
+                calificacion_examen_final={"valor":"Sin Calificación"}
    
 
     
@@ -525,18 +530,40 @@ class BoletinView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        materias_con_calificaciones={}
+        materias_con_calificaciones_anuales={}
+        materias_con_calificaciones_cuatrimestrales={}
+        materias_con_calificaciones_semestrales={}
+        materias_con_calificaciones_trimestrales={}
         alumno=self.get_alumno()
         cursante=Cursante.objects.get(dni=alumno.dni)
      
         asignaturas_anuales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="ANUAL")
-        calificaciones=Calificaciones.objects.filter(cursante=cursante, asignatura__in=asignaturas_anuales)
+        #calificaciones_anuales=Calificaciones.objects.filter(cursante=cursante, asignatura__in=asignaturas_anuales)
         for asignatura in asignaturas_anuales:
-            materias_con_calificaciones[asignatura]=obtenerCalificacionesAnual(asignatura, alumno)
+            materias_con_calificaciones_anuales[asignatura]=obtenerCalificacionesAnual(asignatura, alumno)
        
-        context['materias_con_calificaciones']=materias_con_calificaciones
+        asignaturas_semestrales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="SEMESTRAL")
+        for asignatura in asignaturas_semestrales:
+            materias_con_calificaciones_semestrales[asignatura]=obtenerCalificacionesSemestral(asignatura, alumno)
+            
+        asignaturas_cuatrimestrales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="CUATRIMESTRAL")
+        for asignatura in asignaturas_cuatrimestrales:
+            materias_con_calificaciones_cuatrimestrales[asignatura]=obtenerCalificacionesCuatrimestral(asignatura, alumno)
+            
+        asignaturas_trimestrales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="TRIMESTRAL")   
+        for asignatura in asignaturas_trimestrales:
+            materias_con_calificaciones_trimestrales[asignatura]=obtenerCalificacionesTrimestral(asignatura, alumno)
+            
+            
+        context['materias_con_calificaciones_anuales']=materias_con_calificaciones_anuales
+        context['materias_con_calificaciones_cuatrimestrales']=materias_con_calificaciones_cuatrimestrales
+        context['materias_con_calificaciones_trimestrales']=materias_con_calificaciones_trimestrales
+        print(materias_con_calificaciones_trimestrales)
+        context['materias_con_calificaciones_semestrales']=materias_con_calificaciones_semestrales
+            
+        context['materias_con_calificaciones']=materias_con_calificaciones_anuales
         context['alumno']=alumno
         context['asignaturas_anuales']=asignaturas_anuales
-        context['calificaciones']=calificaciones
+        #context['calificaciones']=calificaciones_anuales
         
         return context
