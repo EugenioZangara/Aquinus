@@ -15,7 +15,7 @@ from pathlib import Path
 from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -86,49 +86,6 @@ WSGI_APPLICATION = 'aquinus.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-"""
-Configuración para trabajar en ESSA con servidor en linea
-
-"""
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "aquinus",
-#         "USER": "ezangara",
-#         "PASSWORD": "Armada2024@",
-#         "HOST": "192.16.0.252",  # O la dirección IP de tu servidor MySQL
-#         "PORT": "3306",  # El puerto de tu servidor MySQL},
-#     },
-#     "id8": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "aspi",
-#         "USER": "ezangara",
-#         "PASSWORD": "Armada2024@",
-#         "HOST": "192.16.0.252",  # O la dirección IP de tu servidor MySQL
-#         "PORT": "3306",  # El puerto de tu servidor MySQL},
-#     },
-# }
-"""
-Configuración para trabajar OFFLINE
-"""
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "aquinus",
-        "USER": "ezangara",
-        "PASSWORD": "Armada2024@",
-        "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
-        "PORT": "3306",  # El puerto de tu servidor MySQL},
-    },
-    "id8": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "aspi",
-        "USER": "ezangara",
-        "PASSWORD": "Armada2024@",
-        "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
-        "PORT": "3306",  # El puerto de tu servidor MySQL},
-    },
-}
 
 
 # Password validation
@@ -166,17 +123,18 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
 # URL para acceder a archivos estáticos
 STATIC_URL = '/static/'
 
 # Directorio donde se recolectan los archivos estáticos para producción
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'aquinus' / 'staticfiles'  # Este directorio será usado solo por collectstatic
 
-# Directorios adicionales donde Django buscará archivos estáticos
+# Directorios adicionales donde Django buscará archivos estáticos durante el desarrollo
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Aquí puedes colocar archivos estáticos globales para tu proyecto
+    BASE_DIR / 'aquinus' / 'static', # Directorio donde tienes tus archivos estáticos para desarrollo
 ]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'aquinus' / 'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

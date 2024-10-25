@@ -1,0 +1,38 @@
+# ./config/nginx/default.conf.template
+
+server {
+    listen       80;
+    server_name  www.aquinus.com aquinus.com;
+    error_log    /var/log/nginx/error.log;
+    access_log   /var/log/nginx/access.log;
+
+    client_max_body_size 100M;  # Aumentado para permitir subidas de archivos grandes
+
+    # Serve static files
+    location /static/ {
+        alias /code/aquinus/staticfiles/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    # Serve media files if you have them
+    location /media/ {
+        alias /code/aquinus/media/;
+    }
+
+    location / {
+        include      /etc/nginx/uwsgi_params;
+        uwsgi_pass unix:/code/aquinus/uwsgi_app.sock;  # Usando el socket Unix
+
+        # Configuración adicional para uWSGI
+        uwsgi_param Host $host;
+        uwsgi_param X-Real-IP $remote_addr;
+        uwsgi_param X-Forwarded-For $proxy_add_x_forwarded_for;
+        uwsgi_param X-Forwarded-Proto $http_x_forwarded_proto;
+
+        # Timeouts
+        uwsgi_read_timeout 300;
+        uwsgi_connect_timeout 300;
+        uwsgi_send_timeout 300;
+    }
+}

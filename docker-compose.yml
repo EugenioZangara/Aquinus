@@ -1,0 +1,71 @@
+
+
+services:
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             ./wait-for-it.sh db:3306 --
+             uwsgi --ini /code/config/uwsgi/uwsgi.ini"
+
+    restart: always
+    volumes:
+      - .:/code
+      - static_volume:/code/aquinus/staticfiles
+      - media_volume:/code/aquinus/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=aquinus.settings.prod
+      - DB_NAME_AQUINUS=${DB_NAME_AQUINUS}
+      - DB_USER_AQUINUS=${DB_USER_AQUINUS}
+      - DB_PASSWORD_AQUINUS=${DB_PASSWORD_AQUINUS}
+      - DB_HOST_AQUINUS=${DB_HOST_AQUINUS}
+      - DB_PORT_AQUINUS=3306  # Puerto interno
+      - DB_NAME_ID8=${DB_NAME_ID8}
+      - DB_USER_ID8=${DB_USER_ID8}
+      - DB_PASSWORD_ID8=${DB_PASSWORD_ID8}
+      - DB_HOST_ID8=${DB_HOST_ID8}
+      - DB_PORT_ID8=3306  # Puerto interno
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USER_AQUINUS}", "--password=${DB_PASSWORD_AQUINUS}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      MYSQL_DATABASE: ${DB_NAME_AQUINUS}
+      MYSQL_USER: ${DB_USER_AQUINUS}
+      MYSQL_PASSWORD: ${DB_PASSWORD_AQUINUS}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  nginx:
+    image: nginx
+    restart: always
+    volumes:
+      - ./config/nginx:/etc/nginx/templates
+      - .:/code
+    
+      - static_volume:/code/aquinus/staticfiles
+      - media_volume:/code/aquinus/media
+   
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+
+
+volumes:
+  db_data:
+  static_volume:
+  media_volume:
