@@ -5,3 +5,4 @@ django-select2==8.2.1
 mysqlclient==2.2.4
 sqlparse==0.5.1
 tzdata==2024.1
+uwsgi

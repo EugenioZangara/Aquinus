@@ -1,12 +1,13 @@
-# ./config/nginx/default.conf.template
+# Define upstream for uWSGI
+upstream uwsgi_app {
+    server unix:/code/aquinus/uwsgi_app.sock;
+}
 
 server {
     listen       80;
     server_name  www.aquinus.com aquinus.com;
-    error_log    /var/log/nginx/error.log;
-    access_log   /var/log/nginx/access.log;
-
-    client_max_body_size 100M;  # Aumentado para permitir subidas de archivos grandes
+    error_log    stderr warn;
+    access_log   /dev/stdout main;
 
     # Serve static files
     location /static/ {
@@ -15,22 +16,25 @@ server {
         add_header Cache-Control "public, no-transform";
     }
 
-    # Serve media files if you have them
+    # Serve media files
     location /media/ {
         alias /code/aquinus/media/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
     }
 
+    # Main application route
     location / {
         include      /etc/nginx/uwsgi_params;
-        uwsgi_pass unix:/code/aquinus/uwsgi_app.sock;  # Usando el socket Unix
+        uwsgi_pass   uwsgi_app;
 
-        # Configuración adicional para uWSGI
+        # Recommended uWSGI parameters
         uwsgi_param Host $host;
         uwsgi_param X-Real-IP $remote_addr;
         uwsgi_param X-Forwarded-For $proxy_add_x_forwarded_for;
         uwsgi_param X-Forwarded-Proto $http_x_forwarded_proto;
 
-        # Timeouts
+        # Timeout settings for long requests
         uwsgi_read_timeout 300;
         uwsgi_connect_timeout 300;
         uwsgi_send_timeout 300;

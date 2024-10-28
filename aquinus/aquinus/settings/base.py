@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = 'django-insecure-_2+-4k8af_(^&hwzql+07zwjvy1jwn47jn6=%87)#op*@-1cyc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -124,17 +124,26 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # URL para acceder a archivos estáticos
-STATIC_URL = '/static/'
 
-# Directorio donde se recolectan los archivos estáticos para producción
-STATIC_ROOT = BASE_DIR / 'aquinus' / 'staticfiles'  # Este directorio será usado solo por collectstatic
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
-# Directorios adicionales donde Django buscará archivos estáticos durante el desarrollo
-STATICFILES_DIRS = [
-    BASE_DIR / 'aquinus' / 'static', # Directorio donde tienes tus archivos estáticos para desarrollo
-]
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'aquinus' / 'media'
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+'''CONFIGURACIÓN ORIGINAL MIA - MODIFICADA PARA DESPLIEGUE'''
+# STATIC_URL = '/static/'
+
+# # Directorio donde se recolectan los archivos estáticos para producción
+# STATIC_ROOT = BASE_DIR / 'aquinus' / 'staticfiles'  # Este directorio será usado solo por collectstatic
+
+# # Directorios adicionales donde Django buscará archivos estáticos durante el desarrollo
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'aquinus' / 'static', # Directorio donde tienes tus archivos estáticos para desarrollo
+# ]
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'aquinus' / 'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
