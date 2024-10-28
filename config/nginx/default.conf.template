@@ -3,9 +3,20 @@ upstream uwsgi_app {
     server unix:/code/aquinus/uwsgi_app.sock;
 }
 
+
+server{
+    listen 80;
+     server_name  www.aquinus.com aquinus.com;
+    return 301 https://$host$request_uri;
+}
+
+
 server {
-    listen       80;
-    server_name  www.aquinus.com aquinus.com;
+  
+    listen               443 ssl;
+    ssl_certificate      /code/aquinus/ssl/aquinus.cert;
+    ssl_certificate_key  /code/aquinus/ssl/aquinus.key;
+   
     error_log    stderr warn;
     access_log   /dev/stdout main;
 

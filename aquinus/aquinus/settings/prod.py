@@ -54,3 +54,9 @@ DATABASES = {
         "PORT": os.getenv('DB_PORT_ID8', '3306'),
     },
 }
+
+
+# Security
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True

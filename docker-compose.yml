@@ -18,5 +18,7 @@
     volumes:
       - ./config/nginx:/etc/nginx/templates
       - .:/code
+      
     ports:
       - "80:80"
+      - "443:443"
