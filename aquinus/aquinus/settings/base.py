@@ -169,3 +169,7 @@ SELECT2_CSS = [
     'assets/select2/bootstrap5-theme/select2-bootstrap-5-theme.min.css'
     
 ]
+# aquinus/settings/base.py
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Usa Redis o el broker que prefieras
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'

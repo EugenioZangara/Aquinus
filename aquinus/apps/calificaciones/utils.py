@@ -62,5 +62,8 @@ def convertirPeriodos(periodo):
         return 'Final Segundo Trimestre'
     elif periodo == 'FT_3':
         return 'Final Tercer Trimestre'
+    elif periodo=="FA":
+        return "Final Anual"
     else:
+        print("periodo", periodo)
         return "Periodo no encontrado"

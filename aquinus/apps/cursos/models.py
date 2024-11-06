@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.urls import reverse
 from django.db.models import Q
-from django.contrib.auth.models import User  # Importa el modelo User
+#from django.contrib.auth.models import User  # Importa el modelo User
 
 from apps.alumnos.models import persona
 from apps.usuarios.models import Perfil
@@ -280,25 +280,38 @@ REGIMEN_MATERIAS_CHOICES=[
 ]    
 
 CALIFICACIONES_CHOICES=[
-    ('BIMESTRAL','Bimestral'), #Calificación promedio de las calificaciones ordinarias del bimestre
-    ('TRIMESTRAL','Trimestral'), # Calificación promedio de las calificaciones ordinarias del trimestre
+    ('BIMESTRAL_1','Primer Bimestre'), #Calificación promedio de las calificaciones ordinarias del bimestre
+    ('BIMESTRAL_2','Segundo Bimestre'), #Calificación promedio de las calificaciones ordinarias del bimestre
+    ('TRIMESTRAL_1','Primer Trimestre'), # Calificación promedio de las calificaciones ordinarias del trimestre
+    ('TRIMESTRAL_2','Segundo Trimestre'), # Calificación promedio de las calificaciones ordinarias del trimestre
+    ('TRIMESTRAL_3','Tercer Trimestre'), # Calificación promedio de las calificaciones ordinarias del trimestre
     ('PROMEDIO CURSADA','Promedio Cursada'), #n Calificación promedio de las notas de los periodos intermedios (trimestre/bimestre)
     ('EXAMEN FINAL','Examen Final'), # Nota de examen final de la materia, las materias promocionables pueden no tenerlo
     ('FINAL','Final'), # Nota final de la materia (promedio de examen fina y promedio de cursada o promedio de cursada en caso de promocionables)
     ('COMPLEMENTARIO', 'Complementario'), # Calificación correspondiente a un examen complementario, debe acompañar el campo numero_complementario
     ('ORDINARIA','Ordinaria') #Calificación volcada por el profesor durante la cursada en función de las evaluaciones que haga
 ]    
-class Calificaciones(models.Model):  
-    asignatura=models.ForeignKey(Asignatura,on_delete=models.DO_NOTHING,  related_name='calificacion_materia')
-    cursante=models.ForeignKey(Cursante, on_delete=models.DO_NOTHING, related_name='nota_cursante')
-    valor=models.DecimalField(decimal_places=2, max_digits=4)
-    tipo=models.CharField(max_length=50, choices=CALIFICACIONES_CHOICES)
-    numero_complementario=models.IntegerField(blank=True, null=True)
-    fecha_examen=models.DateField()
-    fecha=models.DateTimeField( auto_now_add=True)
+
+
+class Calificaciones(models.Model):
+    asignatura = models.ForeignKey(Asignatura, on_delete=models.DO_NOTHING, related_name='calificacion_materia')
+    cursante = models.ForeignKey(Cursante, on_delete=models.DO_NOTHING, related_name='nota_cursante')
+    valor = models.DecimalField(decimal_places=2, max_digits=4)
+    tipo = models.CharField(max_length=50, choices=CALIFICACIONES_CHOICES)
+    numero_complementario = models.IntegerField(blank=True, null=True)
+    fecha_examen = models.DateField()
+    fecha = models.DateTimeField(auto_now_add=True)
     calificador = models.ForeignKey(Perfil, on_delete=models.SET_NULL, null=True, blank=True)
 
-
+    def validate_unique_calification(self):
+        if self.tipo != 'ORDINARIA':
+            if Calificaciones.objects.filter(
+                asignatura=self.asignatura,
+                cursante=self.cursante,
+                tipo=self.tipo
+            ).exclude(pk=self.pk).exists():
+                raise ValidationError(f"Solo puede existir una calificación de tipo {self.tipo} para este cursante y asignatura.")
+            
 class FechasExamenes(models.Model):    
     anio_lectivo=models.IntegerField(validators=[validate_four_digits],  # Aplica la validación personalizada
         )

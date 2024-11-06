@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from apps.cursos.models import Asignatura, Cursante, Calificaciones, FechasExamenes
 from django.db.models import Count, Avg
 import statistics
+from django.core.exceptions import ValidationError
 
 from django.forms import  modelformset_factory
 from django.contrib import messages
@@ -14,6 +15,7 @@ from apps.calificaciones.decorators import verificar_periodo_curso
 from .utils import periodoMateria
 from apps.alumnos.models import persona
 from .forms import CalificacionesForm
+from .tasks import calcular_promedios_periodo
 # Create your views here.
 
 class HomeCalificaciones(TemplateView):
@@ -21,6 +23,7 @@ class HomeCalificaciones(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        calcular_promedios_periodo()
         perfil_usuario=self.request.user.perfil
         asignaturas=Asignatura.objects.filter(profesor=perfil_usuario).all().order_by('materia')
         asignaturas_con_alumnos={}
@@ -212,6 +215,7 @@ class CalificarView(TemplateView):
 
         formset, alumnos = self.get_formset()
         forms_and_alumnos = zip(formset, alumnos)
+        context['alerta_periodo_finalizado'] = getattr(self.request, 'alerta_periodo_finalizado', False)
         context["periodoCalificacion"] = periodoCalificacion
         context['fechasPeriodoCalificacion'] =getFechasPeriodoCursada(periodoCalificacion,asignatura.materia.tipo, asignatura.materia.anio)
         context["asignatura"] = asignatura
@@ -231,31 +235,43 @@ class CalificarView(TemplateView):
             asignatura.materia.tipo, 
             asignatura.materia.anio
         )
+        
         CalificacionFormSet = modelformset_factory(Calificaciones, form=CalificacionesForm, extra=len(self.get_alumnos(asignatura)))
         queryset = Calificaciones.objects.none()
         formset = CalificacionFormSet(request.POST, queryset=queryset, form_kwargs={'fechas_periodo': fechasPeriodoCalificacion})
         alumnos = self.get_alumnos(asignatura)
-        #formset, alumnos = self.get_formset(request.POST)
+        
         perfil_usuario=self.request.user.perfil
         if perfil_usuario.puede_calificar==False:
             messages.error(request, f'No tiene permisos para calificar.')
             return redirect(self.success_url)
         else:
+            
             if formset.is_valid():
+                print("Formulario válido")
+                tipo="FINAL" if request.alerta_periodo_finalizado else "ORDINARIA"
                 instances = formset.save(commit=False)
-
+                print("llega a llamar el save")
                 for instance, alumno in zip(instances, alumnos):
                     if instance.valor is not None:
+                        print(f"Asignando asignatura {asignatura} al cursante {alumno.dni}")
                         cursante=Cursante.objects.get(dni=alumno.dni)
                         instance.cursante = cursante
                         instance.asignatura = asignatura
                         instance.valor = instance.valor
-                        instance.tipo="ORDINARIA"
+                        instance.tipo=tipo
                         instance.calificador=self.request.user.perfil
-                        instance.save()
-                messages.success(request, f'Calificación para cargadas correctamente.')
+                        # Ejecuta la validación antes de guardar
+                        try:
+                            instance.validate_unique_calification()
+                            instance.save()
+                            messages.success(request, f'Calificaciones para cargadas correctamente para el alumnos {cursante}.')
+                        except ValidationError as e:
+                            messages.error(request, f'Error al guardar la calificación del alumno {cursante}: {e}')
+                        
                 return redirect(self.success_url)
             else:
+                print(fechasPeriodoCalificacion, "FECHAS PERIODO CALIFICACION")
                 print("Errores en el formset:", formset.errors)
                 for form in formset:
                     print("Error en el form individual:", form.errors)

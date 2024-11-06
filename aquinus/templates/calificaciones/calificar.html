@@ -23,7 +23,8 @@
           <form method="post">
             {% csrf_token %}
             {{ formset.management_form }}
-
+            <input type="hidden" name="id" value="{{ asignatura.id }}">
+{{alerta_periodo_finalizado}}
             <div class="mb-2 d-flex align-items-end justify-content-between">
               <div class="col-5">
                 <h5 class="card-title">Materia: {{ asignatura.materia.nombre }} - ({{ asignatura.materia.abreviatura }})</h5>
@@ -134,4 +135,44 @@
       }
     })
   </script>
+
+
+
+  {% if alerta_periodo_finalizado %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Mostrar modal de alerta al cargar la página
+        $('#modalAlerta').modal('show');
+    });
+</script>
+
+<!-- Modal de alerta -->
+<div class="modal fade" id="modalAlerta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Alerta de periodo finalizado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        La materia que quiere calificar está en período de mesas de exámenes finales. <br> 
+        Las calificaciones a ingresar son <strong>Calificaciones Finales</strong>. ¿Deseas continuar de todas formas?
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'calificaciones:home' %}" class="btn btn-secondary">Cancelar</a>
+        <button type="button" class="btn btn-primary" id="continuar">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.getElementById('continuar').addEventListener('click', function () {
+      $('#modalAlerta').modal('hide');
+        // Aquí puedes agregar la lógica para continuar
+        // Por ejemplo, hacer una llamada AJAX o redirigir a otra página
+    });
+</script>
+{% endif %}
+
 {% endblock %}
