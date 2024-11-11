@@ -225,17 +225,14 @@ class CalificarView(TemplateView):
 
         return context
     
-    def post(self, request, *args, **kwargs):
-        
-        
+    def post(self, request, *args, **kwargs):    
         asignatura = self.get_asignatura()
           # Obtener las fechas del periodo de calificación para la asignatura
         fechasPeriodoCalificacion = getFechasPeriodoCursada(
             periodoMateria(asignatura), 
             asignatura.materia.tipo, 
             asignatura.materia.anio
-        )
-        
+        )       
         CalificacionFormSet = modelformset_factory(Calificaciones, form=CalificacionesForm, extra=len(self.get_alumnos(asignatura)))
         queryset = Calificaciones.objects.none()
         formset = CalificacionFormSet(request.POST, queryset=queryset, form_kwargs={'fechas_periodo': fechasPeriodoCalificacion})
@@ -308,7 +305,7 @@ def obtenerCalificacionesAnual(asignatura, alumno):
     # Calcular el promedio de la cursada
     promedio_cursada = round(statistics.mean([promedio_1T , promedio_2T , promedio_3T]),2)
     try:
-        calificacion_examen_final=calificaciones.get(fecha_examen__gte=tercer_trimestre.fechaTopeCalificacion, fecha_examen__lte=fechas_examen_final.fechaTopeCalificacion)
+        calificacion_examen_final=calificaciones.get(tipo="FINAL")
         calificacion_final=round(statistics.mean([calificacion_examen_final.valor,promedio_cursada]),2)
     except Calificaciones.DoesNotExist:
         calificacion_final="N/A"
@@ -353,7 +350,7 @@ def obtenerCalificacionesCuatrimestral(asignatura, alumno):
     promedio_cursada = round(statistics.mean([promedio_1B , promedio_2B ]))
     
     try:
-        calificacion_examen_final=calificaciones.get(fecha_examen__gte=segundo_bimestre.fechaTopeCalificacion, fecha_examen__lte=fechas_examen_final.fechaTopeCalificacion)
+        calificacion_examen_final=calificaciones.get(tipo="FINAL")
         calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_cursada])
     except Calificaciones.DoesNotExist:
         calificacion_final="N/A"
@@ -397,7 +394,7 @@ def obtenerCalificacionesSemestral(asignatura, alumno):
      # Calcular el promedio de la cursada
     promedio_cursada = round(statistics.mean([promedio_1T , promedio_2T ]))
     try:
-        calificacion_examen_final=calificaciones.get(fecha_examen__gte=segundo_trimestre.fechaTopeCalificacion, fecha_examen__lte=fechas_examen_final.fechaTopeCalificacion)
+        calificacion_examen_final=calificaciones.get(tipo="FINAL")
         calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_cursada])
     except Calificaciones.DoesNotExist:
         calificacion_final="N/A"
@@ -423,7 +420,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
             promedio_T = round(calificaciones_T.aggregate(promedio=Avg('valor'))['promedio'] or 0, 2)
             try:
                 
-                calificacion_examen_final=calificaciones.get(fecha_examen__gte=primer_trimestre.fechaTopeCalificacion, fecha_examen__lte=fechas_examen_final.fechaTopeCalificacion)
+                calificacion_examen_final=calificaciones.get(tipo="FINAL")
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
@@ -435,7 +432,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
             promedio_T = round(calificaciones_T.aggregate(promedio=Avg('valor'))['promedio'] or 0, 2)
             try:
                 
-                calificacion_examen_final=calificaciones.get(fecha_examen__gte=segundo_trimestre.fechaTopeCalificacion, fecha_examen__lte=fechas_examen_final.fechaTopeCalificacion)
+                calificacion_examen_final=calificaciones.get(tipo="FINAL")
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
@@ -448,7 +445,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
             promedio_T = round(calificaciones_T.aggregate(promedio=Avg('valor'))['promedio'] or 0, 2)
             try:
                 
-                calificacion_examen_final=calificaciones.get(fecha_examen__gte=tercer_trimestre.fechaTopeCalificacion, fecha_examen__lte=fechas_examen_final.fechaTopeCalificacion)
+                calificacion_examen_final=calificaciones.get(tipo="FINAL")
                 calificacion_final=statistics.mean([calificacion_examen_final.valor,promedio_T])
             except Calificaciones.DoesNotExist:
                 calificacion_final="N/A"
