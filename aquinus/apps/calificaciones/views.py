@@ -571,9 +571,7 @@ class BoletinView(TemplateView):
         context['materias_con_calificaciones_anuales']=materias_con_calificaciones_anuales
         context['materias_con_calificaciones_cuatrimestrales']=materias_con_calificaciones_cuatrimestrales
         context['materias_con_calificaciones_trimestrales']=materias_con_calificaciones_trimestrales
-        print(materias_con_calificaciones_trimestrales)
-        context['materias_con_calificaciones_semestrales']=materias_con_calificaciones_semestrales
-            
+        context['materias_con_calificaciones_semestrales']=materias_con_calificaciones_semestrales       
         context['materias_con_calificaciones']=materias_con_calificaciones_anuales
         context['alumno']=alumno
         context['asignaturas_anuales']=asignaturas_anuales

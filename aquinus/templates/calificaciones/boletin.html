@@ -32,7 +32,7 @@
                   <h5 class="m-0 fw-semibold">{{ alumno.apellidos }}, {{ alumno.nombres }}</h5>
                 </div>
                 <div class="col-12 col-md-auto">
-                  <a href="{% url 'cursos:generar_boletin_pdf' %}" class="btn btn-warning">Imprimir Boletín</a>
+                  <a href="{% url 'cursos:generar_boletin_pdf' alumno.pk %}" class="btn btn-warning">Imprimir Boletín</a>
                 </div>
               </div>
             </div>
