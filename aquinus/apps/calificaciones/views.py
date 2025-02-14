@@ -245,13 +245,12 @@ class CalificarView(TemplateView):
         else:
             
             if formset.is_valid():
-                print("Formulario válido")
+             
                 tipo="FINAL" if request.alerta_periodo_finalizado else "ORDINARIA"
                 instances = formset.save(commit=False)
-                print("llega a llamar el save")
+             
                 for instance, alumno in zip(instances, alumnos):
                     if instance.valor is not None:
-                        print(f"Asignando asignatura {asignatura} al cursante {alumno.dni}")
                         cursante=Cursante.objects.get(dni=alumno.dni)
                         instance.cursante = cursante
                         instance.asignatura = asignatura
@@ -268,7 +267,7 @@ class CalificarView(TemplateView):
                         
                 return redirect(self.success_url)
             else:
-                print(fechasPeriodoCalificacion, "FECHAS PERIODO CALIFICACION")
+               
                 print("Errores en el formset:", formset.errors)
                 for form in formset:
                     print("Error en el form individual:", form.errors)
@@ -361,7 +360,7 @@ def obtenerCalificacionesCuatrimestral(asignatura, alumno):
             
 def obtenerCalificacionesSemestral(asignatura, alumno):
     calificaciones = Calificaciones.objects.filter(asignatura=asignatura, cursante__dni=alumno.dni)
-    print(asignatura.materia.tipo, asignatura.materia.anio)
+ 
     #OBTENEMOS FECHAS PARA CADA SUBPERIODO DE LAS MATERIAS ANUALES
     try:
         # Asumimos que la fecha de los finales semestrales, se corresponden con la del trimestre correspondiente
@@ -415,8 +414,7 @@ def obtenerCalificacionesTrimestral(asignatura, alumno):
              
             fechas_examen_final=FechasExamenes.objects.get( regimen_materia=asignatura.materia.tipo, subPeriodo="FT_1", aplica_para=asignatura.materia.anio)
             calificaciones_T=calificaciones.filter(fecha_examen__gte=primer_trimestre.fechaInicioCalificacion, fecha_examen__lte=primer_trimestre.fechaTopeCalificacion)
-            for c in calificaciones_T:
-                print (c.valor) 
+            
             promedio_T = round(calificaciones_T.aggregate(promedio=Avg('valor'))['promedio'] or 0, 2)
             try:
                 

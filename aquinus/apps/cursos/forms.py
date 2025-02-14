@@ -57,19 +57,7 @@ class PlanEstudioForm(forms.ModelForm):
         }
         
 class CursoCreateForm(forms.ModelForm):
-    # anio = forms.ChoiceField(
-    #     choices=[
-    #         ("1", 'Primer Año'),
-    #         ("2", 'Segundo Año'),
-    #         ("3", 'Tercer Año')
-    #     ],
-    #     widget=forms.Select(attrs={'class': 'form-control anio',
-    #                                'hx-get': "/alumnos/alumnosPorEspecialidad",  # Ruta donde envías la solicitud
-    #             'hx-trigger': "change",
-    #             'hx-target': "#listadoAspirantes",  # ID del contenedor que HTMX actualizará
-    #             'hx-include':"[name='plan_de_estudio']", }),
-    #     label='Año del curso:'
-    # )
+   
 
     class Meta:
         model = Curso

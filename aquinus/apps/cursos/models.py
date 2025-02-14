@@ -253,10 +253,7 @@ class Cursante(models.Model):
     def __str__(self):
         return str(self.dni)
 
-# class Profesor (models.Model):
-#     usuario=models.ForeignKey(Perfil, on_delete=models.CASCADE)
-    #curso=models.ManyToManyField(Curso, related_name='profesor_curso')
-    #materias=models.ManyToManyField(Materia, related_name='profesor_materia')
+
 
 class Asignatura(models.Model):
     materia = models.ForeignKey(Materia, on_delete=models.CASCADE)
@@ -268,6 +265,8 @@ class Asignatura(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
+    def __str__(self) -> str:
+        return self.materia.nombre
         
         
         
@@ -311,7 +310,10 @@ class Calificaciones(models.Model):
                 tipo=self.tipo
             ).exclude(pk=self.pk).exists():
                 raise ValidationError(f"Solo puede existir una calificación de tipo {self.tipo} para este cursante y asignatura.")
-            
+    def clean(self):
+        # Llamamos a la validación personalizada
+        self.validate_unique_calification()
+                
 class FechasExamenes(models.Model):    
     anio_lectivo=models.IntegerField(validators=[validate_four_digits],  # Aplica la validación personalizada
         )

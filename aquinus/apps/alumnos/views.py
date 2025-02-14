@@ -11,17 +11,20 @@ def get_alumnos_por_especialidad(request):
     anio=request.GET.get('anio') or None
     buscar = request.GET.get('search', '').strip()  # Recupera el valor del input
     template='parciales/alumnos/alumnosXorientacionXespecialidadXorientacion.html'
+    
     if not plan_de_estudio:
         return HttpResponseBadRequest("Falta el parámetro 'plan_de_estudio'.")
 
     try:
         plan_estudio = PlanEstudio.objects.get(id=plan_de_estudio)
-        especialidad = convertirEspecialidad(plan_estudio.especialidad)
-        orientacion = convertirOrientaciones(plan_estudio.orientacion)      
+        especialidad = convertirEspecialidad(plan_estudio.especialidad) or ''
+        orientacion = convertirOrientaciones(plan_estudio.orientacion) or ''  
+        print(especialidad, orientacion, "ESPECIALIDAD Y ORIENTACIÓN PARA LA QUERY")    
         alumnos_con_curso_asignado=Cursante.objects.filter(activo=True).values_list('dni', flat=True)
         if anio=="0":
             
             if buscar:
+                print("BUSCA ESTA ESPECIALIDAD, ORIENTACION:  ", especialidad, orientacion  )
                 # Filtrar por especialidad, grado y orientación, además de los campos de búsqueda
                 alumnos = persona.objects.using('id8').filter(
                     especialidad=especialidad,
@@ -49,7 +52,7 @@ def get_alumnos_por_especialidad(request):
                 ).order_by('apellidos')
              
         else:
-           
+            print("BUSCA ESTA ESPECIALIDAD, ORIENTACION:  ", especialidad, orientacion  )
             alumnos = persona.objects.using('id8').filter(especialidad=especialidad, orientacion=orientacion, grado=anio,  estado=1).order_by('apellidos').exclude(dni__in=list(alumnos_con_curso_asignado))
  
            

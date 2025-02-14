@@ -1,11 +1,13 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, PageBreak
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm, inch
 import os
+from datetime import datetime
+
 from django.db.models import Avg
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -15,7 +17,7 @@ from django.conf import settings
 from apps.cursos.models import Asignatura, Calificaciones, Cursante
 from .conversorPalacios import convertirEspecialidad, convertirOrientaciones, convertirGrado
 from apps.alumnos.models import persona
-from apps.calificaciones.views import obtenerCalificacionesAnual, obtenerCalificacionesTrimestral,obtenerCalificacionesSemestral
+from apps.calificaciones.views import obtenerCalificacionesAnual, obtenerCalificacionesTrimestral,obtenerCalificacionesSemestral,obtenerCalificacionesCuatrimestral
 from .rotated_text import verticalText
 
 # Registro de cada estilo de la fuente
@@ -49,27 +51,34 @@ def generate_header(canvas, doc):
     # Dibujar imagen centrada (ajustar el tamaño si es necesario)
     image_width = 60
     image_height = 60
+    canvas.setFillColor(colors.lightblue, alpha=0.3)  # Fondo azul claro
+    canvas.setStrokeColor(colors.lightblue)  # Sin borde, usa el mismo color del fondo
+
+    # Dibujar el rectángulo de fondo
+    canvas.rect(20, page_height - image_height - 15, 
+        page_width - 40, image_height + 5, 
+        fill=1)  # fill=1 para rellenar el fondo
+    canvas.setFillColor(colors.blue)
     canvas.drawImage(image_path, ( image_width) / 2, page_height - image_height - 15, width=image_width, height=image_height, mask="auto")
     
     # Dibujar título centrado
     canvas.setFont("Lato", 18)
+    
     canvas.drawCentredString(page_width/3.5, page_height -50, "Escuela de Suboficiales de la Armada")
     
     # Dibujar texto centrado
     canvas.setFont("Lato", 12)
     canvas.drawCentredString(page_width / 3.5, page_height - 65, "Boletín de Calificaciones")
     
+    
     # Añadir línea horizontal debajo del encabezado
     canvas.setStrokeColor(colors.blue)
     canvas.setLineWidth(1)
-    canvas.line(30, page_height - image_height - 15, page_width - 30, page_height - image_height - 15)  # Línea horizontal
-    
-    # Añadir línea horizontal sobre el encabezado
-   
-    canvas.line(30, page_height -10, page_width - 30, page_height -10)  # Línea horizontal
+    canvas.line(20, page_height - image_height - 15, page_width - 20, page_height - image_height - 15)  # Línea horizontal
+    canvas.line(20, page_height -10, page_width - 20, page_height -10)  # Línea horizontal
     canvas.line(page_width/2,page_height-10,page_width/2, page_height - image_height - 15)  # Línea vertical
-    canvas.line(30,page_height-10,30, page_height - image_height - 15)  # Línea vertical
-    canvas.line(page_width - 30,page_height-10,page_width - 30, page_height - image_height - 15)  # Línea vertical
+    canvas.line(20,page_height-10,20, page_height - image_height - 15)  # Línea vertical
+    canvas.line(page_width - 20,page_height-10,page_width - 20, page_height - image_height - 15)  # Línea vertical
     
     canvas.setFont("Lato", 10)
     canvas.drawString(page_width / 2+10, page_height - 25, "Apellido y Nombre:")
@@ -87,20 +96,37 @@ def generate_header(canvas, doc):
     # Restaurar el estado del canvas
     canvas.restoreState()
 
+
 def generate_footer(canvas, doc):
-    # Define el estilo y el contenido del pie de página
+    """
+    Función para generar el pie de página.
+    """
+    # Fecha y hora actual
+    current_datetime = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+    # Define el texto del pie de página
     footer_text = f"Página {doc.page}"
     page_width, page_height = doc.pagesize
+
+    # Dibujar la línea horizontal del pie de página
     canvas.setStrokeColor(colors.blue)
     canvas.setLineWidth(1)
     canvas.line(30, 40, page_width - 30, 40)  # Línea horizontal
-    # Configura la fuente y tamaño para el pie de página
+
+    # Configuración de fuente y color para el pie de página
     canvas.setFont("Lato", 10)
-    
-    # Dibuja el pie de página centrado en la parte inferior
-    canvas.drawCentredString(page_width / 2, 15, footer_text)  # Posición Y de 15 puntos desde el borde 
-    canvas.setFillColor(colors.grey, alpha=0.3)
-    canvas.drawString(page_width-130, 20, "Aquinus by P.P. - 2024 ")
+
+    # Fecha y hora en el margen izquierdo
+    canvas.setFillColor(colors.black)
+    canvas.drawString(30, 20, f"Generado el: {current_datetime}")
+
+    # Texto centrado para la numeración de páginas
+    canvas.drawCentredString(page_width / 2, 15, footer_text)
+
+    # Marca en el margen derecho
+    canvas.setFillColor(colors.grey)
+    canvas.drawString(page_width - 130, 20, "Aquinus by P.P. - 2024")
+
 
 
 def generate_header_footer(canvas, doc):
@@ -180,36 +206,40 @@ def generar_boletin_pdf(request, pk):
     #     ['', 'Álgebra aplicada', 5, 8, 4, 7, 7, 7],
     #     [vertic
     data,cant_anuales,cant_trimestrales,cant_semestrales=obtener_calificaciones_tipo_trimestrales(alumno)
-    print(cant_anuales, cant_semestrales, cant_trimestrales, ">---------------cantindades") 
-  
-    data_bimestrales = [
-        ['', 'Materia', '1er. Bim.', '2do. Bim.', '3er. Bim.', '4to. Bim.','Nota Cursada', 'Ex. Final', 'Nota Final'],
-        [verticalText("CUATRIM."), 'Botánica', 5, 8, '','', 5, 7, 7],
-        ['', 'Física', 5, 8, '','', 5, 7, 7],
+   
+    data_bimestrales=obtener_calificaciones_tipo_bimestrales(alumno)
+    print("DATA BIMESTRALES EN EL GENERAR BOELTIN", data_bimestrales)
+    # data_bimestrales = [
+    #     ['', 'Materia', '1er. Bim.', '2do. Bim.', '3er. Bim.', '4to. Bim.','Nota Cursada', 'Ex. Final', 'Nota Final'],
+    #     [verticalText("CUATRIM."), 'Botánica', 5, 8, '','', 5, 7, 7],
+    #     ['', 'Física', 5, 8, '','', 5, 7, 7],
       
         
         
-    ]
+    # ]
     num_columns = len(data[0])  # Basado en la primera fila
     num_columns_bimestrales = len(data_bimestrales[0])
 # Crear una lista dinámica de anchos
     col_widths = [20] + [None] * (num_columns - 1)  # Primera columna fija, las demás automáticas
     col_widths_bimestrales = [20] + [None] * (num_columns_bimestrales - 1)
     # Detectar los rangos dinámicamente
-    rangos = {}
+    # rangos = {}
    
-    current_section = None
+    # current_section = None
 
-    for idx, row in enumerate(data):
-        # Si la primera columna tiene texto, inicia una nueva sección
-        if row[0] and row[0] != '':
-            current_section = row[0]
-            rangos[current_section] = [idx, idx]  # Inicia el rango con la fila actual
-        elif current_section:
-            # Si estamos en una sección, expandir el rango
-            rangos[current_section][1] = idx
+    # for idx, row in enumerate(data):
+    #     # Si la primera columna tiene texto, inicia una nueva sección
+    #     if row[0] and row[0] != '':
+    #         current_section = row[0]
+    #         rangos[current_section] = [idx, idx]  # Inicia el rango con la fila actual
+    #     elif current_section:
+    #         # Si estamos en una sección, expandir el rango
+    #         rangos[current_section][1] = idx
+            
+            
     rangos_bimestrales = {}
     current_section = None
+    
     for idx, row in enumerate(data_bimestrales):
         # Si la primera columna tiene texto, inicia una nueva sección
         if row[0] and row[0] != '':
@@ -274,6 +304,7 @@ def generar_boletin_pdf(request, pk):
     # Agregar la tabla al documento
     elements.append(Spacer(1, 12))
     elements.append(table)
+    elements.append(PageBreak())
     elements.append(Spacer(1, 12))
     elements.append(tabla_bimestrales)
     # Generar el PDF
@@ -290,7 +321,9 @@ def obtener_calificaciones_tipo_trimestrales(alumno):
     asignaturas_anuales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="ANUAL")   
     asignaturas_semestrales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="SEMESTRAL")
     asignaturas_trimestrales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="TRIMESTRAL") 
-    
+    cantidad_anuales=len(asignaturas_anuales)
+    cantidad_semestrales=len(asignaturas_semestrales)
+    cantidad_trimestrales=len(asignaturas_trimestrales)
     for asignatura in asignaturas_anuales:
             materias_con_calificaciones_anuales[asignatura]=obtenerCalificacionesAnual(asignatura, alumno)
     
@@ -369,7 +402,7 @@ def obtener_calificaciones_tipo_trimestrales(alumno):
             data_materia_semestrales=["",asignatura.materia.nombre, "", "", "", "", "",""]
         #data_materia_semestrales.insert(0,"")
         for k,v in calificaciones.items():
-            print ("k: ",k, "valor: ",v)
+         
             if v==0:
                 valor=""
             else:
@@ -391,7 +424,53 @@ def obtener_calificaciones_tipo_trimestrales(alumno):
         
     # for asignatura,calificaciones in materias_con_calificaciones_trimestrales.items():
     #     print("ASIGNATURA ",asignatura, " CALIFICACIONES", calificaciones) 
-    return data_anuales,15,3,1
+    return data_anuales,cantidad_anuales,cantidad_trimestrales,cantidad_semestrales
     
     
+def obtener_calificaciones_tipo_bimestrales(alumno):
+    cursante=Cursante.objects.get(dni=alumno.dni)
+    materias_con_calificaciones_cuatrimestrales = {}
+    materias_con_calificaciones_bimestrales={}
+
+    asignaturas_bimestrales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="BIMESTRAL")   
+    asignaturas_cuatrimestrales=Asignatura.objects.filter(curso=cursante.curso, materia__tipo="CUATRIMESTRAL")
     
+    
+    for asignatura in asignaturas_cuatrimestrales:
+            materias_con_calificaciones_cuatrimestrales[asignatura]=obtenerCalificacionesCuatrimestral(asignatura, alumno)
+    
+     
+    #Encabezado de la tabla    
+    data_tabla_bimestral=[ ['', 'Materia', '1er. Bim.', '2do. Bim.', '3er. Bim.', '4to. Bim.','Nota Cursada', 'Ex. Final', 'Nota Final'],]
+    
+    for indice,(asignaturas, calificaciones) in enumerate(materias_con_calificaciones_cuatrimestrales.items()):
+        if indice==0:
+            
+            data_cuatrimestrales=[verticalText("Cuatrim."),asignaturas.materia.nombre, "", "", "", "", "","",""]
+        else:
+            data_cuatrimestrales=["",asignaturas.materia.nombre, "", "", "", "", "","",""]
+        #data_materia_semestrales.insert(0,"")
+        for k,v in calificaciones.items():
+         
+            if v==0:
+                valor=""
+            else:
+                valor=v
+            if k=="promedio_1B":
+                data_cuatrimestrales[2]=valor
+                    
+            elif k=="promedio_2B":
+                 data_cuatrimestrales[3]=valor
+            elif k=="promedio_3B":
+                 data_cuatrimestrales[4]=valor
+            elif k=="promedio_4B":
+                 data_cuatrimestrales[5]=valor
+            elif k=="promedio_cursada":
+                data_cuatrimestrales[6]=valor
+            elif k=="examen_final":
+                data_cuatrimestrales[7]=valor
+            elif k=="calificacion_final":
+                data_cuatrimestrales[8]=valor
+        data_tabla_bimestral.append(data_cuatrimestrales)
+
+    return data_tabla_bimestral

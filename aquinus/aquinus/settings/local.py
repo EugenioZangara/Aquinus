@@ -1,7 +1,7 @@
 from .base import *
 
 DEBUG = True
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 """
 Configuración para trabajar en ESSA con servidor en linea
 
@@ -60,6 +60,13 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Aquí puedes colocar archivos estáticos globales para tu proyecto
 ]
 
-# Configuración para pruebas de Celery en modo "eager"
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_TASK_EAGER_PROPAGATES = True  # Esto permitirá que veas cualquier excepción lanzada
+# # Configuración para pruebas de Celery en modo "eager"
+# CELERY_TASK_ALWAYS_EAGER = True
+# CELERY_TASK_EAGER_PROPAGATES = True  # Esto permitirá que veas cualquier excepción lanzada
+# Configuración de Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # O tu broker preferido
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'  # O tu zona horaria

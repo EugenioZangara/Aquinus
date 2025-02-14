@@ -23,3 +23,4 @@ class CursanteAdmin(admin.ModelAdmin):
 class CalificacionesAdmin(admin.ModelAdmin):
     list_display=['asignatura', 'cursante', 'valor', 'tipo']
     raw_id_fields=['asignatura', 'cursante']
+    search_fields = ['asignatura__nombre'] 

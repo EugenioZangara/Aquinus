@@ -23,7 +23,8 @@ combinaciones_permitidas = {
     'OP': ['GN', 'SO'],
     'AG': ['CC', 'CD', 'CM', 'PE'],
     'IPDSV': ['CD', 'CM'],
-    'MA': ['(ITD)', 'MA']
+    'MA': ['(ITD)', 'MA'],
+    'EN':[' - ']
 }
 def get_orientaciones(request):
     especialidad= request.GET.get('especialidad')

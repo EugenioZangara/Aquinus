@@ -1,4 +1,4 @@
-from celery import shared_task
+from celery import shared_task, Celery
 from django.db.models import Avg
 from django.db.models.functions import Round
 from django.contrib import messages
@@ -6,7 +6,21 @@ from django.core.exceptions import ValidationError
 
 from django.db import transaction
 from django.utils import timezone
-from apps.cursos.models import  Cursante, FechasExamenes, Calificaciones, Asignatura
+#from apps.cursos.models import Cursante, FechasExamenes, Calificaciones, Asignatura
+from ..cursos.models import Cursante, FechasExamenes, Calificaciones, Asignatura
+
+
+app = Celery('tasks', broker='pyamqp://guest@localhost//')
+
+@app.task
+def add(x, y):
+    return x + y
+
+
+
+
+
+
 
 equivalencia_periodos={
     "T1":1,

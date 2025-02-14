@@ -115,7 +115,7 @@ class PerfilForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Tomar el usuario logueado
         super(PerfilForm, self).__init__(*args, **kwargs)
-        print(user.perfil.roles.all() , "rol del usuario", user.perfil.id)
+        # print(user.perfil.roles.all() , "rol del usuario", user.perfil.id)
         # Filtrar opciones de rol basado en el rol del usuario logueado
         if user:
             user_roles = user.perfil.roles.all()

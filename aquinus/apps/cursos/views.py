@@ -642,12 +642,13 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                         messages.error(request, "Es necesario fijar previamente el fin del 1° Trimestre, para definir el 2° Trimestre")
                     
                 if data['T3'] :
+                    print(data['T3'], "ESTE ES EL DATA T3")
                     if data['T2']:
-                        anual_T1, an_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T3',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
+                        anual_T3, an_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="ANUAL", subPeriodo='T3',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                         'fechaTopeCalificacion':data['T3']})
-                        anual_T1.fechaInicioCalificacion=data['T2']
-                        anual_T1.fechaTopeCalificacion=data['T3']  
-                        anual_T1.save()  
+                        anual_T3.fechaInicioCalificacion=data['T2']
+                        anual_T3.fechaTopeCalificacion=data['T3']  
+                        anual_T3.save()  
                         
                         semestre_T3, sem_t3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia="SEMESTRAL", subPeriodo='T3',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                         'fechaTopeCalificacion':data['T3']})
@@ -673,6 +674,8 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                     if data['T1']:
                         final_1trimestral, ft1_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_1',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T1'],
                         'fechaTopeCalificacion':data['FT_1']})
+                        final_1trimestral.fechaInicioCalificacion=data['T1']
+                        final_1trimestral.fechaTopeCalificacion=data['FT_1']
                         final_1trimestral.save()
                         if ft1_created:
                             creado.append("Final Primer Trimestre")
@@ -684,6 +687,8 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                     if data['T2']:
                         final_2trimestral, ft2_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_2',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                         'fechaTopeCalificacion':data['FT_2']})
+                        final_2trimestral.fechaInicioCalificacion=data['T2']    
+                        final_2trimestral.fechaTopeCalificacion=data['FT_2']    
                         final_2trimestral.save()
                         if ft2_created:
                             creado.append("Final Segundo Trimestre")
@@ -696,6 +701,9 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                     if data['T3']:
                         final_3trimestral, ft3_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='TRIMESTRAL', subPeriodo='FT_3',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T3'],
                         'fechaTopeCalificacion':data['FT_3']})
+                        final_3trimestral.fechaInicioCalificacion=data['T3']
+                        final_3trimestral.fechaTopeCalificacion=data['FT_3']
+                        
                         if ft3_created:
                             creado.append("Final Tercer Trimestre")
                         else:
@@ -711,6 +719,9 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                     if data['T2']:
                         final_semestre_A, fs_a_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='SEMESTRAL', subPeriodo='FS_A',aplica_para=aplica_para, defaults={'fechaInicioCalificacion':data['T2'],
                         'fechaTopeCalificacion':data['FS_A']})
+                        final_semestre_A.fechaInicioCalificacion=data['T2']
+                        final_semestre_A.fechaTopeCalificacion=data['FT_2'] 
+                       
                         if fs_a_created:
                             creado.append("Final Primer Semestre")
                         else:
@@ -723,6 +734,8 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                     if data['T3']:
                         final_semestre_B, fs_b_created=FechasExamenes.objects.get_or_create(anio_lectivo=anio_lectivo, regimen_materia='SEMESTRAL', subPeriodo='FS_B', aplica_para=aplica_para,defaults={'fechaInicioCalificacion':data['T2'],
                         'fechaTopeCalificacion':data['FS_B']})
+                        final_semestre_B.fechaInicioCalificacion=data['T3']
+                        final_semestre_B.fechaTopeCalificacion=data['FA']
                         if fs_b_created:
                             creado.append("Final Segundo Semestre")
                         else:
@@ -737,6 +750,7 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                         'fechaTopeCalificacion':data['FA']})
                         final_anual.fechaInicioCalificacion=data['T3']
                         final_anual.fechaTopeCalificacion=data['FA']
+                        
                         if fa_created:
                             creado.append("Final Anual")
                         else:
@@ -753,6 +767,7 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                     'fechaTopeCalificacion':data['B1_A']})
                     bimestre1_A.fechaInicioCalificacion=fecha_inicio_ciclo_lectivo
                     bimestre1_A.fechaTopeCalificacion=data['B1_A']  
+                    
                     if b1_a_created:
                             creado.append("Primer Bimestre - Primer Cuatrimestre")
                     else:
@@ -766,6 +781,7 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                         'fechaTopeCalificacion':data['B2_A']})
                         bimestre2_A.fechaInicioCalificacion=data['B1_A']
                         bimestre2_A.fechaTopeCalificacion=data['B2_A'] 
+                  
                         if b2_a_created:
                                 creado.append("Segundo Bimestre - Primer Cuatrimestre")
                         else:
@@ -781,6 +797,7 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                         'fechaTopeCalificacion':data['B1_B']})
                         bimestre1_B.fechaInicioCalificacion=data['B2_A']
                         bimestre1_B.fechaTopeCalificacion=data['B1_B']  
+                       
                         if b1_b_created:
                                 creado.append("Primer Bimestre - Segundo Cuatrimestre")
                         else:
@@ -797,6 +814,7 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                         'fechaTopeCalificacion':data['B2_B']})
                         bimestre1_B.fechaInicioCalificacion=data['B1_B']
                         bimestre1_B.fechaTopeCalificacion=data['B2_B'] 
+                       
                         if b2_b_created:
                                 creado.append("Segundo Bimestre - Segundo Cuatrimestre")
                         else:
@@ -815,13 +833,13 @@ class DefinirFechas(MultipleRolesRequiredMixin,TemplateView):
                         'fechaTopeCalificacion':data['FC_A']})
                         final_cuatrimestre_A.fechaInicioCalificacion=data['B2_A']
                         final_cuatrimestre_A.fechaTopeCalificacion=data['FC_A']
+                        
                         if fc_a_created:
                             creado.append("Final Primer Cuatrimestre")
                         else:
                             actualizado.append("Final Primer Cuatrimestre") 
                         final_cuatrimestre_A.save()
                     else:
-                        print("falta el fin del segundo bimestre")
                         messages.error(request, "Es necesario fijar previamente el fin del Segundo Bimestre, para definir el período de finales del Primer Cuatrimestre")
                         
                         
