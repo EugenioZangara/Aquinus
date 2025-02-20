@@ -6,7 +6,7 @@ ADMINS = [
 ('Eugenio Z', 'eugeniozangara_armada@outlook.com'),
 ]
 
-ALLOWED_HOSTS = ['www.aquinus.com', 'aquinus.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['www.aquinus.com', 'aquinus.com', 'localhost', '127.0.0.1', '192.16.3.252']
 # DATABASES = {
 #  'default': {
 #     }
