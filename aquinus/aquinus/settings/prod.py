@@ -8,32 +8,71 @@ ALLOWED_HOSTS = ['www.aquinus.com', 'aquinus.com', 'localhost', '127.0.0.1', '19
 Configuración para trabajar en ESSA con servidor en linea
 
 """
-env = environ.Env()
-# Lee el archivo .env
-env_path = env.str('ENV_PATH', '.env')
-print(f"Leyendo variables de entorno desde: {env_path}")  # Debug
-environ.Env.read_env(env.str('ENV_PATH', '.env'))
-
-SECRET_KEY = env('DJANGO_SECRET_KEY')
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('DEFAULT_DB_NAME'),
-        'USER': env('DEFAULT_DB_USER'),
-        'PASSWORD': env('DEFAULT_DB_PASSWORD'),
-        'HOST': env('DEFAULT_DB_HOST'),
-        'PORT': env('DEFAULT_DB_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "aquinus",
+        "USER": "ezangara",
+        "PASSWORD": "Armada2024@",
+        "HOST": "192.16.0.252",  # O la dirección IP de tu servidor MySQL
+        "PORT": "3306",  # El puerto de tu servidor MySQL},
     },
-    'db2': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('ID8_DB_NAME'),
-        'USER': env('ID8_DB_USER'),
-        'PASSWORD': env('ID8_DB_PASSWORD'),
-        'HOST': env('ID8_DB_HOST'),
-        'PORT': env('ID8_DB_PORT'),
+    "id8": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "aspi",
+        "USER": "ezangara",
+        "PASSWORD": "Armada2024@",
+        "HOST": "192.16.0.252",  # O la dirección IP de tu servidor MySQL
+        "PORT": "3306",  # El puerto de tu servidor MySQL},
     },
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": os.getenv('DEFAULT_DB_NAME'),
+#         "USER": os.getenv('DEFAULT_DB_USER'),
+#         "PASSWORD": os.getenv('DEFAULT_DB_PASSWORD'),
+#         "HOST": os.getenv('DEFAULT_DB_HOST'),
+#         "PORT": os.getenv('DEFAULT_DB_PORT'),
+#     },
+#     "id8": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": os.getenv('ID8_DB_NAME'),
+#         "USER": os.getenv('ID8_DB_USER'),
+#         "PASSWORD": os.getenv('ID8_DB_PASSWORD'),
+#         "HOST": os.getenv('ID8_DB_HOST'),
+#         "PORT": os.getenv('ID8_DB_PORT'),
+#     },
+# }
+
+
+# env = environ.Env()
+# # Lee el archivo .env
+# env_path = env.str('ENV_PATH', '.env')
+# print(f"Leyendo variables de entorno desde: {env_path}")  # Debug
+# environ.Env.read_env(env.str('ENV_PATH', '.env'))
+
+# SECRET_KEY = env('DJANGO_SECRET_KEY')
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': env('DEFAULT_DB_NAME'),
+#         'USER': env('DEFAULT_DB_USER'),
+#         'PASSWORD': env('DEFAULT_DB_PASSWORD'),
+#         'HOST': env('DEFAULT_DB_HOST'),
+#         'PORT': env('DEFAULT_DB_PORT'),
+#     },
+#     'db2': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': env('ID8_DB_NAME'),
+#         'USER': env('ID8_DB_USER'),
+#         'PASSWORD': env('ID8_DB_PASSWORD'),
+#         'HOST': env('ID8_DB_HOST'),
+#         'PORT': env('ID8_DB_PORT'),
+#     },
+# }
 
  
 

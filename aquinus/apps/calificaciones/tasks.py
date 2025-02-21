@@ -3,6 +3,7 @@ from django.db.models import Avg
 from django.db.models.functions import Round
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from datetime import datetime
 
 from django.db import transaction
 from django.utils import timezone
@@ -12,9 +13,10 @@ from ..cursos.models import Cursante, FechasExamenes, Calificaciones, Asignatura
 
 app = Celery('tasks', broker='pyamqp://guest@localhost//')
 
-@app.task
-def add(x, y):
-    return x + y
+@shared_task
+def calcular_promedios():
+    print(f"Calculando promedios en {datetime.now()}")
+    # Aquí iría la lógica para calcular los promedios
 
 
 

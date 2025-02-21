@@ -1,6 +1,4 @@
 from .base import *
-import environ
-from pathlib import Path
 
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -8,33 +6,6 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 Configuración para trabajar en ESSA con servidor en linea
 
 """
-env = environ.Env()
-# Lee el archivo .env
-env_path = env.str('ENV_PATH', '.env')
-print(f"Leyendo variables de entorno desde: {env_path}")  # Debug
-environ.Env.read_env(env.str('ENV_PATH', '.env'))
-
-SECRET_KEY = env('DJANGO_SECRET_KEY')
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('LOCAL_DEFAULT_DB_NAME'),
-        'USER': env('LOCAL_DEFAULT_DB_USER'),
-        'PASSWORD': env('LOCAL_DEFAULT_DB_PASSWORD'),
-        'HOST': env('LOCAL_DEFAULT_DB_HOST'),
-        'PORT': env('LOCAL_DEFAULT_DB_PORT'),
-    },
-    'db2': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('LOCAL_ID8_DB_NAME'),
-        'USER': env('LOCAL_ID8_DB_USER'),
-        'PASSWORD': env('LOCAL_ID8_DB_PASSWORD'),
-        'HOST': env('LOCAL_ID8_DB_HOST'),
-        'PORT': env('LOCAL_ID8_DB_PORT'),
-    },
-}
-
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.mysql",
@@ -56,24 +27,24 @@ DATABASES = {
 """
 Configuración para trabajar OFFLINE
 """
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "aquinus",
-#         "USER": "ezangara",
-#         "PASSWORD": "Armada2024@",
-#         "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
-#         "PORT": "3306",  # El puerto de tu servidor MySQL},
-#     },
-#     "id8": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "aspi",
-#         "USER": "ezangara",
-#         "PASSWORD": "Armada2024@",
-#         "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
-#         "PORT": "3306",  # El puerto de tu servidor MySQL},
-#     },
-# }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "aquinus",
+        "USER": "ezangara",
+        "PASSWORD": "Armada2024@",
+        "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
+        "PORT": "3306",  # El puerto de tu servidor MySQL},
+    },
+    "id8": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "aspi",
+        "USER": "ezangara",
+        "PASSWORD": "Armada2024@",
+        "HOST": "localhost",  # O la dirección IP de tu servidor MySQL
+        "PORT": "3306",  # El puerto de tu servidor MySQL},
+    },
+}
 
 
 # Static files (CSS, JavaScript, Images)
